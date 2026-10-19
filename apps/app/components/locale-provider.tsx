@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useOptimistic } from "react";
+import { createContext, useContext, useState } from "react";
 import type { Locale } from "@/lib/i18n/locale";
 import type { Messages } from "@/lib/i18n/messages";
 
@@ -12,38 +12,38 @@ type LocaleContextType = {
 
 const LocaleContext = createContext<LocaleContextType | null>(null);
 
+function readLocaleCookie(): Locale {
+	if (typeof document === "undefined") return "en";
+	const match = document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);
+	return match?.[1] === "ar" ? "ar" : "en";
+}
+
+function applyHtmlDirection(locale: Locale) {
+	document.documentElement.lang = locale;
+	document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+}
+
 export function LocaleProvider({
-	locale: initialLocale,
 	messages,
 	children,
 }: {
-	locale: Locale;
-	messages: Messages;
+	messages: { en: Messages; ar: Messages };
 	children: React.ReactNode;
 }) {
-	const [locale, setLocaleOptimistic] = useOptimistic<Locale, Locale>(
-		initialLocale,
-		(_, next) => next,
-	);
+	const [locale, setLocaleState] = useState<Locale>(readLocaleCookie);
+
+	const value: LocaleContextType = {
+		locale,
+		messages: messages[locale],
+		setLocale: (next) => {
+			document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+			applyHtmlDirection(next);
+			setLocaleState(next);
+		},
+	};
 
 	return (
-		<LocaleContext.Provider
-			value={{
-				locale,
-				messages,
-				setLocale: async (next) => {
-					await fetch("/api/locale", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ locale: next }),
-					});
-					setLocaleOptimistic(next);
-					window.location.reload();
-				},
-			}}
-		>
-			{children}
-		</LocaleContext.Provider>
+		<LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
 	);
 }
 

@@ -4,13 +4,13 @@ import { TooltipProvider } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
-import { cookies } from "next/headers";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
 import { LocaleProvider } from "@/components/locale-provider";
 import { ThemeProvider } from "@/components/theme-provider";
-import { getMessages } from "@/lib/i18n/messages";
 import { TRPCReactProvider } from "@/lib/trpc/client";
+import arMessages from "@/messages/ar.json";
+import enMessages from "@/messages/en.json";
 
 const fontSans = Geist({
 	variable: "--font-geist-sans",
@@ -44,38 +44,32 @@ export const metadata: Metadata = {
 	manifest: "/site.webmanifest",
 };
 
-async function getLocale() {
-	const c = await cookies();
-	const lang = c.get("NEXT_LOCALE")?.value;
-	return lang === "ar" ? "ar" : "en";
-}
+const LOCALE_BOOT_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);if(m&&m[1]==='ar'){document.documentElement.lang='ar';document.documentElement.dir='rtl';}}catch(e){}`;
 
-export default async function RootLayout({
+export default function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const locale = await getLocale();
-	const isAr = locale === "ar";
-	const messages = await getMessages(locale);
 	return (
 		<html
-			lang={locale}
-			dir={isAr ? "rtl" : "ltr"}
+			lang="en"
+			dir="ltr"
 			suppressHydrationWarning
 			className={cn(
 				fontSans.variable,
 				fontMono.variable,
 				fontArabic.variable,
 				"h-full antialiased",
-				isAr && "font-arabic",
 			)}
 		>
 			<body className="flex min-h-full flex-col font-sans">
+				{/* biome-ignore lint/security/noDangerouslySetInnerHtml: static constant, no user input */}
+				<script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
 				<NuqsAdapter>
 					<TRPCReactProvider>
 						<ThemeProvider>
-							<LocaleProvider locale={locale} messages={messages}>
+							<LocaleProvider messages={{ en: enMessages, ar: arMessages }}>
 								<TooltipProvider>{children}</TooltipProvider>
 								<Toaster richColors />
 							</LocaleProvider>
