@@ -1,0 +1,42 @@
+{
+	"appName": "Comp AI CRM",
+	"auth": {
+		"signInTitle": "تسجيل الدخول",
+		"signInSubtitle": "تابع عبر Microsoft أو Google",
+		"signInWithMicrosoft": "المتابعة عبر Microsoft",
+		"signInWithGoogle": "المتابعة عبر Google",
+		"notAllowed": "حسابك ليس ضمن القائمة المسموح بها.",
+		"signOut": "تسجيل الخروج"
+	},
+	"nav": {
+		"dashboard": "لوحة التحكم",
+		"contacts": "جهات الاتصال",
+		"companies": "الشركات",
+		"deals": "الصفقات",
+		"activities": "الأنشطة",
+		"settings": "الإعدادات",
+		"agents": "الوكلاء"
+	},
+	"common": {
+		"search": "بحث",
+		"create": "إنشاء",
+		"save": "حفظ",
+		"cancel": "إلغاء",
+		"delete": "حذف",
+		"edit": "تعديل",
+		"close": "إغلاق",
+		"loading": "جارٍ التحميل...",
+		"noResults": "لا توجد نتائج",
+		"language": "اللغة",
+		"english": "English",
+		"arabic": "العربية"
+	},
+	"settings": {
+		"title": "الإعدادات",
+		"general": "عام",
+		"appearance": "المظهر",
+		"members": "الأعضاء",
+		"languageLabel": "لغة الواجهة",
+		"languageDescription": "اختر لغة واتجاه النص لواجهة إدارة علاقات العملاء."
+	}
+}

@@ -59,6 +59,7 @@
 	--sidebar-ring: #006b4f;
 	--font-sans: var(--font-geist-sans, "Geist", sans-serif);
 	--font-mono: var(--font-geist-mono, "Geist Mono", monospace);
+	--font-arabic: var(--font-arabic, "Noto Sans Arabic", sans-serif);
 	--radius: 5px;
 	--shadow-x: 0px;
 	--shadow-y: 1px;
@@ -131,6 +132,7 @@
 	--sidebar-ring: #40be96;
 	--font-sans: var(--font-geist-sans, "Geist", sans-serif);
 	--font-mono: var(--font-geist-mono, "Geist Mono", monospace);
+	--font-arabic: var(--font-arabic, "Noto Sans Arabic", sans-serif);
 	--radius: 5px;
 	--shadow-x: 0px;
 	--shadow-y: 1px;
@@ -219,6 +221,7 @@
 
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
+	--font-arabic: var(--font-arabic);
 	--radius-sm: 4px;
 	--radius-md: var(--radius);
 	--radius-lg: 8px;
@@ -244,6 +247,10 @@
 	}
 	body {
 		@apply bg-background text-foreground font-sans;
+	}
+
+	html[dir="rtl"] body {
+		font-family: var(--font-arabic), var(--font-sans);
 	}
 
 	* {
@@ -282,6 +289,18 @@
 		box-shadow:
 			0 0 4px var(--bloom-color, currentColor),
 			0 0 10px var(--bloom-color, currentColor);
+	}
+
+	/* RTL helpers: flip physical utilities that the current codebase still uses */
+	html[dir="rtl"] .text-left {
+		text-align: right;
+	}
+	html[dir="rtl"] .text-right {
+		text-align: left;
+	}
+	html[dir="rtl"] [class*="rotate-180"],
+	html[dir="rtl"] [class*="rtl:rotate-180"] {
+		transform: rotate(180deg);
 	}
 }
 

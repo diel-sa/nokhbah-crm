@@ -24,8 +24,8 @@ export type SimpleTableColumn = {
 };
 
 const ALIGN_CLASS = {
-	left: "",
-	right: "text-right",
+	left: "text-start",
+	right: "text-end",
 	center: "text-center",
 } as const;
 

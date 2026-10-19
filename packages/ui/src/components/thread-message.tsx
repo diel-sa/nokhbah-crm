@@ -28,8 +28,8 @@ function ThreadMessage({
 			data-slot="thread-message"
 			data-direction={direction}
 			className={cn(
-				"flex gap-2.5 border-l-2 py-2 pl-3",
-				outbound ? "border-l-foreground/30" : "border-l-border",
+				"flex gap-2.5 border-s-2 py-2 ps-3",
+				outbound ? "border-s-foreground/30" : "border-s-border",
 				className,
 			)}
 			{...props}
@@ -48,7 +48,7 @@ function ThreadMessage({
 					<span className="truncate text-muted-foreground text-xs">
 						{fromEmail}
 					</span>
-					<span className="ml-auto text-muted-foreground text-xs">
+					<span className="ms-auto text-muted-foreground text-xs">
 						{sentAt}
 					</span>
 				</div>

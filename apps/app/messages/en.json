@@ -1,0 +1,42 @@
+{
+	"appName": "Comp AI CRM",
+	"auth": {
+		"signInTitle": "Sign in",
+		"signInSubtitle": "Continue with Microsoft or Google",
+		"signInWithMicrosoft": "Continue with Microsoft",
+		"signInWithGoogle": "Continue with Google",
+		"notAllowed": "Your account is not on the allowed list.",
+		"signOut": "Sign out"
+	},
+	"nav": {
+		"dashboard": "Dashboard",
+		"contacts": "Contacts",
+		"companies": "Companies",
+		"deals": "Deals",
+		"activities": "Activities",
+		"settings": "Settings",
+		"agents": "Agents"
+	},
+	"common": {
+		"search": "Search",
+		"create": "Create",
+		"save": "Save",
+		"cancel": "Cancel",
+		"delete": "Delete",
+		"edit": "Edit",
+		"close": "Close",
+		"loading": "Loading...",
+		"noResults": "No results",
+		"language": "Language",
+		"english": "English",
+		"arabic": "Arabic"
+	},
+	"settings": {
+		"title": "Settings",
+		"general": "General",
+		"appearance": "Appearance",
+		"members": "Members",
+		"languageLabel": "Interface language",
+		"languageDescription": "Choose the language and text direction for the CRM interface."
+	}
+}

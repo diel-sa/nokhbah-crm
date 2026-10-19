@@ -3,11 +3,14 @@ import { Toaster } from "@crm/ui/components/sonner";
 import { TooltipProvider } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
+import { cookies } from "next/headers";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { LocaleProvider } from "@/components/locale-provider";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TRPCReactProvider } from "@/lib/trpc/client";
+import { getMessages } from "@/lib/i18n/messages";
 
 const fontSans = Geist({
 	variable: "--font-geist-sans",
@@ -17,6 +20,12 @@ const fontSans = Geist({
 const fontMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+const fontArabic = Noto_Sans_Arabic({
+	variable: "--font-arabic",
+	subsets: ["arabic"],
+	weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -35,23 +44,41 @@ export const metadata: Metadata = {
 	manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+async function getLocale() {
+	const c = await cookies();
+	const lang = c.get("NEXT_LOCALE")?.value;
+	return lang === "ar" ? "ar" : "en";
+}
+
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const locale = await getLocale();
+	const isAr = locale === "ar";
+	const messages = await getMessages(locale);
 	return (
 		<html
-			lang="en"
+			lang={locale}
+			dir={isAr ? "rtl" : "ltr"}
 			suppressHydrationWarning
-			className={cn(fontSans.variable, fontMono.variable, "h-full antialiased")}
+			className={cn(
+				fontSans.variable,
+				fontMono.variable,
+				fontArabic.variable,
+				"h-full antialiased",
+				isAr && "font-arabic",
+			)}
 		>
 			<body className="flex min-h-full flex-col font-sans">
 				<NuqsAdapter>
 					<TRPCReactProvider>
 						<ThemeProvider>
-							<TooltipProvider>{children}</TooltipProvider>
-							<Toaster richColors />
+							<LocaleProvider locale={locale} messages={messages}>
+								<TooltipProvider>{children}</TooltipProvider>
+								<Toaster richColors />
+							</LocaleProvider>
 						</ThemeProvider>
 					</TRPCReactProvider>
 				</NuqsAdapter>
