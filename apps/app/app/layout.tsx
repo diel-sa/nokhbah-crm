@@ -30,8 +30,8 @@ const fontArabic = Noto_Sans_Arabic({
 
 export const metadata: Metadata = {
 	title: {
-		default: "Comp AI - CRM",
-		template: "%s · Comp AI CRM",
+		default: "NOKHBAH - CRM",
+		template: "%s · NOKHBAH CRM",
 	},
 	description: "Customer Relationship Management for Comp AI",
 	icons: {
