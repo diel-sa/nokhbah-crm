@@ -1,9 +1,9 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
-	"crons": [
-		{
-			"path": "/internal/sync/mailboxes",
-			"schedule": "0 5 * * *"
+	"functions": {
+		"api/[[...path]].cjs": {
+			"maxDuration": 60,
+			"includeFiles": "dist/api-handler.js"
 		}
-	]
+	}
 }
