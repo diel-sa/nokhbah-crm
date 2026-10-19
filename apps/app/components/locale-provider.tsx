@@ -61,5 +61,5 @@ export function t(messages: Messages, path: string): string {
 		if (value == null) return path;
 		value = value[key];
 	}
-	return typeof value === "string" ? value : path;
+	return String(value ?? path);
 }
