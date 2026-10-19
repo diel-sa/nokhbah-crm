@@ -10,7 +10,11 @@ import { brief, drainAll, taskAuth } from "../lib/dispatch";
 import { reconcileStaleTasks } from "../lib/stale-tasks";
 
 export default defineSchedule({
-	cron: "* * * * *",
+	// NOTE: Vercel Hobby only permits cron jobs that run at most once per day.
+	// The upstream value is "* * * * *" (every minute). For real-time agent
+	// dispatch, upgrade to Vercel Pro (restore the every-minute value) or host
+	// the agent on a VPS. See DEPLOY.md.
+	cron: "0 5 * * *",
 	async run({ receive, waitUntil, appAuth }) {
 		waitUntil(
 			Promise.all([
