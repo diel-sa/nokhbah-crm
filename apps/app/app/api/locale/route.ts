@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { setLocale, type Locale } from "@/lib/i18n/locale";
+import { type Locale, setLocale } from "@/lib/i18n/locale";
 
 export async function POST(request: Request) {
 	const { locale } = (await request.json()) as { locale: Locale };

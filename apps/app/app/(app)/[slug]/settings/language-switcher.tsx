@@ -1,7 +1,5 @@
 "use client";
 
-import { Check, Globe } from "lucide-react";
-import { useLocale, t } from "@/components/locale-provider";
 import { Button } from "@crm/ui/components/button";
 import {
 	Card,
@@ -10,6 +8,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@crm/ui/components/card";
+import { Check, Globe } from "lucide-react";
+import { t, useLocale } from "@/components/locale-provider";
 
 export function LanguageSwitcher() {
 	const { locale, messages, setLocale } = useLocale();
@@ -20,7 +20,9 @@ export function LanguageSwitcher() {
 					<Globe className="h-4 w-4" />
 					{t(messages, "settings.languageLabel")}
 				</CardTitle>
-				<CardDescription>{t(messages, "settings.languageDescription")}</CardDescription>
+				<CardDescription>
+					{t(messages, "settings.languageDescription")}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<div className="flex gap-2">

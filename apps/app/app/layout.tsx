@@ -6,11 +6,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { cookies } from "next/headers";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { LocaleProvider } from "@/components/locale-provider";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
+import { LocaleProvider } from "@/components/locale-provider";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TRPCReactProvider } from "@/lib/trpc/client";
 import { getMessages } from "@/lib/i18n/messages";
+import { TRPCReactProvider } from "@/lib/trpc/client";
 
 const fontSans = Geist({
 	variable: "--font-geist-sans",
