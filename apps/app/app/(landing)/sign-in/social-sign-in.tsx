@@ -9,21 +9,23 @@ import { Spinner } from "@crm/ui/components/spinner";
 import type { FC, SVGProps } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 
 type ProviderChoice = {
-	label: string;
+	labelKey: string;
 	Logo: FC<SVGProps<SVGSVGElement>>;
 };
 
 const PROVIDERS = {
-	google: { label: "Continue with Google", Logo: GoogleLogo },
-	microsoft: { label: "Continue with Microsoft", Logo: MicrosoftLogo },
+	google: { labelKey: "auth.signInWithGoogle", Logo: GoogleLogo },
+	microsoft: { labelKey: "auth.signInWithMicrosoft", Logo: MicrosoftLogo },
 } as const satisfies Record<MailboxProviderId, ProviderChoice>;
 
 export function SocialSignIn({ provider }: { provider: MailboxProviderId }) {
 	const [pending, setPending] = useState(false);
+	const { messages } = useLocale();
 
-	const { label, Logo } = PROVIDERS[provider];
+	const { labelKey, Logo } = PROVIDERS[provider];
 
 	function fail(message?: string) {
 		setPending(false);
@@ -59,7 +61,7 @@ export function SocialSignIn({ provider }: { provider: MailboxProviderId }) {
 			) : (
 				<Logo data-icon="inline-start" className="size-4" />
 			)}
-			{label}
+			{t(messages, labelKey)}
 		</Button>
 	);
 }

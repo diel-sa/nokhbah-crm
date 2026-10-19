@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { EnrichmentQueue } from "@/components/enrichment-queue";
 import { useMobileNav } from "@/components/mobile-nav";
 import { signOutAndRedirect } from "@/lib/sign-out";
@@ -104,6 +105,7 @@ export function AppHeaderFallback() {
 
 function UserMenu({ user, onSignOut }: { user: User; onSignOut: () => void }) {
 	const { resolvedTheme, setTheme } = useTheme();
+	const { messages } = useLocale();
 	const isDark = resolvedTheme === "dark";
 
 	return (
@@ -136,12 +138,12 @@ function UserMenu({ user, onSignOut }: { user: User; onSignOut: () => void }) {
 					}}
 				>
 					{isDark ? <Light /> : <Asleep />}
-					{isDark ? "Light mode" : "Dark mode"}
+					{t(messages, isDark ? "common.lightMode" : "common.darkMode")}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={onSignOut}>
 					<Logout />
-					Sign out
+					{t(messages, "auth.signOut")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

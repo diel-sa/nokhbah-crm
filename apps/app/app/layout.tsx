@@ -3,7 +3,7 @@ import { Toaster } from "@crm/ui/components/sonner";
 import { TooltipProvider } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
+import { Geist, Geist_Mono, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
 import { LocaleProvider } from "@/components/locale-provider";
@@ -22,7 +22,7 @@ const fontMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-const fontArabic = Noto_Sans_Arabic({
+const fontArabic = IBM_Plex_Sans_Arabic({
 	variable: "--font-arabic",
 	subsets: ["arabic"],
 	weight: ["400", "500", "600", "700"],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 		default: "NOKHBAH - CRM",
 		template: "%s · NOKHBAH CRM",
 	},
-	description: "Customer Relationship Management for Comp AI",
+	description: "Customer Relationship Management by NOKHBAH",
 	icons: {
 		icon: [
 			{ url: "/favicon.svg", type: "image/svg+xml" },

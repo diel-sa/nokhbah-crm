@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import { AuthShader } from "@/components/auth-shader";
 
 function NokhbahLogo({ className }: { className: string }) {
@@ -13,6 +16,7 @@ function NokhbahLogo({ className }: { className: string }) {
 }
 
 export function AuthShell({ children }: { children: ReactNode }) {
+	const { messages } = useLocale();
 	return (
 		<main className="dark grid min-h-svh bg-background text-foreground lg:grid-cols-[minmax(0,1fr)_minmax(420px,520px)]">
 			<section className="relative hidden min-h-svh overflow-hidden bg-muted p-8 lg:flex lg:flex-col lg:justify-between xl:p-12">
@@ -30,7 +34,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
 							CRM
 						</p>
 						<h1 className="max-w-[14ch] text-5xl/14 font-semibold text-balance">
-							Every customer, one place.
+							{t(messages, "landing.headline")}
 						</h1>
 					</div>
 				</div>
@@ -79,5 +83,15 @@ export function AuthHeading({
 				</p>
 			</div>
 		</div>
+	);
+}
+
+export function LocalizedWelcomeHeading() {
+	const { messages } = useLocale();
+	return (
+		<AuthHeading
+			title={t(messages, "auth.welcomeBack")}
+			description={t(messages, "auth.welcomeBackDescription")}
+		/>
 	);
 }

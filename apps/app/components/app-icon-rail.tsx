@@ -26,12 +26,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { AgentBuilderSidebar } from "@/components/agent-builder/agent-builder-sidebar";
+import { t, useLocale } from "@/components/locale-provider";
 import { usePrefetchSection } from "@/components/crm/section-prefetch";
 import { useMobileNav } from "@/components/mobile-nav";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type RailItem = {
-	title: string;
+	titleKey: string;
 	href: string;
 	icon: CarbonIcon;
 	iconClassName?: string;
@@ -40,24 +41,24 @@ type RailItem = {
 };
 
 const ITEMS: RailItem[] = [
-	{ title: "Overview", href: "/", icon: Dashboard, match: "exact" },
+	{ titleKey: "nav.overview", href: "/", icon: Dashboard, match: "exact" },
 	{
-		title: "Chat",
+		titleKey: "nav.chat",
 		href: "/chat",
 		icon: Bot,
 		iconClassName: "size-5",
 		match: "prefix",
 		related: ["/agents"],
 	},
-	{ title: "Companies", href: "/companies", icon: Building, match: "prefix" },
+	{ titleKey: "nav.companies", href: "/companies", icon: Building, match: "prefix" },
 	{
-		title: "Contacts",
+		titleKey: "nav.contacts",
 		href: "/contacts",
 		icon: UserMultiple,
 		match: "prefix",
 	},
-	{ title: "Deals", href: "/deals", icon: Partnership, match: "prefix" },
-	{ title: "Settings", href: "/settings", icon: Settings, match: "prefix" },
+	{ titleKey: "nav.deals", href: "/deals", icon: Partnership, match: "prefix" },
+	{ titleKey: "nav.settings", href: "/settings", icon: Settings, match: "prefix" },
 ];
 
 function isActive(item: RailItem, pathname: string): boolean {
@@ -77,6 +78,8 @@ function RailLink({
 	active: boolean;
 	onPrefetch: () => void;
 }) {
+	const { messages } = useLocale();
+	const title = t(messages, item.titleKey);
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -99,11 +102,11 @@ function RailLink({
 						transitionTypes={["nav-lateral"]}
 					>
 						<Icon icon={item.icon} className={item.iconClassName} />
-						<span className="sr-only">{item.title}</span>
+						<span className="sr-only">{title}</span>
 					</Link>
 				</Button>
 			</TooltipTrigger>
-			<TooltipContent side="right">{item.title}</TooltipContent>
+			<TooltipContent side="right">{title}</TooltipContent>
 		</Tooltip>
 	);
 }
@@ -119,6 +122,7 @@ function MobileRailLink({
 	onNavigate: () => void;
 	onPrefetch: () => void;
 }) {
+	const { messages } = useLocale();
 	return (
 		<Button
 			asChild
@@ -137,11 +141,11 @@ function MobileRailLink({
 				aria-current={active ? "page" : undefined}
 				onClick={onNavigate}
 				transitionTypes={[
-					item.title === "Chat" ? "nav-forward" : "nav-lateral",
+					item.titleKey === "nav.chat" ? "nav-forward" : "nav-lateral",
 				]}
 			>
 				<Icon icon={item.icon} className={item.iconClassName} />
-				<span>{item.title}</span>
+				<span>{t(messages, item.titleKey)}</span>
 			</Link>
 		</Button>
 	);
@@ -158,6 +162,7 @@ function MobileRailIconLink({
 	onNavigate: () => void;
 	onPrefetch: () => void;
 }) {
+	const { messages } = useLocale();
 	return (
 		<Button
 			asChild
@@ -178,13 +183,14 @@ function MobileRailIconLink({
 				onClick={onNavigate}
 			>
 				<Icon icon={item.icon} className={item.iconClassName} />
-				<span className="sr-only">{item.title}</span>
+				<span className="sr-only">{t(messages, item.titleKey)}</span>
 			</Link>
 		</Button>
 	);
 }
 
 export function AppIconRailFallback() {
+	const { messages } = useLocale();
 	return (
 		<nav
 			aria-label="Primary"
@@ -200,7 +206,7 @@ export function AppIconRailFallback() {
 					className="text-muted-foreground"
 				>
 					<Icon icon={item.icon} className={item.iconClassName} />
-					<span className="sr-only">{item.title}</span>
+					<span className="sr-only">{t(messages, item.titleKey)}</span>
 				</Button>
 			))}
 		</nav>
@@ -224,7 +230,7 @@ export function AppIconRail() {
 		[workspaceUrl],
 	);
 	const inChat = items.some(
-		(item) => item.title === "Chat" && isActive(item, pathname),
+		(item) => item.titleKey === "nav.chat" && isActive(item, pathname),
 	);
 
 	return (

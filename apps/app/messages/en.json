@@ -5,11 +5,19 @@
 		"signInSubtitle": "Continue with Microsoft or Google",
 		"signInWithMicrosoft": "Continue with Microsoft",
 		"signInWithGoogle": "Continue with Google",
+		"signInWith": "Continue with",
 		"notAllowed": "Your account is not on the allowed list.",
-		"signOut": "Sign out"
+		"signOut": "Sign out",
+		"welcomeBack": "Welcome back",
+		"welcomeBackDescription": "Sign in with your account to continue."
+	},
+	"landing": {
+		"headline": "Every customer, one place."
 	},
 	"nav": {
 		"dashboard": "Dashboard",
+		"overview": "Overview",
+		"chat": "Chat",
 		"contacts": "Contacts",
 		"companies": "Companies",
 		"deals": "Deals",
@@ -29,7 +37,9 @@
 		"noResults": "No results",
 		"language": "Language",
 		"english": "English",
-		"arabic": "Arabic"
+		"arabic": "Arabic",
+		"lightMode": "Light mode",
+		"darkMode": "Dark mode"
 	},
 	"settings": {
 		"title": "Settings",

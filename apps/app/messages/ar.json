@@ -5,11 +5,19 @@
 		"signInSubtitle": "تابع عبر Microsoft أو Google",
 		"signInWithMicrosoft": "المتابعة عبر Microsoft",
 		"signInWithGoogle": "المتابعة عبر Google",
+		"signInWith": "المتابعة عبر",
 		"notAllowed": "حسابك ليس ضمن القائمة المسموح بها.",
-		"signOut": "تسجيل الخروج"
+		"signOut": "تسجيل الخروج",
+		"welcomeBack": "مرحبًا بعودتك",
+		"welcomeBackDescription": "سجّل الدخول بحسابك للمتابعة."
+	},
+	"landing": {
+		"headline": "كل عملائك في مكان واحد."
 	},
 	"nav": {
 		"dashboard": "لوحة التحكم",
+		"overview": "نظرة عامة",
+		"chat": "المحادثة",
 		"contacts": "جهات الاتصال",
 		"companies": "الشركات",
 		"deals": "الصفقات",
@@ -29,7 +37,9 @@
 		"noResults": "لا توجد نتائج",
 		"language": "اللغة",
 		"english": "English",
-		"arabic": "العربية"
+		"arabic": "العربية",
+		"lightMode": "الوضع الفاتح",
+		"darkMode": "الوضع الداكن"
 	},
 	"settings": {
 		"title": "الإعدادات",

@@ -5,6 +5,7 @@ import { Button } from "@crm/ui/components/button";
 import { Spinner } from "@crm/ui/components/spinner";
 import { useState } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 
 export type SsoProvider = {
 	providerId: string;
@@ -13,6 +14,7 @@ export type SsoProvider = {
 
 export function SsoSignIn({ providers }: { providers: SsoProvider[] }) {
 	const [pending, setPending] = useState<string | null>(null);
+	const { messages } = useLocale();
 
 	async function handleClick(providerId: string) {
 		setPending(providerId);
@@ -45,7 +47,7 @@ export function SsoSignIn({ providers }: { providers: SsoProvider[] }) {
 					{pending === provider.providerId ? (
 						<Spinner data-icon="inline-start" />
 					) : null}
-					Continue with {provider.name}
+					{t(messages, "auth.signInWith")} {provider.name}
 				</Button>
 			))}
 		</>
