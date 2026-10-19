@@ -8,7 +8,7 @@
 		"./app-router": "./src/generated/server.ts"
 	},
 	"scripts": {
-		"build": "bun build src/main.ts --target=bun --outdir dist --packages=external --sourcemap && bun build serverless/handler.ts --target=node --format=esm --outfile dist/api-handler.mjs --banner:js=\"import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);\" --external class-transformer/storage --external @nestjs/graphql --external @nestjs/microservices --external @nestjs/websockets --external @nestjs/websockets/socket-module --external @nestjs/platform-fastify --external @nestjs/platform-socket.io --external fastify && mkdir -p dist/node_modules && node scripts/materialize-node-modules.mjs express",
+		"build": "NODE_ENV=production bun build src/main.ts --target=bun --outdir dist --packages=external --sourcemap && NODE_ENV=production bun build serverless/handler.ts --target=node --format=esm --outfile dist/api-handler.mjs --banner:js=\"import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);\" --external class-transformer/storage --external @nestjs/graphql --external @nestjs/microservices --external @nestjs/websockets --external @nestjs/websockets/socket-module --external @nestjs/platform-fastify --external @nestjs/platform-socket.io --external fastify && mkdir -p dist/node_modules && node scripts/materialize-node-modules.mjs express",
 		"check-types": "tsc --noEmit",
 		"dev": "concurrently -n api,trpc -c blue,magenta \"bun --watch src/main.ts\" \"bun run dev:trpc\"",
 		"dev:trpc": "nestjs-trpc watch -e src/app.module.ts -r \"**/*.router.ts\" -o src/generated",
