@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellActions,
@@ -10,7 +11,6 @@ import {
 	PageShellLoading,
 	PageShellTitle,
 } from "@/components/page-shell";
-import { LocalizedText } from "@/components/localized-text";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";

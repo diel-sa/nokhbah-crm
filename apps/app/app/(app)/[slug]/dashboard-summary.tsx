@@ -35,8 +35,8 @@ import { DealStageIndicator } from "@/components/crm/deal-stage";
 import { RecordLink } from "@/components/crm/record-sheet/record-link";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { LocalRelativeTime } from "@/components/local-date-time";
-import { activityLabel } from "@/lib/activity-presentation";
 import { t, tf, useLocale } from "@/components/locale-provider";
+import { activityLabel } from "@/lib/activity-presentation";
 import { dealStageColor } from "@/lib/deal-stage";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
@@ -239,7 +239,9 @@ export function DashboardSummary() {
 					</CardHeader>
 					<CardPanel>
 						{overdueTasks.length === 0 ? (
-							<CardPanelEmpty>{t(messages, "overview.nothingOverdue")}</CardPanelEmpty>
+							<CardPanelEmpty>
+								{t(messages, "overview.nothingOverdue")}
+							</CardPanelEmpty>
 						) : (
 							<SimpleTable
 								variant="panel"

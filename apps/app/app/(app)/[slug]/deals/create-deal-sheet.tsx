@@ -34,9 +34,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import { t, tf, useLocale } from "@/components/locale-provider";
 import { CompanyPicker } from "@/components/crm/company-picker";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { dealStageLabel, OPEN_STAGES } from "@/lib/deal-stage";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
@@ -149,7 +149,9 @@ function CreateDealForm({ companyId }: { companyId?: string }) {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={nameId}>{t(messages, "common.name")}</FieldLabel>
+							<FieldLabel htmlFor={nameId}>
+								{t(messages, "common.name")}
+							</FieldLabel>
 							<Input
 								id={nameId}
 								value={name}
@@ -177,7 +179,9 @@ function CreateDealForm({ companyId }: { companyId?: string }) {
 							</FieldLabel>
 							<Select value={resolvedOwner} onValueChange={setOwnerId}>
 								<SelectTrigger id="create-deal-owner">
-									<SelectValue placeholder={t(messages, "newDealForm.chooseOwner")} />
+									<SelectValue
+										placeholder={t(messages, "newDealForm.chooseOwner")}
+									/>
 								</SelectTrigger>
 								<SelectContent>
 									{(users.data ?? []).map((user) => (
@@ -211,7 +215,9 @@ function CreateDealForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={amountId}>{t(messages, "common.amount")}</FieldLabel>
+							<FieldLabel htmlFor={amountId}>
+								{t(messages, "common.amount")}
+							</FieldLabel>
 							<div className="flex gap-2">
 								<Input
 									id={amountId}

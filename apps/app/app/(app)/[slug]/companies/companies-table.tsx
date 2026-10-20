@@ -15,7 +15,6 @@ import {
 import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { t, useLocale } from "@/components/locale-provider";
 import { EnrichmentIndicator } from "@/components/crm/enrichment-status";
 import { useFieldColumns } from "@/components/crm/fields/field-columns";
 import { useFieldFacets } from "@/components/crm/fields/field-facets";
@@ -26,6 +25,7 @@ import { ListSearch } from "@/components/data-table/list-search";
 import { SavedViewsMenu } from "@/components/data-table/saved-views-menu";
 import { useTableQuery } from "@/components/data-table/use-table-query";
 import { LocalRelativeTime } from "@/components/local-date-time";
+import { t, useLocale } from "@/components/locale-provider";
 import { ACTIVITY_FACET_OPTIONS } from "@/lib/activity-recency";
 import {
 	ENRICHMENT_FACET_OPTIONS,
@@ -48,7 +48,10 @@ const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
 	deals: { header: "companies.colOpenDeals" },
 	createdAt: { header: "common.created", label: "common.createdDate" },
 	lastActivity: { header: "common.lastActivity" },
-	enrichment: { header: "companies.facetEnrichment", label: "companies.enrichmentStatus" },
+	enrichment: {
+		header: "companies.facetEnrichment",
+		label: "companies.enrichmentStatus",
+	},
 	archivedAt: { header: "common.archived", label: "common.archivedDate" },
 };
 

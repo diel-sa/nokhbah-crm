@@ -26,8 +26,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { AgentBuilderSidebar } from "@/components/agent-builder/agent-builder-sidebar";
-import { t, useLocale } from "@/components/locale-provider";
 import { usePrefetchSection } from "@/components/crm/section-prefetch";
+import { t, useLocale } from "@/components/locale-provider";
 import { useMobileNav } from "@/components/mobile-nav";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
@@ -50,7 +50,12 @@ const ITEMS: RailItem[] = [
 		match: "prefix",
 		related: ["/agents"],
 	},
-	{ titleKey: "nav.companies", href: "/companies", icon: Building, match: "prefix" },
+	{
+		titleKey: "nav.companies",
+		href: "/companies",
+		icon: Building,
+		match: "prefix",
+	},
 	{
 		titleKey: "nav.contacts",
 		href: "/contacts",
@@ -58,7 +63,12 @@ const ITEMS: RailItem[] = [
 		match: "prefix",
 	},
 	{ titleKey: "nav.deals", href: "/deals", icon: Partnership, match: "prefix" },
-	{ titleKey: "nav.settings", href: "/settings", icon: Settings, match: "prefix" },
+	{
+		titleKey: "nav.settings",
+		href: "/settings",
+		icon: Settings,
+		match: "prefix",
+	},
 ];
 
 function isActive(item: RailItem, pathname: string): boolean {

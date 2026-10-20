@@ -23,7 +23,6 @@ import {
 import { formatMoney } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { t, useLocale } from "@/components/locale-provider";
 import { AgentPanel } from "@/components/crm/agent-panel";
 import { InlineCompanyField } from "@/components/crm/company-picker";
 import { contactName } from "@/components/crm/contact-name";
@@ -55,6 +54,7 @@ import {
 	LocalDay,
 	LocalRelativeTime,
 } from "@/components/local-date-time";
+import { t, useLocale } from "@/components/locale-provider";
 import { savingField } from "@/lib/pending-field";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";

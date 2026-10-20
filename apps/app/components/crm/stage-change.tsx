@@ -29,8 +29,8 @@ import { toast } from "sonner";
 import { t, useLocale } from "@/components/locale-provider";
 import {
 	DEAL_STAGE_OPTIONS,
-	LOSING_STAGES,
 	dealStageLabel,
+	LOSING_STAGES,
 } from "@/lib/deal-stage";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";

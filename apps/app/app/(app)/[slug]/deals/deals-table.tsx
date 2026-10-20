@@ -1,6 +1,7 @@
 "use client";
 
 import Archive from "@carbon/icons-react/es/Archive";
+import type { DealStage } from "@crm/db/enums";
 import { Button } from "@crm/ui/components/button";
 import {
 	DataTable,
@@ -12,7 +13,6 @@ import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
 import { formatMoney } from "@crm/ui/lib/format";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
-import { t, tf, useLocale } from "@/components/locale-provider";
 import { CLOSING_OPTIONS } from "@/components/crm/closing-window";
 import { CompanyCell } from "@/components/crm/company-cell";
 import { useFieldColumns } from "@/components/crm/fields/field-columns";
@@ -24,8 +24,8 @@ import { DealStageMenu } from "@/components/crm/stage-change";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
 import { LocalDay, LocalRelativeTime } from "@/components/local-date-time";
-import type { DealStage } from "@crm/db/enums";
-import { dealStageLabel, DEAL_STAGE_OPTIONS } from "@/lib/deal-stage";
+import { t, tf, useLocale } from "@/components/locale-provider";
+import { DEAL_STAGE_OPTIONS, dealStageLabel } from "@/lib/deal-stage";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { DealsBulkActions } from "./deals-bulk-actions";

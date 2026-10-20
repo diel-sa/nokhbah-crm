@@ -2,7 +2,11 @@ import type { MailboxProviderId } from "@crm/auth/scopes";
 import type { Metadata } from "next";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
-import { AuthHeading, AuthShell, LocalizedWelcomeHeading } from "@/components/auth-shell";
+import {
+	AuthHeading,
+	AuthShell,
+	LocalizedWelcomeHeading,
+} from "@/components/auth-shell";
 import { getSession } from "@/lib/session";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { SocialSignIn } from "./social-sign-in";
@@ -43,11 +47,7 @@ async function currentSession() {
 export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
 	return (
 		<AuthShell>
-			<Suspense
-				fallback={
-					<LocalizedWelcomeHeading />
-				}
-			>
+			<Suspense fallback={<LocalizedWelcomeHeading />}>
 				<SignIn searchParams={searchParams} />
 			</Suspense>
 		</AuthShell>

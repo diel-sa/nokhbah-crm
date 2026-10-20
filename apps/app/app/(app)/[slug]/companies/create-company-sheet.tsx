@@ -32,8 +32,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import { t, tf, useLocale } from "@/components/locale-provider";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -123,7 +123,9 @@ function CreateCompanyForm() {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={nameId}>{t(messages, "common.name")}</FieldLabel>
+							<FieldLabel htmlFor={nameId}>
+								{t(messages, "common.name")}
+							</FieldLabel>
 							<Input
 								id={nameId}
 								value={name}
@@ -135,7 +137,9 @@ function CreateCompanyForm() {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={domainId}>{t(messages, "common.domain")}</FieldLabel>
+							<FieldLabel htmlFor={domainId}>
+								{t(messages, "common.domain")}
+							</FieldLabel>
 							<Input
 								id={domainId}
 								value={domain}

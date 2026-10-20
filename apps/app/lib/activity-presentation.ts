@@ -24,10 +24,7 @@ const PRESENTATION: ActivityPresentation = {
 	ENRICHMENT: { icon: MagicWand, label: "Enrichment" },
 };
 
-export function activityLabel(
-	type: ActivityType,
-	messages?: Messages,
-): string {
+export function activityLabel(type: ActivityType, messages?: Messages): string {
 	if (messages) {
 		const section = (messages as Record<string, unknown>).activities as
 			| Record<string, string>

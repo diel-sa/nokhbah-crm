@@ -27,9 +27,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import { t, tf, useLocale } from "@/components/locale-provider";
 import { CompanyPicker } from "@/components/crm/company-picker";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -159,7 +159,9 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={emailId}>{t(messages, "common.email")}</FieldLabel>
+							<FieldLabel htmlFor={emailId}>
+								{t(messages, "common.email")}
+							</FieldLabel>
 							<Input
 								id={emailId}
 								type="email"
@@ -171,7 +173,9 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={titleId}>{t(messages, "common.title")}</FieldLabel>
+							<FieldLabel htmlFor={titleId}>
+								{t(messages, "common.title")}
+							</FieldLabel>
 							<Input
 								id={titleId}
 								value={title}

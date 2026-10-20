@@ -23,7 +23,6 @@ import { StatusIndicator } from "@crm/ui/components/status-indicator";
 import { TableCell } from "@crm/ui/components/table";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { t, useLocale } from "@/components/locale-provider";
 import { AgentPanel } from "@/components/crm/agent-panel";
 import { InlineCompanyField } from "@/components/crm/company-picker";
 import { contactName } from "@/components/crm/contact-name";
@@ -53,6 +52,7 @@ import {
 	type DetailSheetTab,
 } from "@/components/detail-sheet";
 import { LocalDateTime, LocalRelativeDate } from "@/components/local-date-time";
+import { t, useLocale } from "@/components/locale-provider";
 import { factsByField } from "@/lib/contact-facts";
 import { ENRICHMENT_POLL_MS, isEnriching } from "@/lib/enrichment-status";
 import { savingField } from "@/lib/pending-field";

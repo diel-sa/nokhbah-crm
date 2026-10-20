@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { t, useLocale } from "@/components/locale-provider";
 import { AuthShader } from "@/components/auth-shader";
+import { t, useLocale } from "@/components/locale-provider";
 
 function NokhbahLogo({ className }: { className: string }) {
 	return (

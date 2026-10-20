@@ -1,7 +1,7 @@
 "use client";
 
-import { t, useLocale } from "@/components/locale-provider";
 import { useQueryState } from "nuqs";
+import { t, useLocale } from "@/components/locale-provider";
 import { PageShellDescription, PageShellTitle } from "@/components/page-shell";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { overviewParsers } from "./overview-search-params";
