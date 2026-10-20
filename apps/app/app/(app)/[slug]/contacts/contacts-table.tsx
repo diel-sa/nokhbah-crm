@@ -33,7 +33,9 @@ import { contactsSearchParams } from "./contacts-search-params";
 
 type ContactRow = RouterOutputs["contacts"]["list"]["rows"][number];
 
-const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+type HeaderKeyMap = Record<string, { header: string; label?: string }>;
+
+const HEADER_KEYS: HeaderKeyMap = {
 	name: { header: "common.name" },
 	title: { header: "common.title" },
 	email: { header: "common.email" },
@@ -42,7 +44,7 @@ const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
 	createdAt: { header: "common.created", label: "common.createdDate" },
 	lastActivity: { header: "common.lastActivity" },
 	archivedAt: { header: "common.archived", label: "common.archivedDate" },
-};
+} satisfies HeaderKeyMap;
 
 const COLUMNS: DataTableColumn<ContactRow>[] = [
 	{

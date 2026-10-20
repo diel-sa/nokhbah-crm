@@ -33,7 +33,9 @@ import { dealsSearchParams } from "./deals-search-params";
 
 type DealRow = RouterOutputs["deals"]["list"]["rows"][number];
 
-const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+type HeaderKeyMap = Record<string, { header: string; label?: string }>;
+
+const HEADER_KEYS: HeaderKeyMap = {
 	name: { header: "deals.colDeal" },
 	company: { header: "common.company" },
 	stage: { header: "common.stage" },
@@ -43,7 +45,7 @@ const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
 	createdAt: { header: "common.created", label: "common.createdDate" },
 	lastActivity: { header: "common.lastActivity" },
 	archivedAt: { header: "common.archived", label: "common.archivedDate" },
-};
+} satisfies HeaderKeyMap;
 
 const COLUMNS: DataTableColumn<DealRow>[] = [
 	{

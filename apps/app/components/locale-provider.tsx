@@ -13,7 +13,7 @@ type LocaleContextType = {
 const LocaleContext = createContext<LocaleContextType | null>(null);
 
 function readLocaleCookie(): Locale {
-	if (typeof document === "undefined") return "en";
+	if (!globalThis.document) return "en";
 	const match = document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);
 	return match?.[1] === "ar" ? "ar" : "en";
 }

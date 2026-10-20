@@ -55,14 +55,8 @@ export function dealStageColor(stage: DealStage): string {
 }
 
 export function dealStageLabel(stage: DealStage, messages?: Messages): string {
-	if (messages) {
-		const section = (messages as Record<string, unknown>).stages as
-			| Record<string, string>
-			| undefined;
-		const label = section?.[stage];
-		if (label) return label;
-	}
-	return PRESENTATION[stage].label;
+	const localized = messages?.stages[stage];
+	return localized ?? PRESENTATION[stage].label;
 }
 
 export function dealStagePresentation(stage: DealStage) {

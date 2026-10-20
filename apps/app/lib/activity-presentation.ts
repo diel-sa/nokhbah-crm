@@ -25,14 +25,8 @@ const PRESENTATION: ActivityPresentation = {
 };
 
 export function activityLabel(type: ActivityType, messages?: Messages): string {
-	if (messages) {
-		const section = (messages as Record<string, unknown>).activities as
-			| Record<string, string>
-			| undefined;
-		const label = section?.[type];
-		if (label) return label;
-	}
-	return PRESENTATION[type].label;
+	const localized = messages?.activities[type];
+	return localized ?? PRESENTATION[type].label;
 }
 
 export function activityIcon(type: ActivityType): CarbonIcon {

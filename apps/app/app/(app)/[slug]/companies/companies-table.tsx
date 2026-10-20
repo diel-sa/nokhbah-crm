@@ -39,7 +39,9 @@ import { companiesSearchParams } from "./companies-search-params";
 
 type CompanyRow = RouterOutputs["companies"]["list"]["rows"][number];
 
-const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+type HeaderKeyMap = Record<string, { header: string; label?: string }>;
+
+const HEADER_KEYS: HeaderKeyMap = {
 	name: { header: "common.company" },
 	domain: { header: "common.domain" },
 	industry: { header: "common.industry" },
@@ -53,7 +55,7 @@ const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
 		label: "companies.enrichmentStatus",
 	},
 	archivedAt: { header: "common.archived", label: "common.archivedDate" },
-};
+} satisfies HeaderKeyMap;
 
 const COLUMNS: DataTableColumn<CompanyRow>[] = [
 	{
