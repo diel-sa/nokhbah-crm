@@ -6,9 +6,11 @@ import { Spinner } from "@crm/ui/components/spinner";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import { requireSession } from "@/lib/session";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { AddConnectionDialog } from "./add-connection-dialog";
+import { LocalizedValue } from "./localized-value";
 
 export const metadata: Metadata = { title: "Connections" };
 
@@ -40,9 +42,9 @@ async function ConnectionsSettingsPageContent({
 			? [
 					{
 						name: "Google Workspace",
-						status: "Connected",
-						bringsIn: "Emails, meetings and the people on them",
-						sends: "Nothing yet",
+						status: <LocalizedText k="settings.connections.connected" />,
+						bringsIn: "settings.connections.google.bringsIn",
+						sends: "settings.connections.nothingYet",
 						href: `/${slug}/settings/connections/google`,
 						logo: GoogleLogo,
 					},
@@ -52,11 +54,16 @@ async function ConnectionsSettingsPageContent({
 			? [
 					{
 						name: "Slack",
-						status: slack.workspace
-							? `Connected to ${slack.workspace}`
-							: "Connected",
-						bringsIn: "Workspace members and channels the app has joined",
-						sends: "Messages to approved channels and people",
+						status: slack.workspace ? (
+							<LocalizedValue
+								k="settings.connections.connectedTo"
+								values={{ workspace: slack.workspace }}
+							/>
+						) : (
+							<LocalizedText k="settings.connections.connected" />
+						),
+						bringsIn: "settings.connections.slack.bringsIn",
+						sends: "settings.connections.slack.sends",
 						href: `/${slug}/settings/connections/slack`,
 						logo: SlackLogo,
 					},
@@ -66,9 +73,9 @@ async function ConnectionsSettingsPageContent({
 			? [
 					{
 						name: "Microsoft 365",
-						status: "Connected",
-						bringsIn: "Outlook email and the people on it",
-						sends: "Nothing yet",
+						status: <LocalizedText k="settings.connections.connected" />,
+						bringsIn: "settings.connections.microsoft.bringsIn",
+						sends: "settings.connections.nothingYet",
 						href: `/${slug}/settings/connections/microsoft`,
 						logo: MicrosoftLogo,
 					},
@@ -83,16 +90,15 @@ async function ConnectionsSettingsPageContent({
 					<header className="flex items-start justify-between gap-4 px-(--spacing-block-inline)">
 						<div className="flex flex-col gap-2">
 							<h1 className="font-medium text-2xl tracking-tight">
-								Connections
+								<LocalizedText k="settings.connections.title" />
 							</h1>
 							<p className="max-w-2xl text-muted-foreground text-sm">
-								Where your CRM gets its information, and what it is allowed to
-								send on your behalf.
+								<LocalizedText k="settings.connections.description" />
 							</p>
 						</div>
 						<Button asChild variant="outline">
 							<Link href={`/${slug}/settings/connections?add=1`}>
-								Add connection
+								<LocalizedText k="settings.connections.add" />
 							</Link>
 						</Button>
 					</header>
@@ -106,41 +112,39 @@ async function ConnectionsSettingsPageContent({
 				<div className="mx-auto flex w-full max-w-(--container-narrow) flex-1 flex-col justify-center gap-(--spacing-page-gap) text-center">
 					<div className="flex flex-col gap-2 px-(--spacing-block-inline)">
 						<h1 className="font-medium text-2xl tracking-tight">
-							Nothing is connected yet
+							<LocalizedText k="settings.connections.emptyTitle" />
 						</h1>
 						<p className="text-muted-foreground text-sm leading-relaxed">
-							Right now every deal, contact and note has to be typed in by hand.
-							Connect a tool and the CRM starts filling itself in from the work
-							your team already does.
+							<LocalizedText k="settings.connections.emptyDescription" />
 						</p>
 					</div>
 					<div className="flex flex-col divide-y rounded-lg border bg-card px-(--spacing-block-inline)">
 						<StarterRow
 							logo={GoogleLogo}
 							name="Google Workspace"
-							description="File email and meetings against the right company"
+							description="settings.connections.google.starterDescription"
 							href={`/${slug}/settings/connections/google`}
 						/>
 						<StarterRow
 							logo={SlackLogo}
 							name="Slack"
-							description="Let deployed agents notify approved channels and people"
+							description="settings.connections.slack.starterDescription"
 							href={`/${slug}/settings/connections/slack`}
 						/>
 						<StarterRow
 							logo={MicrosoftLogo}
 							name="Microsoft 365"
-							description="File Outlook email against the right company"
+							description="settings.connections.microsoft.starterDescription"
 							href={`/${slug}/settings/connections/microsoft`}
 						/>
 					</div>
 					<p className="px-(--spacing-block-inline) text-muted-foreground text-sm">
-						Looking for something else?{" "}
+						<LocalizedText k="settings.connections.lookingFor" />{" "}
 						<Link
 							className="font-medium text-foreground underline underline-offset-4"
 							href={`/${slug}/settings/connections?add=1`}
 						>
-							Browse all connections
+							<LocalizedText k="settings.connections.browseAll" />
 						</Link>
 					</p>
 				</div>
@@ -171,7 +175,7 @@ function ConnectionCard({
 	logo: Logo,
 }: {
 	name: string;
-	status: string;
+	status: React.ReactNode;
 	bringsIn: string;
 	sends: string;
 	href: string;
@@ -186,12 +190,14 @@ function ConnectionCard({
 					{status}
 				</p>
 				<Button asChild size="sm" variant="outline">
-					<Link href={href}>Manage</Link>
+					<Link href={href}>
+						<LocalizedText k="settings.connections.manage" />
+					</Link>
 				</Button>
 			</div>
 			<div className="flex flex-col gap-2 pl-8 text-sm">
-				<CapabilityRow label="Brings in" value={bringsIn} />
-				<CapabilityRow label="Sends" value={sends} />
+				<CapabilityRow label="settings.connections.bringsIn" value={bringsIn} />
+				<CapabilityRow label="settings.connections.sends" value={sends} />
 			</div>
 		</section>
 	);
@@ -200,8 +206,12 @@ function ConnectionCard({
 function CapabilityRow({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex gap-4">
-			<span className="w-22 shrink-0 text-muted-foreground">{label}</span>
-			<span>{value}</span>
+			<span className="w-22 shrink-0 text-muted-foreground">
+				<LocalizedText k={label} />
+			</span>
+			<span>
+				<LocalizedText k={value} />
+			</span>
 		</div>
 	);
 }
@@ -222,10 +232,14 @@ function StarterRow({
 			<Logo className="size-5 shrink-0" />
 			<div className="min-w-0 flex-1">
 				<h2 className="font-medium text-sm">{name}</h2>
-				<p className="text-muted-foreground text-xs">{description}</p>
+				<p className="text-muted-foreground text-xs">
+					<LocalizedText k={description} />
+				</p>
 			</div>
 			<Button asChild variant="outline" size="sm">
-				<Link href={href}>Connect</Link>
+				<Link href={href}>
+					<LocalizedText k="settings.connections.connect" />
+				</Link>
 			</Button>
 		</div>
 	);

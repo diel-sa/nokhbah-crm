@@ -119,7 +119,7 @@ export function SettingsSidebar() {
 	const labels = useMemo(
 		() =>
 			Object.fromEntries(
-				ITEMS.map((item) => [item.href, t(messages, item.titleKey)]),
+				ITEMS.map((item) => [item.titleKey, t(messages, item.titleKey)]),
 			),
 		[messages],
 	);
@@ -134,7 +134,7 @@ export function SettingsSidebar() {
 					{items.map((item) => (
 						<NavLink
 							key={item.href}
-							label={labels[item.href] ?? item.href}
+							label={labels[item.titleKey] ?? item.titleKey}
 							href={item.href}
 							active={isActive(item.href, root, pathname)}
 							className="w-full px-3"
@@ -150,7 +150,7 @@ export function SettingsSidebar() {
 				{items.map((item) => (
 					<NavLink
 						key={item.href}
-						label={labels[item.href] ?? item.href}
+						label={labels[item.titleKey] ?? item.titleKey}
 						href={item.href}
 						active={isActive(item.href, root, pathname)}
 						className="shrink-0 px-3"

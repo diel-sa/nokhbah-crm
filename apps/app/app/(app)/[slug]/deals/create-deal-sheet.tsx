@@ -253,7 +253,7 @@ function CreateDealForm({ companyId }: { companyId?: string }) {
 								id={closeDateId}
 								value={closeDate}
 								onChange={setCloseDate}
-								placeholder="No date yet"
+								placeholder={t(messages, "common.noDateYet")}
 							/>
 						</Field>
 					</FieldGroup>

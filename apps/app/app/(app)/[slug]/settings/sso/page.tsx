@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellActions,
@@ -28,10 +29,11 @@ export default function SsoSettingsPage({
 		<PageShell className="min-h-0">
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>SSO</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.sso" />
+					</PageShellTitle>
 					<PageShellDescription>
-						Let your people sign in through your own identity provider. While
-						one is configured, the sign-in page offers it instead of Google.
+						<LocalizedText k="settings.pages.ssoDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 

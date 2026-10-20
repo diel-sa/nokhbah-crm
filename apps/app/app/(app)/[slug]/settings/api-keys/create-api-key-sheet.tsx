@@ -32,6 +32,7 @@ import { useMutation } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -41,34 +42,47 @@ import { CreatedApiKeyDialog } from "./created-api-key-dialog";
 const FORM = "create-api-key";
 
 const EXPIRATION_OPTIONS = [
-	{ value: "30", label: "30 days" },
-	{ value: "90", label: "90 days" },
-	{ value: "365", label: "1 year" },
-	{ value: "never", label: "No expiration" },
+	{ value: "30", key: "settings.apiKeys.opt30" },
+	{ value: "90", key: "settings.apiKeys.opt90" },
+	{ value: "365", key: "settings.apiKeys.opt365" },
+	{ value: "never", key: "settings.apiKeys.optNever" },
 ] as const;
 
 type ExpirationValue = (typeof EXPIRATION_OPTIONS)[number]["value"];
 
 type CreatedApiKey = RouterOutputs["apiKeys"]["create"];
 
-function NewApiKeyButton(props: ComponentProps<typeof Button>) {
+function NewApiKeyButton({
+	label,
+	...props
+}: ComponentProps<typeof Button> & { label: string }) {
 	return (
 		<Button {...props}>
 			<Icon icon={Add} data-icon="inline-start" />
-			New API key
+			{label}
 		</Button>
 	);
 }
 
 export function CreateApiKeySheet() {
+	const { messages } = useLocale();
+
 	return (
-		<Suspense fallback={<NewApiKeyButton disabled />}>
+		<Suspense
+			fallback={
+				<NewApiKeyButton
+					disabled
+					label={t(messages, "settings.apiKeys.newKey")}
+				/>
+			}
+		>
 			<CreateApiKeyForm />
 		</Suspense>
 	);
 }
 
 function CreateApiKeyForm() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 
@@ -100,15 +114,16 @@ function CreateApiKeyForm() {
 		<>
 			<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
 				<SheetTrigger asChild>
-					<NewApiKeyButton />
+					<NewApiKeyButton label={t(messages, "settings.apiKeys.newKey")} />
 				</SheetTrigger>
 
 				<SheetContent side="right">
 					<SheetHeader>
-						<SheetTitle>New API key</SheetTitle>
+						<SheetTitle>
+							{t(messages, "settings.apiKeys.sheetTitle")}
+						</SheetTitle>
 						<SheetDescription>
-							Acts as you. Anything it can read or change is exactly what you
-							can.
+							{t(messages, "settings.apiKeys.sheetDescription")}
 						</SheetDescription>
 					</SheetHeader>
 
@@ -126,12 +141,14 @@ function CreateApiKeyForm() {
 					>
 						<FieldGroup>
 							<Field>
-								<FieldLabel htmlFor={nameId}>Name</FieldLabel>
+								<FieldLabel htmlFor={nameId}>
+									{t(messages, "settings.apiKeys.nameLabel")}
+								</FieldLabel>
 								<Input
 									id={nameId}
 									value={name}
 									onChange={(event) => setName(event.target.value)}
-									placeholder="CI pipeline"
+									placeholder={t(messages, "settings.apiKeys.namePlaceholder")}
 									maxLength={64}
 									autoComplete="off"
 									autoCapitalize="off"
@@ -140,12 +157,14 @@ function CreateApiKeyForm() {
 									required
 								/>
 								<FieldDescription>
-									Something you will recognise later, like where it runs.
+									{t(messages, "settings.apiKeys.nameHint")}
 								</FieldDescription>
 							</Field>
 
 							<Field>
-								<FieldLabel htmlFor={expirationId}>Expires</FieldLabel>
+								<FieldLabel htmlFor={expirationId}>
+									{t(messages, "settings.apiKeys.expires")}
+								</FieldLabel>
 								<Select
 									value={expiration}
 									onValueChange={(value) =>
@@ -158,7 +177,7 @@ function CreateApiKeyForm() {
 									<SelectContent>
 										{EXPIRATION_OPTIONS.map((option) => (
 											<SelectItem key={option.value} value={option.value}>
-												{option.label}
+												{t(messages, option.key)}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -174,10 +193,10 @@ function CreateApiKeyForm() {
 							disabled={!name.trim() || create.isPending}
 						>
 							{create.isPending ? <Spinner /> : null}
-							Create key
+							{t(messages, "settings.apiKeys.createKey")}
 						</Button>
 						<SheetClose asChild>
-							<Button variant="outline">Cancel</Button>
+							<Button variant="outline">{t(messages, "common.cancel")}</Button>
 						</SheetClose>
 					</SheetFooter>
 				</SheetContent>

@@ -18,6 +18,10 @@ function displayCurrencyCode(currency: string): string {
 		: "USD";
 }
 
+export function displayCurrencyCodeOf(currency: string): string {
+	return displayCurrencyCode(currency);
+}
+
 const currencyDigits = new Map<string, number>();
 
 function fractionDigits(code: string): number {

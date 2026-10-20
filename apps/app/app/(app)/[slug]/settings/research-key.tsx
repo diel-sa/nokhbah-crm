@@ -22,10 +22,12 @@ import { StatusIndicator } from "@crm/ui/components/status-indicator";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
 export function ResearchKey() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 
@@ -39,7 +41,7 @@ export function ResearchKey() {
 			onSuccess: async () => {
 				await cache.settings();
 				setDraft("");
-				toast.success("Context API key saved.");
+				toast.success(t(messages, "settings.research.savedToast"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -52,10 +54,9 @@ export function ResearchKey() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Company research</CardTitle>
+				<CardTitle>{t(messages, "settings.research.title")}</CardTitle>
 				<CardDescription>
-					Enter your Context API key so our agents can research every company in
-					the CRM.
+					{t(messages, "settings.research.description")}
 				</CardDescription>
 
 				<CardAction>
@@ -65,7 +66,9 @@ export function ResearchKey() {
 						disabled={save.isPending || draft.trim() === ""}
 					>
 						{save.isPending ? <Spinner data-icon="inline-start" /> : null}
-						{configured ? "Replace key" : "Save key"}
+						{configured
+							? t(messages, "settings.research.replaceKey")
+							: t(messages, "settings.research.saveKey")}
 					</Button>
 				</CardAction>
 			</CardHeader>
@@ -81,11 +84,17 @@ export function ResearchKey() {
 					<FieldGroup>
 						<Field>
 							<div className="flex items-center justify-between gap-3">
-								<FieldLabel htmlFor={keyId}>Context API key</FieldLabel>
+								<FieldLabel htmlFor={keyId}>
+									{t(messages, "settings.research.keyLabel")}
+								</FieldLabel>
 								<StatusIndicator
 									size="sm"
 									tone={configured ? "success" : "warning"}
-									label={configured ? "Connected" : "Not connected"}
+									label={
+										configured
+											? t(messages, "settings.research.connected")
+											: t(messages, "settings.research.notConnected")
+									}
 								/>
 							</div>
 							<Input
@@ -93,7 +102,9 @@ export function ResearchKey() {
 								type="password"
 								value={draft}
 								onChange={(event) => setDraft(event.target.value)}
-								placeholder={hint ?? "Paste the key"}
+								placeholder={
+									hint ?? t(messages, "settings.research.pastePlaceholder")
+								}
 								autoComplete="off"
 								autoCapitalize="off"
 								autoCorrect="off"
@@ -101,14 +112,14 @@ export function ResearchKey() {
 								disabled={save.isPending}
 							/>
 							<FieldDescription>
-								Don't have a Context API key?{" "}
+								{t(messages, "settings.research.noKeyYet")}{" "}
 								<a
 									href={CONTEXT_DEV_SIGNUP_URL}
 									target="_blank"
 									rel="noreferrer"
 									className="underline underline-offset-4 hover:text-foreground"
 								>
-									Sign up here
+									{t(messages, "settings.research.signUpHere")}
 								</a>
 							</FieldDescription>
 						</Field>

@@ -30,6 +30,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -45,24 +46,34 @@ const EMPTY = {
 	clientSecret: "",
 };
 
-function AddButton(props: ComponentProps<typeof Button>) {
+function AddButton({
+	label,
+	...props
+}: ComponentProps<typeof Button> & { label: string }) {
 	return (
 		<Button {...props}>
 			<Icon icon={Add} data-icon="inline-start" />
-			Add provider
+			{label}
 		</Button>
 	);
 }
 
 export function AddSsoProviderSheet() {
+	const { messages } = useLocale();
+
 	return (
-		<Suspense fallback={<AddButton disabled />}>
+		<Suspense
+			fallback={
+				<AddButton disabled label={t(messages, "settings.sso.addProvider")} />
+			}
+		>
 			<AddSsoProviderForm />
 		</Suspense>
 	);
 }
 
 function AddSsoProviderForm() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 
@@ -85,7 +96,9 @@ function AddSsoProviderForm() {
 		trpc.sso.register.mutationOptions({
 			onSuccess: async (provider) => {
 				await cache.sso();
-				toast.success(`${provider.name} saved.`);
+				toast.success(
+					tf(messages, "settings.sso.savedToast", { name: provider.name }),
+				);
 				await setOpen(null);
 				setValues(EMPTY);
 			},
@@ -107,14 +120,17 @@ function AddSsoProviderForm() {
 	return (
 		<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
 			<SheetTrigger asChild>
-				<AddButton disabled={!settings.data?.canConfigure} />
+				<AddButton
+					disabled={!settings.data?.canConfigure}
+					label={t(messages, "settings.sso.addProvider")}
+				/>
 			</SheetTrigger>
 
 			<SheetContent side="right">
 				<SheetHeader>
-					<SheetTitle>Add an identity provider</SheetTitle>
+					<SheetTitle>{t(messages, "settings.sso.sheetTitle")}</SheetTitle>
 					<SheetDescription>
-						Configure an OpenID Connect provider.
+						{t(messages, "settings.sso.sheetDescription")}
 					</SheetDescription>
 				</SheetHeader>
 
@@ -134,12 +150,14 @@ function AddSsoProviderForm() {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={providerIdId}>Name</FieldLabel>
+							<FieldLabel htmlFor={providerIdId}>
+								{t(messages, "settings.sso.nameLabel")}
+							</FieldLabel>
 							<Input
 								id={providerIdId}
 								value={values.providerId}
 								onChange={(event) => edit({ providerId: event.target.value })}
-								placeholder="okta"
+								placeholder={t(messages, "settings.sso.namePlaceholder")}
 								autoComplete="off"
 								autoCapitalize="off"
 								autoCorrect="off"
@@ -147,12 +165,14 @@ function AddSsoProviderForm() {
 								required
 							/>
 							<FieldDescription>
-								Names the sign-in button. Cannot be changed later.
+								{t(messages, "settings.sso.nameHint")}
 							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={issuerId}>Issuer URL</FieldLabel>
+							<FieldLabel htmlFor={issuerId}>
+								{t(messages, "settings.sso.issuerLabel")}
+							</FieldLabel>
 							<Input
 								id={issuerId}
 								type="url"
@@ -166,11 +186,15 @@ function AddSsoProviderForm() {
 								inputMode="url"
 								required
 							/>
-							<FieldDescription>Where discovery lives.</FieldDescription>
+							<FieldDescription>
+								{t(messages, "settings.sso.issuerHint")}
+							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={domainId}>Email domain</FieldLabel>
+							<FieldLabel htmlFor={domainId}>
+								{t(messages, "settings.sso.domainLabel")}
+							</FieldLabel>
 							<Input
 								id={domainId}
 								value={values.domain}
@@ -182,11 +206,15 @@ function AddSsoProviderForm() {
 								spellCheck={false}
 								required
 							/>
-							<FieldDescription>Comma-separate several.</FieldDescription>
+							<FieldDescription>
+								{t(messages, "settings.sso.domainHint")}
+							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={clientIdId}>Client ID</FieldLabel>
+							<FieldLabel htmlFor={clientIdId}>
+								{t(messages, "settings.sso.clientIdLabel")}
+							</FieldLabel>
 							<Input
 								id={clientIdId}
 								value={values.clientId}
@@ -200,7 +228,9 @@ function AddSsoProviderForm() {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={clientSecretId}>Client secret</FieldLabel>
+							<FieldLabel htmlFor={clientSecretId}>
+								{t(messages, "settings.sso.clientSecretLabel")}
+							</FieldLabel>
 							<Input
 								id={clientSecretId}
 								type="password"
@@ -209,19 +239,26 @@ function AddSsoProviderForm() {
 								autoComplete="off"
 								required
 							/>
-							<FieldDescription>Never shown again.</FieldDescription>
+							<FieldDescription>
+								{t(messages, "settings.sso.clientSecretHint")}
+							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={redirectId}>Redirect URI</FieldLabel>
+							<FieldLabel htmlFor={redirectId}>
+								{t(messages, "settings.sso.redirectLabel")}
+							</FieldLabel>
 							<InputGroup>
 								<InputGroupInput id={redirectId} value={callbackURL} readOnly />
 								<InputGroupAddon align="inline-end">
-									<CopyValue value={callbackURL} label="Redirect URI" />
+									<CopyValue
+										value={callbackURL}
+										label={t(messages, "settings.sso.redirectLabel")}
+									/>
 								</InputGroupAddon>
 							</InputGroup>
 							<FieldDescription>
-								Add this at your provider before saving.
+								{t(messages, "settings.sso.redirectHint")}
 							</FieldDescription>
 						</Field>
 					</FieldGroup>
@@ -234,10 +271,10 @@ function AddSsoProviderForm() {
 						disabled={!complete || register.isPending}
 					>
 						{register.isPending ? <Spinner /> : null}
-						Add provider
+						{t(messages, "settings.sso.addProvider")}
 					</Button>
 					<SheetClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">{t(messages, "common.cancel")}</Button>
 					</SheetClose>
 				</SheetFooter>
 			</SheetContent>

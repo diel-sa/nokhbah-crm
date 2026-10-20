@@ -19,6 +19,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
@@ -28,6 +29,7 @@ import { ssoSearchParams } from "./sso-search-params";
 type ProviderRow = RouterOutputs["sso"]["list"]["rows"][number];
 
 function columns(
+	messages: Parameters<typeof t>[0],
 	canConfigure: boolean,
 	onRemove: (provider: ProviderRow) => void,
 	pending: boolean,
@@ -35,7 +37,7 @@ function columns(
 	return [
 		{
 			id: "providerId",
-			header: "Provider",
+			header: t(messages, "settings.sso.colProvider"),
 			sortable: true,
 			hideable: false,
 			width: "w-[30%]",
@@ -43,15 +45,17 @@ function columns(
 				<span className="flex min-w-0 flex-col">
 					<span className="truncate font-medium">{row.name}</span>
 					<span className="truncate text-muted-foreground text-xs">
-						{row.type === "saml" ? "SAML" : "OpenID Connect"}
-						{row.clientIdLastFour ? ` · client …${row.clientIdLastFour}` : ""}
+						{row.type === "saml" ? "SAML" : t(messages, "settings.sso.openid")}
+						{row.clientIdLastFour
+							? ` · ${tf(messages, "settings.sso.clientSuffix", { digits: row.clientIdLastFour })}`
+							: ""}
 					</span>
 				</span>
 			),
 		},
 		{
 			id: "domain",
-			header: "Email domain",
+			header: t(messages, "settings.sso.colDomain"),
 			sortable: true,
 			width: "w-[22%]",
 			hideBelow: "sm",
@@ -63,7 +67,7 @@ function columns(
 		},
 		{
 			id: "issuer",
-			header: "Issuer",
+			header: t(messages, "settings.sso.colIssuer"),
 			sortable: true,
 			width: "w-[22%]",
 			hideBelow: "md",
@@ -73,20 +77,27 @@ function columns(
 		},
 		{
 			id: "callbackURL",
-			header: "Redirect URI",
+			header: t(messages, "settings.sso.colRedirect"),
 			width: "w-[20%]",
 			hideBelow: "lg",
 			cell: (row) => (
 				<span className="flex min-w-0 items-center gap-1 text-muted-foreground">
 					<span className="truncate">{row.callbackURL}</span>
-					<CopyValue value={row.callbackURL} label="Redirect URI" />
+					<CopyValue
+						value={row.callbackURL}
+						label={t(messages, "settings.sso.colRedirect")}
+					/>
 				</span>
 			),
 		},
 		{
 			id: "actions",
-			header: <span className="sr-only">Actions</span>,
-			label: "Actions",
+			header: (
+				<span className="sr-only">
+					{t(messages, "settings.sso.colActions")}
+				</span>
+			),
+			label: t(messages, "settings.sso.actionsLabel"),
 			hideable: false,
 			align: "right",
 			width: "w-[6%]",
@@ -96,26 +107,31 @@ function columns(
 						<AlertDialogTrigger asChild>
 							<Button variant="ghost" size="icon" disabled={pending}>
 								<Icon icon={TrashCan} />
-								<span className="sr-only">Remove {row.name}</span>
+								<span className="sr-only">
+									{tf(messages, "settings.sso.removeSr", { name: row.name })}
+								</span>
 							</Button>
 						</AlertDialogTrigger>
 
 						<AlertDialogContent>
 							<AlertDialogHeader>
-								<AlertDialogTitle>Remove {row.name}?</AlertDialogTitle>
+								<AlertDialogTitle>
+									{tf(messages, "settings.sso.removeTitle", { name: row.name })}
+								</AlertDialogTitle>
 								<AlertDialogDescription>
-									Nobody can sign in through it again. If this is the only
-									provider, the sign-in page goes back to Google.
+									{t(messages, "settings.sso.removeDescription")}
 								</AlertDialogDescription>
 							</AlertDialogHeader>
 
 							<AlertDialogFooter>
-								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogCancel>
+									{t(messages, "common.cancel")}
+								</AlertDialogCancel>
 								<AlertDialogAction
 									variant="destructive"
 									onClick={() => onRemove(row)}
 								>
-									Remove
+									{t(messages, "settings.sso.remove")}
 								</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>
@@ -126,6 +142,7 @@ function columns(
 }
 
 export function SsoTable() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const { query, input } = useTableQuery(ssoSearchParams);
@@ -140,7 +157,7 @@ export function SsoTable() {
 		trpc.sso.remove.mutationOptions({
 			onSuccess: async () => {
 				await cache.sso();
-				toast.success("Identity provider removed.");
+				toast.success(t(messages, "settings.sso.removedToast"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -149,8 +166,13 @@ export function SsoTable() {
 	return (
 		<DataTable
 			query={query}
-			search={<ListSearch placeholder="Search by name, domain or issuer…" />}
+			search={
+				<ListSearch
+					placeholder={t(messages, "settings.sso.searchPlaceholder")}
+				/>
+			}
 			columns={columns(
+				messages,
 				settings.data?.canConfigure ?? false,
 				(provider) => remove.mutate({ providerId: provider.providerId }),
 				remove.isPending,
@@ -159,7 +181,7 @@ export function SsoTable() {
 			total={providers.data?.total ?? 0}
 			getRowId={(row) => row.providerId}
 			loading={providers.isFetching}
-			empty="No identity provider yet — everyone signs in with Google."
+			empty={t(messages, "settings.sso.empty")}
 		/>
 	);
 }

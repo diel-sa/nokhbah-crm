@@ -23,6 +23,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useDeferredValue, useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import {
 	ChannelPicker,
 	type PickerChannel,
@@ -33,6 +34,7 @@ import { useTRPC } from "@/lib/trpc/client";
 const INVITE_COMMAND = "/invite @Comp AI";
 
 export function SlackChannels() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const [asking, setAsking] = useState<PickerChannel | null>(null);
 	const [query, setQuery] = useState("");
@@ -45,10 +47,10 @@ export function SlackChannels() {
 				setAsking(null);
 				toast.success(
 					result.alreadyJoined
-						? "Comp AI is already in there."
+						? t(messages, "settings.connections.channels.joinedAlready")
 						: result.queued
-							? "Comp AI is joining."
-							: "Ask someone inside to invite Comp AI.",
+							? t(messages, "settings.connections.channels.joining")
+							: t(messages, "settings.connections.channels.askInside"),
 				);
 			},
 			onError: (error) => toast.error(error.message),
@@ -60,7 +62,7 @@ export function SlackChannels() {
 	const refresh = useMutation(
 		trpc.slack.refreshPeople.mutationOptions({
 			onSuccess: async () => {
-				toast.success("Reading the channel list from Slack.");
+				toast.success(t(messages, "settings.connections.channels.readingList"));
 				await channels.reload();
 			},
 			onError: (error) => toast.error(error.message),
@@ -75,9 +77,11 @@ export function SlackChannels() {
 		<section className="flex flex-col gap-3 px-(--spacing-block-inline)">
 			<div className="flex items-end justify-between gap-4">
 				<div>
-					<h2 className="font-medium text-sm">Channels Comp AI can reach</h2>
+					<h2 className="font-medium text-sm">
+						{t(messages, "settings.connections.channels.title")}
+					</h2>
 					<p className="text-muted-foreground text-xs">
-						Agents pick from this list.
+						{t(messages, "settings.connections.channels.note")}
 					</p>
 				</div>
 				<Button
@@ -86,13 +90,15 @@ export function SlackChannels() {
 					size="sm"
 					variant="outline"
 				>
-					{refreshing ? "Refreshing…" : "Refresh"}
+					{refreshing
+						? t(messages, "settings.connections.channels.refreshing")
+						: t(messages, "settings.connections.channels.refresh")}
 				</Button>
 			</div>
 
 			{channels.stalled ? (
 				<p className="text-warning text-xs">
-					Comp AI is not reading Slack right now. The list can be out of date.
+					{t(messages, "settings.connections.channels.stalled")}
 				</p>
 			) : null}
 
@@ -103,7 +109,10 @@ export function SlackChannels() {
 					</InputGroupAddon>
 					<InputGroupInput
 						onChange={(event) => setQuery(event.target.value)}
-						placeholder="Search channels"
+						placeholder={t(
+							messages,
+							"settings.connections.channels.searchPlaceholder",
+						)}
 						value={query}
 					/>
 				</InputGroup>
@@ -115,10 +124,12 @@ export function SlackChannels() {
 				empty={
 					<p className="px-4 py-4 text-muted-foreground text-sm">
 						{channels.pending
-							? "Reading the channel list from Slack…"
+							? t(messages, "settings.connections.channels.pending")
 							: query
-								? `No channel matches “${query}”.`
-								: "No channels yet. Comp AI reads the list from Slack after it connects."}
+								? tf(messages, "settings.connections.channels.noMatch", {
+										query,
+									})
+								: t(messages, "settings.connections.channels.empty")}
 					</p>
 				}
 				onAdd={(channel) => void joinAction.run(channel.id)}
@@ -133,7 +144,9 @@ export function SlackChannels() {
 					size="sm"
 					variant="outline"
 				>
-					{channels.fetchingMore ? "Loading…" : "Load more"}
+					{channels.fetchingMore
+						? t(messages, "settings.connections.channels.loading")
+						: t(messages, "settings.connections.channels.loadMore")}
 				</Button>
 			) : null}
 
@@ -161,17 +174,19 @@ function AskDialog({
 	onConfirm: () => void;
 	status: "idle" | "pending" | "success" | "error";
 }) {
+	const { messages } = useLocale();
+
 	if (!channel) return null;
 
 	async function copyThenConfirm() {
 		try {
 			await navigator.clipboard.writeText(INVITE_COMMAND);
 		} catch {
-			toast.error("Copying failed. Copy the command above by hand.");
+			toast.error(t(messages, "settings.connections.channels.copyFail"));
 			return;
 		}
 
-		toast.success("Command copied.");
+		toast.success(t(messages, "settings.connections.channels.copiedToast"));
 		onConfirm();
 	}
 
@@ -181,13 +196,21 @@ function AskDialog({
 				<AlertDialogHeader>
 					<AlertDialogTitle>
 						{canInviteItself
-							? `Add Comp AI to #${channel.name}?`
-							: "Ask someone to add Comp AI"}
+							? tf(messages, "settings.connections.channels.addSelfTitle", {
+									channel: channel.name,
+								})
+							: t(messages, "settings.connections.channels.addOtherTitle")}
 					</AlertDialogTitle>
 					<AlertDialogDescription>
 						{canInviteItself
-							? `It is a private channel, so Comp AI joins as you. Same as typing the invite yourself. Everyone in the channel sees it join. It reads nothing until you turn a permission on.`
-							: `We cannot add Comp AI to a private channel yet. Someone already in #${channel.name} has to run this.`}
+							? t(messages, "settings.connections.channels.addSelfDescription")
+							: tf(
+									messages,
+									"settings.connections.channels.addOtherDescription",
+									{
+										channel: channel.name,
+									},
+								)}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 
@@ -199,14 +222,19 @@ function AskDialog({
 
 				<AlertDialogFooter>
 					<AlertDialogCancel disabled={status === "pending"}>
-						Cancel
+						{t(messages, "common.cancel")}
 					</AlertDialogCancel>
 					<Button
 						disabled={status === "pending"}
 						onClick={canInviteItself ? onConfirm : () => void copyThenConfirm()}
 					>
-						<AsyncButtonContent pendingLabel="Adding…" status={status}>
-							{canInviteItself ? "Add Comp AI" : "Copy and mark as asked"}
+						<AsyncButtonContent
+							pendingLabel={t(messages, "settings.connections.channels.adding")}
+							status={status}
+						>
+							{canInviteItself
+								? t(messages, "settings.connections.channels.addSelf")
+								: t(messages, "settings.connections.channels.copyAndMark")}
 						</AsyncButtonContent>
 					</Button>
 				</AlertDialogFooter>

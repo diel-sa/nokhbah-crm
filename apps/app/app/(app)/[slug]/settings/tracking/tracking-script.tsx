@@ -35,10 +35,12 @@ import { Switch } from "@crm/ui/components/switch";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
 export function TrackingScript() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const tracking = useQuery(trpc.tracking.settings.queryOptions());
@@ -50,8 +52,8 @@ export function TrackingScript() {
 				await cache.tracking();
 				toast.success(
 					input.enabled
-						? "Tracking paused. The script stops recording within five minutes."
-						: "Tracking resumed.",
+						? t(messages, "settings.tracking.script.pausedToast")
+						: t(messages, "settings.tracking.script.resumedToast"),
 				);
 			},
 			onError: (error) => toast.error(error.message),
@@ -62,7 +64,7 @@ export function TrackingScript() {
 		trpc.tracking.rotateSiteId.mutationOptions({
 			onSuccess: async () => {
 				await cache.tracking();
-				toast.success("Site ID rotated. Paste the new tag on your website.");
+				toast.success(t(messages, "settings.tracking.script.rotatedToast"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -84,14 +86,16 @@ export function TrackingScript() {
 		const clipboard = navigator.clipboard;
 
 		if (!value || !clipboard) {
-			toast.error("Could not copy the script. Select it instead.");
+			toast.error(t(messages, "settings.tracking.script.copyFail"));
 			return;
 		}
 
 		clipboard
 			.writeText(value)
-			.then(() => toast.success("Script copied."))
-			.catch(() => toast.error("Could not copy the script."));
+			.then(() => toast.success(t(messages, "settings.tracking.script.copied")))
+			.catch(() =>
+				toast.error(t(messages, "settings.tracking.script.copyFail")),
+			);
 	};
 
 	return (
@@ -99,22 +103,22 @@ export function TrackingScript() {
 			<CardHeader>
 				<CardTitle>
 					<div className="flex items-center gap-2">
-						Tracking script
+						{t(messages, "settings.tracking.script.title")}
 						<StatusIndicator
 							size="sm"
 							tone={paused ? "warning" : receivingSince ? "success" : "neutral"}
 							label={
 								paused
-									? "Paused"
+									? t(messages, "settings.tracking.script.statusPaused")
 									: receivingSince
-										? "Receiving page views"
-										: "No page views yet"
+										? t(messages, "settings.tracking.script.statusReceiving")
+										: t(messages, "settings.tracking.script.statusNoViews")
 							}
 						/>
 					</div>
 				</CardTitle>
 				<CardDescription>
-					One tag, 4 KB, in the head of every page you measure.
+					{t(messages, "settings.tracking.script.description")}
 				</CardDescription>
 
 				<CardAction>
@@ -126,7 +130,7 @@ export function TrackingScript() {
 						type="button"
 					>
 						<Icon icon={Copy} data-icon="inline-start" />
-						Copy
+						{t(messages, "settings.tracking.script.copy")}
 					</Button>
 				</CardAction>
 			</CardHeader>
@@ -139,7 +143,9 @@ export function TrackingScript() {
 					onValueChange={setSection}
 				>
 					<AccordionItem value="html">
-						<AccordionTrigger>Paste it into your HTML</AccordionTrigger>
+						<AccordionTrigger>
+							{t(messages, "settings.tracking.script.pasteHtml")}
+						</AccordionTrigger>
 						<AccordionContent className="flex flex-col gap-4">
 							<pre className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5">
 								<span className="text-code-accent">{"<script"}</span>
@@ -151,16 +157,16 @@ export function TrackingScript() {
 								<span className="text-code-accent">{"></script>"}</span>
 							</pre>
 							<p className="text-muted-foreground text-xs/relaxed">
-								Site ID{" "}
-								<span className="font-mono text-foreground">{siteId}</span> ·
-								Rotating it stops every copy of the old script at once.
+								{t(messages, "settings.tracking.script.siteIdLabel")}{" "}
+								<span className="font-mono text-foreground">{siteId}</span> ·{" "}
+								{t(messages, "settings.tracking.script.rotateNote")}
 							</p>
 						</AccordionContent>
 					</AccordionItem>
 
 					<AccordionItem value="gtm">
 						<AccordionTrigger>
-							Add it through Google Tag Manager
+							{t(messages, "settings.tracking.script.gtm")}
 						</AccordionTrigger>
 						<AccordionContent className="flex flex-col gap-4">
 							<pre className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5">
@@ -171,21 +177,16 @@ export function TrackingScript() {
 								<span className="text-code-accent">{"></script>"}</span>
 							</pre>
 							<ol className="flex list-decimal flex-col gap-1 pl-4 text-muted-foreground text-xs/relaxed">
-								<li>In Tag Manager, add a new Custom HTML tag.</li>
+								<li>{t(messages, "settings.tracking.script.gtmStep1")}</li>
+								<li>{t(messages, "settings.tracking.script.gtmStep2")}</li>
 								<li>
-									Paste this snippet — not the one above — as the tag's HTML.
-								</li>
-								<li>
-									Trigger it on All Pages, then publish the container. Keep{" "}
-									<span className="font-mono text-foreground">{scriptUrl}</span>{" "}
-									off any consent-blocked category you do not need.
+									{tf(messages, "settings.tracking.script.gtmStep3", {
+										scriptUrl,
+									})}
 								</li>
 							</ol>
 							<p className="text-muted-foreground text-xs/relaxed">
-								Tag Manager drops a{" "}
-								<span className="font-mono text-foreground">data-site</span>{" "}
-								attribute when it injects a script, so this form carries the
-								site ID in the URL instead.
+								{t(messages, "settings.tracking.script.gtmNote")}
 							</p>
 						</AccordionContent>
 					</AccordionItem>
@@ -196,10 +197,11 @@ export function TrackingScript() {
 						htmlFor="tracking-paused"
 						className="flex flex-col items-start gap-1"
 					>
-						<span className="text-sm">Pause tracking</span>
+						<span className="text-sm">
+							{t(messages, "settings.tracking.script.pauseLabel")}
+						</span>
 						<span className="font-normal text-muted-foreground text-xs">
-							The script keeps loading and records nothing. Your domains and
-							settings are kept
+							{t(messages, "settings.tracking.script.pauseHint")}
 						</span>
 					</Label>
 
@@ -222,28 +224,29 @@ export function TrackingScript() {
 									size="xs"
 									disabled={!canManage || rotate.isPending}
 								>
-									Rotate site ID
+									{t(messages, "settings.tracking.script.rotate")}
 								</Button>
 							</AlertDialogTrigger>
 
 							<AlertDialogContent>
 								<AlertDialogHeader>
-									<AlertDialogTitle>Rotate the site ID?</AlertDialogTitle>
+									<AlertDialogTitle>
+										{t(messages, "settings.tracking.script.rotateTitle")}
+									</AlertDialogTitle>
 									<AlertDialogDescription>
-										Every copy of the old script stops recording at once,
-										including any you have forgotten about. You will need to
-										paste the new tag on every page that carries the old one.
-										Nothing already collected is lost.
+										{t(messages, "settings.tracking.script.rotateDescription")}
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 
 								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogCancel>
+										{t(messages, "common.cancel")}
+									</AlertDialogCancel>
 									<AlertDialogAction
 										variant="destructive"
 										onClick={() => rotate.mutate()}
 									>
-										Rotate
+										{t(messages, "settings.tracking.script.rotateConfirm")}
 									</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>

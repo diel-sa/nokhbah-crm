@@ -249,6 +249,14 @@
 		@apply bg-background text-foreground font-sans;
 	}
 
+	html[dir="rtl"] {
+		/* Utilities like `.font-sans` resolve var(--font-sans) at the usage site,
+		   so overriding the variable here (not the font-family) beats them. */
+		--font-sans:
+			var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+			var(--font-geist-sans, "Geist"), sans-serif;
+	}
+
 	html[dir="rtl"] body {
 		font-family: var(--font-arabic), var(--font-sans);
 	}
@@ -291,16 +299,16 @@
 			0 0 10px var(--bloom-color, currentColor);
 	}
 
-	/* RTL helpers: flip physical utilities that the current codebase still uses */
+	/* RTL helpers: flip physical utilities that the current codebase still uses
+	   (Tailwind's native rtl: variant already covers rtl:rotate-180 usages —
+	   do NOT substring-match [class*="rotate-180"] here: it also matches
+	   calendar/day-picker roots whose class list merely contains that text and
+	   rotates the whole component upside-down). */
 	html[dir="rtl"] .text-left {
 		text-align: right;
 	}
 	html[dir="rtl"] .text-right {
 		text-align: left;
-	}
-	html[dir="rtl"] [class*="rotate-180"],
-	html[dir="rtl"] [class*="rtl:rotate-180"] {
-		transform: rotate(180deg);
 	}
 }
 

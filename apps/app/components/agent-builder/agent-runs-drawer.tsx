@@ -8,6 +8,7 @@ import {
 	SheetTitle,
 } from "@crm/ui/components/sheet";
 import { useState } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { AgentActivity, AgentRuns } from "./agent-history";
 
@@ -15,8 +16,8 @@ type Runs = RouterOutputs["agents"]["history"];
 type Activity = RouterOutputs["agents"]["activity"];
 
 const VIEWS = [
-	{ id: "runs", label: "Runs" },
-	{ id: "activity", label: "Activity" },
+	{ id: "runs", labelKey: "chat.drawer.runs" },
+	{ id: "activity", labelKey: "chat.drawer.activity" },
 ] as const;
 
 type View = (typeof VIEWS)[number]["id"];
@@ -41,6 +42,7 @@ export function AgentRunsDrawer({
 	retryingRunId?: string;
 	runs: Runs;
 }) {
+	const { messages } = useLocale();
 	const [view, setView] = useState<View>("runs");
 	const [wasOpen, setWasOpen] = useState(open);
 
@@ -53,9 +55,9 @@ export function AgentRunsDrawer({
 		<Sheet onOpenChange={onOpenChange} open={open}>
 			<SheetContent className="flex flex-col gap-0 p-0" side="right" size="xl">
 				<SheetHeader className="gap-1 border-b px-5 py-4">
-					<SheetTitle>History</SheetTitle>
+					<SheetTitle>{t(messages, "chat.drawer.history")}</SheetTitle>
 					<SheetDescription>
-						Every run and every change, newest first.
+						{t(messages, "chat.drawer.description")}
 					</SheetDescription>
 				</SheetHeader>
 
@@ -71,7 +73,7 @@ export function AgentRunsDrawer({
 							onClick={() => setView(entry.id)}
 							type="button"
 						>
-							{entry.label}{" "}
+							{t(messages, entry.labelKey)}{" "}
 							<span className="font-mono text-muted-foreground">
 								{entry.id === "runs" ? runs.length : activity.length}
 							</span>

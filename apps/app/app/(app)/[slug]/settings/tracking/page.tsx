@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellContent,
@@ -23,10 +24,11 @@ export default function TrackingSettingsPage() {
 		<PageShell>
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>Tracking &amp; Analytics</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.tracking" />
+					</PageShellTitle>
 					<PageShellDescription>
-						Track website visitors and automatically add contacts when a form is
-						submitted.
+						<LocalizedText k="settings.pages.trackingDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 			</PageShellHeader>

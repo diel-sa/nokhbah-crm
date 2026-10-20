@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellActions,
@@ -28,7 +29,9 @@ export default function ApiKeysSettingsPage({
 		<PageShell className="min-h-0">
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>API Keys</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.apiKeys" />
+					</PageShellTitle>
 					<PageShellDescription>
 						Personal keys for calling the CRM API. Each one acts as you —
 						anything it can read or change is exactly what you can.

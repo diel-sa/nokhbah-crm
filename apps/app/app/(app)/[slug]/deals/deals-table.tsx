@@ -9,8 +9,8 @@ import {
 	type DataTableFacet,
 } from "@crm/ui/components/data-table";
 import { EmptyCellValue } from "@crm/ui/components/empty-cell";
+import { Money } from "@crm/ui/components/money";
 import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
-import { formatMoney } from "@crm/ui/lib/format";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { CLOSING_OPTIONS } from "@/components/crm/closing-window";
@@ -81,9 +81,7 @@ const COLUMNS: DataTableColumn<DealRow>[] = [
 			row.amountCents === null ? (
 				<EmptyCellValue />
 			) : (
-				<span className="tabular-nums">
-					{formatMoney(row.amountCents, row.currency)}
-				</span>
+				<Money cents={row.amountCents} currency={row.currency} />
 			),
 	},
 	{
@@ -319,9 +317,10 @@ export function DealsTable() {
 				input.archived || openPipelineCents === null ? undefined : (
 					<span>
 						{deals.data?.total ?? 0} {t(messages, "nav.deals")} ·{" "}
-						<span className="tabular-nums">
-							{formatMoney(openPipelineCents, reportingCurrency)}
-						</span>{" "}
+						<Money
+							cents={openPipelineCents}
+							currency={reportingCurrency ?? "USD"}
+						/>{" "}
 						{t(messages, "deals.openPipelineMeta")}
 						{unconverted && unconverted.count > 0 ? (
 							<span className="text-muted-foreground">

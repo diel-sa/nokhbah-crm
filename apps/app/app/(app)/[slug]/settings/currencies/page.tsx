@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellContent,
@@ -23,10 +24,11 @@ export default function CurrenciesSettingsPage() {
 		<PageShell>
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>Currencies</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.currencies" />
+					</PageShellTitle>
 					<PageShellDescription>
-						What your numbers are reported in, and how the other currencies get
-						there.
+						<LocalizedText k="settings.pages.currenciesDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 			</PageShellHeader>

@@ -34,12 +34,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useReducer, useRef } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import {
 	type BuilderCommandType,
 	builderCommandType,
 	consumeBuilderCommand,
 	consumeBuilderIntent,
 } from "@/lib/agent-builder";
+import type { Messages } from "@/lib/i18n/messages";
 import { useTRPC } from "@/lib/trpc/client";
 import { AGENT_COMPOSER_CLASS_NAME } from "../agent-composer-frame";
 import {
@@ -415,6 +417,7 @@ export function AgentComposer({
 	) => Promise<void>;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 	const pendingSubmission = useRef<PendingSubmission | null>(null);
 	const editor = useRef<HTMLDivElement>(null);
 	const selectionOffset = useRef(initialPrompt.length);
@@ -535,7 +538,9 @@ export function AgentComposer({
 					disabled={!canSend}
 					aria-busy={submitAction.pending || state.attachmentsReading}
 					aria-label={
-						state.attachmentsReading ? "Preparing attachments" : "Send message"
+						state.attachmentsReading
+							? t(messages, "chat.composer.preparingAttachments")
+							: t(messages, "chat.composer.send")
 					}
 					onClick={submit}
 					className="rounded-full"
@@ -544,11 +549,21 @@ export function AgentComposer({
 						status={state.attachmentsReading ? "pending" : submitAction.status}
 						pendingLabel={
 							<span className="sr-only">
-								{state.attachmentsReading ? "Preparing attachments" : "Sending"}
+								{state.attachmentsReading
+									? t(messages, "chat.composer.preparingAttachments")
+									: t(messages, "chat.composer.sending")}
 							</span>
 						}
-						successLabel={<span className="sr-only">Sent</span>}
-						errorLabel={<span className="sr-only">Send failed</span>}
+						successLabel={
+							<span className="sr-only">
+								{t(messages, "chat.composer.sent")}
+							</span>
+						}
+						errorLabel={
+							<span className="sr-only">
+								{t(messages, "chat.composer.sendFailed")}
+							</span>
+						}
 					>
 						<Icon icon={ArrowUp} />
 					</AsyncButtonContent>
@@ -589,11 +604,12 @@ function ComposerEditor({
 	onRemoveContext: (key: string) => void;
 	onSubmit: () => void;
 }) {
+	const { messages } = useLocale();
 	const parts = composerEditorParts(state);
 	const placeholder =
 		mode === "home"
-			? "Ask about your CRM or automate a task…"
-			: "Send a message";
+			? t(messages, "chat.composer.placeholderHome")
+			: t(messages, "chat.composer.placeholderChat");
 	const commit = () => {
 		const root = editorRef.current;
 		if (!root || composingRef.current) return;
@@ -610,7 +626,7 @@ function ComposerEditor({
 			ref={editorRef}
 			role="textbox"
 			tabIndex={disabled ? -1 : 0}
-			aria-label="Message the agent builder"
+			aria-label={t(messages, "chat.composer.editorAria")}
 			aria-multiline="true"
 			aria-disabled={disabled}
 			data-empty={state.draft.length === 0 && state.anchors.length === 0}
@@ -770,12 +786,13 @@ function ComposerContextToken({
 	disabled: boolean;
 	onRemove: (key: string) => void;
 }) {
+	const { messages } = useLocale();
 	const remove = disabled ? undefined : () => onRemove(anchor.key);
 	let content: React.ReactNode = null;
 	if (anchor.key === COMMAND_CONTEXT_KEY && state.command) {
 		content = (
 			<ChatCommandChip
-				label={state.command.label}
+				label={t(messages, "chat.createAgent")}
 				icon={Application}
 				variant="composer"
 				onRemove={remove}
@@ -1232,6 +1249,7 @@ function ResourcePicker({
 	getInsertionOffset: () => number;
 	onPicked: (key: string) => void;
 }) {
+	const { messages } = useLocale();
 	const add = (resource: BuilderResource) => {
 		dispatch({
 			type: "resource.added",
@@ -1253,7 +1271,7 @@ function ResourcePicker({
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					aria-label="Tag CRM records and integrations"
+					aria-label={t(messages, "chat.composer.tagRecords")}
 					disabled={disabled}
 				>
 					<Icon icon={Add} />
@@ -1270,8 +1288,8 @@ function ResourcePicker({
 									value: event.target.value,
 								})
 							}
-							placeholder="Search CRM"
-							aria-label="Search CRM"
+							placeholder={t(messages, "chat.composer.searchCrm")}
+							aria-label={t(messages, "chat.composer.searchCrm")}
 							disabled={disabled}
 						/>
 						<InputGroupAddon>
@@ -1303,7 +1321,7 @@ function ResourcePicker({
 					})}
 					<SkeletonSwap
 						loading={loading}
-						label="CRM records"
+						label={t(messages, "chat.composer.crmRecords")}
 						skeleton={<ResourceResultsSkeleton />}
 					>
 						{resources.map((resource) => (
@@ -1318,7 +1336,7 @@ function ResourcePicker({
 						))}
 						{ready && connectedGoogle.length === 0 && resources.length === 0 ? (
 							<p className="px-3 py-5 text-center text-muted-foreground text-xs">
-								No matching records.
+								{t(messages, "chat.composer.noRecords")}
 							</p>
 						) : null}
 					</SkeletonSwap>
@@ -1341,12 +1359,13 @@ function AttachmentPicker({
 	getInsertionOffset: () => number;
 	onPicked: (key: string) => void;
 }) {
+	const { messages } = useLocale();
 	const input = useRef<HTMLInputElement>(null);
 	const addFiles = async (files: FileList | null) => {
 		if (!files || files.length === 0) return;
 		dispatch({ type: "attachments.reading.started" });
 		try {
-			const attachments = await readFiles(files);
+			const attachments = await readFiles(files, messages);
 			const accepted = attachments.slice(0, remaining);
 			const lastAccepted = accepted.at(-1);
 			if (lastAccepted) {
@@ -1358,7 +1377,7 @@ function AttachmentPicker({
 				onPicked(attachmentContextKey(lastAccepted));
 			}
 		} catch {
-			toast.error("Those files could not be attached. Try again.");
+			toast.error(t(messages, "chat.composer.attachFailed"));
 		} finally {
 			dispatch({ type: "attachments.reading.finished" });
 		}
@@ -1380,7 +1399,7 @@ function AttachmentPicker({
 			<Button
 				variant="ghost"
 				size="icon-sm"
-				aria-label="Attach files"
+				aria-label={t(messages, "chat.composer.attachFiles")}
 				disabled={disabled}
 				onClick={() => input.current?.click()}
 			>
@@ -1403,6 +1422,7 @@ function CommandPicker({
 	getInsertionOffset: () => number;
 	onPicked: (key: string) => void;
 }) {
+	const { messages } = useLocale();
 	return (
 		<Popover
 			open={disabled ? false : open}
@@ -1414,7 +1434,7 @@ function CommandPicker({
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					aria-label="Open slash commands"
+					aria-label={t(messages, "chat.composer.slashCommands")}
 					disabled={disabled}
 					className="font-mono text-sm"
 				>
@@ -1436,7 +1456,7 @@ function CommandPicker({
 				>
 					<Icon icon={Application} className="size-4 text-muted-foreground" />
 					<span className="font-medium text-xs">
-						/{CREATE_AGENT_COMMAND.label}
+						/{t(messages, "chat.createAgent")}
 					</span>
 				</button>
 			</PopoverContent>
@@ -1501,25 +1521,30 @@ function ResourceButton({
 
 async function readFiles(
 	files: FileList | null,
+	messages: Messages,
 ): Promise<BuilderUploadAttachment[]> {
 	if (!files) return [];
 	const acceptedFiles: File[] = [];
 
 	for (const file of Array.from(files).slice(0, 5)) {
 		if (file.size === 0) {
-			toast.error(`${file.name} is empty.`);
+			toast.error(tf(messages, "chat.composer.fileEmpty", { name: file.name }));
 			continue;
 		}
 		if (file.size > 2_000_000) {
-			toast.error(`${file.name} is larger than 2 MB.`);
+			toast.error(
+				tf(messages, "chat.composer.fileTooLarge", { name: file.name }),
+			);
 			continue;
 		}
 		if (file.name.length > 180) {
-			toast.error("That file name is too long.");
+			toast.error(t(messages, "chat.composer.fileNameTooLong"));
 			continue;
 		}
 		if (file.type.length > 120) {
-			toast.error(`${file.name} has an unsupported file type.`);
+			toast.error(
+				tf(messages, "chat.composer.fileUnsupported", { name: file.name }),
+			);
 			continue;
 		}
 		acceptedFiles.push(file);
@@ -1537,7 +1562,9 @@ async function readFiles(
 					),
 				};
 			} catch {
-				toast.error(`${file.name} could not be read.`);
+				toast.error(
+					tf(messages, "chat.composer.fileUnreadable", { name: file.name }),
+				);
 				return null;
 			}
 		}),

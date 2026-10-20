@@ -1,4 +1,7 @@
+"use client";
+
 import { Skeleton } from "@crm/ui/components/skeleton";
+import { t, useLocale } from "@/components/locale-provider";
 
 export function AgentBuilderShell({
 	children,
@@ -16,13 +19,15 @@ export function AgentBuilderShell({
 }
 
 export function AgentBuilderSidebarFallback() {
+	const { messages } = useLocale();
+
 	return (
 		<aside
 			className="hidden w-[213px] flex-none flex-col border-r p-4 md:flex"
 			aria-busy="true"
 		>
 			<div className="flex h-7 items-center pl-2 font-medium text-xs">
-				Chats
+				{t(messages, "chat.sidebar.chats")}
 			</div>
 			<div className="mt-3 space-y-2 px-2" aria-hidden="true">
 				<Skeleton className="h-2.5 w-16" />
@@ -30,7 +35,7 @@ export function AgentBuilderSidebarFallback() {
 				<Skeleton className="h-7 w-full" />
 			</div>
 			<span role="status" className="sr-only">
-				Loading agent navigation…
+				{t(messages, "chat.sidebar.loading")}
 			</span>
 		</aside>
 	);

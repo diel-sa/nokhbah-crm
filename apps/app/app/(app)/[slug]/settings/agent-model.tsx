@@ -26,6 +26,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
@@ -39,20 +40,27 @@ type CatalogModel = {
 
 const FOLLOW_DEFAULT = "__default__";
 
+type Messages = Parameters<typeof t>[0];
+
 function perMillion(rate: number): string {
 	const dollars = rate * 1_000_000;
 	return `$${dollars.toFixed(2).replace(/\.?0+$/, "")}`;
 }
 
-function priceHint(model: CatalogModel): string | null {
+function priceHint(model: CatalogModel, messages: Messages): string | null {
 	if (!model.pricing) return null;
-	return `${perMillion(model.pricing.input)} in · ${perMillion(model.pricing.output)} out per 1M`;
+	return tf(messages, "settings.agentModel.pricePerMillion", {
+		input: perMillion(model.pricing.input),
+		output: perMillion(model.pricing.output),
+	});
 }
 
-function contextHint(tokens: number): string {
-	return tokens >= 1_000_000
-		? `${Math.round(tokens / 1_000_000)}M context`
-		: `${Math.round(tokens / 1_000)}K context`;
+function contextHint(tokens: number, messages: Messages): string {
+	const size =
+		tokens >= 1_000_000
+			? `${Math.round(tokens / 1_000_000)}M`
+			: `${Math.round(tokens / 1_000)}K`;
+	return tf(messages, "settings.agentModel.context", { size });
 }
 
 function byProvider(models: CatalogModel[]): [string, CatalogModel[]][] {
@@ -68,6 +76,7 @@ function byProvider(models: CatalogModel[]): [string, CatalogModel[]][] {
 }
 
 export function AgentModel() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const [open, setOpen] = useState(false);
@@ -79,7 +88,7 @@ export function AgentModel() {
 		trpc.settings.setAgentModel.mutationOptions({
 			onSuccess: async () => {
 				await cache.settings();
-				toast.success("The agent will use this model from its next session.");
+				toast.success(t(messages, "settings.agentModel.savedToast"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -98,7 +107,7 @@ export function AgentModel() {
 
 	const currentLabel = selectedId
 		? effectiveName
-		: `Default — ${effectiveName}`;
+		: tf(messages, "settings.agentModel.default", { name: effectiveName });
 
 	const choose = (id: string) => {
 		setOpen(false);
@@ -109,9 +118,9 @@ export function AgentModel() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Research agent</CardTitle>
+				<CardTitle>{t(messages, "settings.agentModel.title")}</CardTitle>
 				<CardDescription>
-					The model the agent thinks with, routed through the Vercel AI Gateway.
+					{t(messages, "settings.agentModel.description")}
 				</CardDescription>
 			</CardHeader>
 
@@ -122,7 +131,7 @@ export function AgentModel() {
 							variant="outline"
 							role="combobox"
 							aria-expanded={open}
-							aria-label="Model"
+							aria-label={t(messages, "settings.agentModel.modelAria")}
 							disabled={save.isPending || catalog.isPending || unavailable}
 						>
 							{currentLabel}
@@ -132,9 +141,16 @@ export function AgentModel() {
 
 					<PopoverContent align="start" size="fit" className="w-96">
 						<Command>
-							<CommandInput placeholder="Search models…" />
+							<CommandInput
+								placeholder={t(
+									messages,
+									"settings.agentModel.searchPlaceholder",
+								)}
+							/>
 							<CommandList>
-								<CommandEmpty>No model matches that.</CommandEmpty>
+								<CommandEmpty>
+									{t(messages, "settings.agentModel.noMatch")}
+								</CommandEmpty>
 
 								<CommandGroup>
 									<CommandItem
@@ -142,14 +158,16 @@ export function AgentModel() {
 										data-checked={current === FOLLOW_DEFAULT}
 										onSelect={() => choose(FOLLOW_DEFAULT)}
 									>
-										Default — {defaultModel?.name ?? defaultId}
+										{tf(messages, "settings.agentModel.default", {
+											name: defaultModel?.name ?? defaultId,
+										})}
 									</CommandItem>
 								</CommandGroup>
 
 								{byProvider(models).map(([provider, group]) => (
 									<CommandGroup key={provider} heading={provider}>
 										{group.map((model) => {
-											const price = priceHint(model);
+											const price = priceHint(model, messages);
 
 											return (
 												<CommandItem
@@ -160,7 +178,8 @@ export function AgentModel() {
 												>
 													<span>{model.name}</span>
 													<span className="ml-auto text-muted-foreground text-xs">
-														{price ?? contextHint(model.contextWindowTokens)}
+														{price ??
+															contextHint(model.contextWindowTokens, messages)}
 													</span>
 												</CommandItem>
 											);
@@ -174,10 +193,14 @@ export function AgentModel() {
 
 				<p className="text-muted-foreground text-xs">
 					{unavailable
-						? `Could not reach the AI Gateway to list models. The agent is still running ${effectiveId}.`
+						? tf(messages, "settings.agentModel.unavailable", {
+								model: effectiveId,
+							})
 						: effective
-							? `${effectiveId} · ${contextHint(effective.contextWindowTokens)}${
-									priceHint(effective) ? ` · ${priceHint(effective)}` : ""
+							? `${effectiveId} · ${contextHint(effective.contextWindowTokens, messages)}${
+									priceHint(effective, messages)
+										? ` · ${priceHint(effective, messages)}`
+										: ""
 								}`
 							: effectiveId}
 				</p>

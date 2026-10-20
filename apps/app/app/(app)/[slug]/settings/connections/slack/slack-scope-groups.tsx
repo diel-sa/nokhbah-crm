@@ -10,6 +10,7 @@ import {
 	AccordionTrigger,
 } from "@crm/ui/components/accordion";
 import { Icon } from "@crm/ui/components/icon";
+import { t, tf, useLocale } from "@/components/locale-provider";
 
 export type ScopeLine = {
 	scope: string;
@@ -29,17 +30,18 @@ export function SlackScopeGroups({
 	groups,
 	withheld,
 }: {
-	title: string;
+	title: React.ReactNode;
 	groups: ScopeGroup[];
 	withheld: ScopeLine[];
 }) {
+	const { messages } = useLocale();
+
 	return (
 		<section className="flex flex-col gap-3 px-(--spacing-block-inline)">
 			<div>
 				<h2 className="font-medium text-sm">{title}</h2>
 				<p className="text-muted-foreground text-xs">
-					Broad means the whole workspace, not one channel. Open a group to see
-					the details.
+					{t(messages, "settings.connections.scopeGroups.broadNote")}
 				</p>
 			</div>
 
@@ -57,7 +59,10 @@ export function SlackScopeGroups({
 									</span>
 								</span>
 								<span className="shrink-0 whitespace-nowrap pt-0.5 pr-2 font-normal text-muted-foreground text-xs">
-									{broad} broad of {group.scopes.length}
+									{tf(messages, "settings.connections.scopeGroups.broadCount", {
+										broad,
+										total: group.scopes.length,
+									})}
 								</span>
 							</AccordionTrigger>
 
@@ -94,11 +99,11 @@ export function SlackScopeGroups({
 								{entry.grant}
 							</span>
 							<span className="text-muted-foreground text-xs">
-								Slack held this one back, so it is off.
+								{t(messages, "settings.connections.scopeGroups.withheldNote")}
 							</span>
 						</span>
 						<span className="shrink-0 whitespace-nowrap pt-0.5 pr-2 text-muted-foreground text-xs">
-							Not granted
+							{t(messages, "settings.connections.scopeGroups.notGranted")}
 						</span>
 					</div>
 				))}

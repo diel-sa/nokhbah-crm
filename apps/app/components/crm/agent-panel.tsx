@@ -53,6 +53,7 @@ import {
 	ConversationPicker,
 	useConversations,
 } from "@/components/crm/agent-conversations";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import {
 	type AgentRecord,
 	recordCopy,
@@ -202,6 +203,7 @@ function Thread({
 	thread: ThreadState | undefined;
 	onNewThread: () => void;
 }) {
+	const { messages: uiMessages } = useLocale();
 	const copy = recordCopy(record.kind);
 	const agent = useEveAgent({
 		headers: recordHeader(record),
@@ -267,18 +269,17 @@ function Thread({
 
 			{thread?.status === "working" && !busy ? (
 				<p className="border-t px-4 py-2 text-pretty text-muted-foreground text-xs sm:px-5">
-					Still working on the last question. Your next one can go in when it
-					finishes.
+					{t(uiMessages, "chat.panel.stillWorking")}
 				</p>
 			) : null}
 
 			{ended ? (
 				<div className="flex flex-col items-start gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-2">
 					<p className="text-pretty text-muted-foreground text-xs">
-						This conversation has ended.
+						{t(uiMessages, "chat.panel.ended")}
 					</p>
 					<Button variant="outline" size="sm" onClick={onNewThread}>
-						Start a new conversation
+						{t(uiMessages, "chat.panel.startNew")}
 					</Button>
 				</div>
 			) : null}
@@ -312,7 +313,7 @@ function Thread({
 							disabled={locked}
 						>
 							{busy ? <Spinner /> : <Icon icon={Send} />}
-							<span className="sr-only">Ask</span>
+							<span className="sr-only">{t(uiMessages, "chat.panel.ask")}</span>
 						</Button>
 					</form>
 				)}
@@ -388,6 +389,7 @@ const SOURCE_ICONS = {
 } satisfies Record<Source["network"], CarbonIcon>;
 
 function Item({ item }: { item: TranscriptItem }) {
+	const { messages } = useLocale();
 	if (item.kind === "said") {
 		return item.mine ? (
 			<Message align="end" className="min-w-0">
@@ -414,7 +416,7 @@ function Item({ item }: { item: TranscriptItem }) {
 	if (item.kind === "asked") {
 		return (
 			<div className="w-full max-w-sm border-ring/50 border-l-2 bg-muted/40 px-3 py-2.5">
-				<p className="font-medium text-xs">Follow-up</p>
+				<p className="font-medium text-xs">{t(messages, "chat.followUp")}</p>
 				<Markdown className="mt-1.5 wrap-break-word text-sm leading-5">
 					{item.question.prompt}
 				</Markdown>
@@ -439,6 +441,7 @@ function Item({ item }: { item: TranscriptItem }) {
 }
 
 function Sources({ sources }: { sources: Source[] }) {
+	const { messages } = useLocale();
 	return (
 		<AttachmentGroup>
 			{sources.map((source) => (
@@ -452,7 +455,9 @@ function Sources({ sources }: { sources: Source[] }) {
 
 					<AttachmentTrigger asChild>
 						<a href={source.url} target="_blank" rel="noreferrer noopener">
-							<span className="sr-only">Open {source.title}</span>
+							<span className="sr-only">
+								{tf(messages, "chat.openRecord", { name: source.title })}
+							</span>
 						</a>
 					</AttachmentTrigger>
 				</Attachment>

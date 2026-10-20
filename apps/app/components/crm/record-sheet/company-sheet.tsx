@@ -13,6 +13,7 @@ import {
 	type EntityLogoTone,
 } from "@crm/ui/components/entity-logo";
 import { Icon } from "@crm/ui/components/icon";
+import { Money } from "@crm/ui/components/money";
 import { PersonAvatar } from "@crm/ui/components/person-avatar";
 import { SimpleTable, SimpleTableRow } from "@crm/ui/components/simple-table";
 import { TableCell } from "@crm/ui/components/table";
@@ -21,7 +22,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@crm/ui/components/tooltip";
-import { formatMoney } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AgentPanel } from "@/components/crm/agent-panel";
@@ -270,9 +270,10 @@ export function CompanySheet({ companyId }: { companyId: string }) {
 				company ? (
 					<DetailSheetStats>
 						<DetailSheetStat label={t(messages, "dashboard.openPipeline")}>
-							<span className="tabular-nums">
-								{formatMoney(openValueCents, company.reportingCurrency)}
-							</span>
+							<Money
+								cents={openValueCents}
+								currency={company.reportingCurrency}
+							/>
 							{openUncounted > 0 ? (
 								<span className="text-muted-foreground">
 									{" "}

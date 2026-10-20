@@ -12,6 +12,7 @@ import {
 	type EntityLogoTone,
 } from "@crm/ui/components/entity-logo";
 import { Icon } from "@crm/ui/components/icon";
+import { Money } from "@crm/ui/components/money";
 import { PersonAvatar } from "@crm/ui/components/person-avatar";
 import { SimpleTable, SimpleTableRow } from "@crm/ui/components/simple-table";
 import { TableCell } from "@crm/ui/components/table";
@@ -99,8 +100,12 @@ function ReportedValue({ deal }: { deal: Deal }) {
 					No {currency} rate — left out of totals
 				</span>
 			) : (
-				<span className="tabular-nums text-muted-foreground">
-					≈ {formatMoney(deal.baseAmountCents, deal.reportingCurrency)}
+				<span className="text-muted-foreground">
+					≈{" "}
+					<Money
+						cents={deal.baseAmountCents}
+						currency={deal.reportingCurrency}
+					/>
 				</span>
 			)}
 		</DetailSheetProperty>
@@ -220,9 +225,10 @@ export function DealSheet({ dealId }: { dealId: string }) {
 							{deal.amountCents === null ? (
 								<EmptyCellValue />
 							) : (
-								<span className="tabular-nums">
-									{formatMoney(deal.amountCents, dealCurrency(deal.currency))}
-								</span>
+								<Money
+									cents={deal.amountCents}
+									currency={dealCurrency(deal.currency)}
+								/>
 							)}
 						</DetailSheetStat>
 						<DetailSheetStat label="Expected close">

@@ -14,44 +14,82 @@ import { OwnerCell } from "@/components/crm/owner-cell";
 import { usePrefetchRecord } from "@/components/crm/record-sheet/record-prefetch";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { LocalDay } from "@/components/local-date-time";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import type { DealListItem, DealListResult } from "@/lib/agent-transcript";
 import { DEAL_STAGE_OPTIONS } from "@/lib/deal-stage";
+import type { Messages } from "@/lib/i18n/messages";
 
-const COLUMNS: SimpleTableColumn[] = [
-	{ id: "deal", header: "Deal", width: "w-[20%]" },
-	{ id: "company", header: "Company", width: "w-[18%]" },
-	{ id: "stage", header: "Stage", width: "w-[18%]" },
-	{
-		id: "amount",
-		header: "Amount",
-		width: "w-[12%]",
-		align: "right",
-	},
-	{ id: "owner", header: "Owner", width: "w-[14%]" },
-	{ id: "close", header: "Close date", width: "w-[12%]" },
-	{ id: "idle", header: "Idle", width: "w-[8%]", align: "right" },
-];
+function dealStatusLabel(messages: Messages, status: string): string | null {
+	const map = messages.chat.deal.dealStatus as Record<
+		string,
+		string | undefined
+	>;
+	return map[status] ?? null;
+}
+
+function columnsOf(messages: Messages): SimpleTableColumn[] {
+	return [
+		{
+			id: "deal",
+			header: t(messages, "chat.deal.columns.deal"),
+			width: "w-[20%]",
+		},
+		{
+			id: "company",
+			header: t(messages, "chat.deal.columns.company"),
+			width: "w-[18%]",
+		},
+		{
+			id: "stage",
+			header: t(messages, "chat.deal.columns.stage"),
+			width: "w-[18%]",
+		},
+		{
+			id: "amount",
+			header: t(messages, "chat.deal.columns.amount"),
+			width: "w-[12%]",
+			align: "right",
+		},
+		{
+			id: "owner",
+			header: t(messages, "chat.deal.columns.owner"),
+			width: "w-[14%]",
+		},
+		{
+			id: "close",
+			header: t(messages, "chat.deal.columns.closeDate"),
+			width: "w-[12%]",
+		},
+		{
+			id: "idle",
+			header: t(messages, "chat.deal.columns.idle"),
+			width: "w-[8%]",
+			align: "right",
+		},
+	];
+}
 
 export function DealListResultTable({ result }: { result: DealListResult }) {
+	const { messages } = useLocale();
 	const openRecord = useOpenRecord();
 	const prefetchRecord = usePrefetchRecord();
 	const count = result.deals.length;
-	const title = tableTitle(result);
+	const title = tableTitle(result, messages);
 
 	return (
 		<section aria-label={title} className="flex w-full flex-col gap-3">
 			<SimpleTable
-				columns={COLUMNS}
+				columns={columnsOf(messages)}
 				className="min-w-[56rem] table-fixed [&_td:first-child]:pl-4 [&_td:last-child]:pr-4 [&_th:first-child]:pl-4 [&_th:last-child]:pr-4"
 				headerHeight="h-11"
 			>
 				{count === 0 ? (
 					<SimpleTableRow>
 						<TableCell
-							colSpan={COLUMNS.length}
+							colSpan={columnsOf(messages).length}
 							className="h-32 whitespace-normal py-8 text-center align-middle text-muted-foreground"
 						>
-							No deals met these pipeline filters.
+							{t(messages, "chat.deal.noDeals")}
 						</TableCell>
 					</SimpleTableRow>
 				) : (
@@ -105,11 +143,13 @@ export function DealListResultTable({ result }: { result: DealListResult }) {
 									className="overflow-hidden px-3 py-3 text-right text-muted-foreground tabular-nums"
 									title={
 										deal.neverActive
-											? "No activity has ever been recorded"
+											? t(messages, "chat.deal.noActivity")
 											: undefined
 									}
 								>
-									{deal.daysSinceLastActivity}d
+									{tf(messages, "chat.deal.days", {
+										count: deal.daysSinceLastActivity,
+									})}
 								</TableCell>
 							</SimpleTableRow>
 						);
@@ -117,9 +157,10 @@ export function DealListResultTable({ result }: { result: DealListResult }) {
 				)}
 			</SimpleTable>
 			<div className="flex flex-wrap items-center justify-between gap-3 text-muted-foreground text-xs">
-				<span>{tableMeta(result)}</span>
+				<span>{tableMeta(result, messages)}</span>
 				<span>
-					As of <LocalDay date={result.asOf} />
+					{tf(messages, "chat.deal.asOf", { date: "" })}
+					<LocalDay date={result.asOf} />
 				</span>
 			</div>
 		</section>
@@ -137,24 +178,42 @@ function Stage({ stage }: { stage: string }) {
 	);
 }
 
-function tableTitle(result: DealListResult): string {
+function tableTitle(result: DealListResult, messages: Messages): string {
 	const count = result.deals.length;
-	const status =
-		result.criteria.status === "all" ? "" : `${result.criteria.status} `;
-	const stale = result.criteria.inactiveForDays === null ? "" : "stale ";
-	return count === 0
-		? "No matching deals"
-		: `${count} ${stale}${status}deal${count === 1 ? "" : "s"}`;
+	if (count === 0) return t(messages, "chat.deal.noMatching");
+	const statusValue = dealStatusLabel(messages, result.criteria.status);
+	const statusWord =
+		result.criteria.status === "all"
+			? ""
+			: `${statusValue ?? result.criteria.status} `;
+	const staleWord =
+		result.criteria.inactiveForDays === null
+			? ""
+			: `${t(messages, "chat.deal.stale")} `;
+	const countWord = tf(
+		messages,
+		count === 1 ? "chat.deal.dealCountOne" : "chat.deal.dealCountMany",
+		{ count },
+	);
+	return `${countWord} ${staleWord}${statusWord}`.trim();
 }
 
-function tableMeta(result: DealListResult): string {
+function tableMeta(result: DealListResult, messages: Messages): string {
 	const details = [
-		`${result.deals.length} deal${result.deals.length === 1 ? "" : "s"}`,
-		pipelineTotal(result.deals),
+		tf(
+			messages,
+			result.deals.length === 1
+				? "chat.deal.dealCountOne"
+				: "chat.deal.dealCountMany",
+			{ count: result.deals.length },
+		),
+		pipelineTotal(result.deals, messages),
 		result.criteria.inactiveForDays === null
 			? null
-			: `${result.criteria.inactiveForDays}+ days inactive`,
-		result.hasMore ? "More results available" : null,
+			: tf(messages, "chat.deal.inactiveDays", {
+					count: result.criteria.inactiveForDays,
+				}),
+		result.hasMore ? t(messages, "chat.deal.moreResults") : null,
 	].filter((detail): detail is string => Boolean(detail));
 
 	return details.join(" · ");
@@ -168,7 +227,10 @@ function humaniseStage(stage: string): string {
 		.join(" ");
 }
 
-function pipelineTotal(deals: readonly DealListItem[]): string | null {
+function pipelineTotal(
+	deals: readonly DealListItem[],
+	messages: Messages,
+): string | null {
 	const currencies = new Set(deals.map((deal) => deal.currency));
 	if (currencies.size !== 1) return null;
 
@@ -176,5 +238,7 @@ function pipelineTotal(deals: readonly DealListItem[]): string | null {
 	if (!currency) return null;
 
 	const amount = deals.reduce((sum, deal) => sum + (deal.amount ?? 0), 0);
-	return `${formatMoney(Math.round(amount * 100), currency)} pipeline`;
+	return tf(messages, "chat.deal.pipeline", {
+		total: formatMoney(Math.round(amount * 100), currency),
+	});
 }

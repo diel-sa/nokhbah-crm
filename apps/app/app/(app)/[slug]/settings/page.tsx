@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellContent,
@@ -27,9 +28,11 @@ export default function GeneralSettingsPage() {
 		<PageShell>
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>General</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.general" />
+					</PageShellTitle>
 					<PageShellDescription>
-						Who you are, and the model the research agent thinks with.
+						<LocalizedText k="settings.pages.generalDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 			</PageShellHeader>

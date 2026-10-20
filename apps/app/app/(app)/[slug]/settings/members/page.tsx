@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LocalizedText } from "@/components/localized-text";
 import {
 	PageShell,
 	PageShellContent,
@@ -26,9 +27,11 @@ export default function MembersSettingsPage({
 		<PageShell className="min-h-0">
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>Members</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="settings.pages.members" />
+					</PageShellTitle>
 					<PageShellDescription>
-						Everyone who has access to your CRM.
+						<LocalizedText k="settings.pages.membersDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 			</PageShellHeader>

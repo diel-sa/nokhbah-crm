@@ -20,28 +20,30 @@ import { Switch } from "@crm/ui/components/switch";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
 const TOGGLES = [
 	{
 		flag: "cookieSubdomains",
-		label: "Limit cookies to subdomains",
-		hint: "Set the cookie on the exact host that served the page, never on the parent domain",
+		labelKey: "settings.tracking.cookies.cookieSubdomains",
+		hintKey: "settings.tracking.cookies.cookieSubdomainsHint",
 	},
 	{
 		flag: "secureCookies",
-		label: "Use secure cookies only",
-		hint: "Send the cookie over HTTPS and drop it on plain HTTP",
+		labelKey: "settings.tracking.cookies.secureCookies",
+		hintKey: "settings.tracking.cookies.secureCookiesHint",
 	},
 	{
 		flag: "honourDnt",
-		label: "Honour Do Not Track",
-		hint: "Record nothing at all when the browser asks not to be tracked",
+		labelKey: "settings.tracking.cookies.honourDnt",
+		hintKey: "settings.tracking.cookies.honourDntHint",
 	},
 ] as const;
 
 export function TrackingCookies() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const lifetimeId = useId();
@@ -59,7 +61,7 @@ export function TrackingCookies() {
 		trpc.tracking.setCookieLifetime.mutationOptions({
 			onSuccess: async () => {
 				await cache.tracking();
-				toast.success("Cookie lifetime saved.");
+				toast.success(t(messages, "settings.tracking.cookies.savedToast"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -73,9 +75,9 @@ export function TrackingCookies() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Cookies</CardTitle>
+				<CardTitle>{t(messages, "settings.tracking.cookies.title")}</CardTitle>
 				<CardDescription>
-					How a returning visitor is recognised.
+					{t(messages, "settings.tracking.cookies.description")}
 				</CardDescription>
 			</CardHeader>
 
@@ -89,9 +91,9 @@ export function TrackingCookies() {
 							htmlFor={`tracking-${toggle.flag}`}
 							className="flex flex-col items-start gap-1"
 						>
-							<span className="text-sm">{toggle.label}</span>
+							<span className="text-sm">{t(messages, toggle.labelKey)}</span>
 							<span className="font-normal text-muted-foreground text-xs">
-								{toggle.hint}
+								{t(messages, toggle.hintKey)}
 							</span>
 						</Label>
 
@@ -107,7 +109,9 @@ export function TrackingCookies() {
 				))}
 
 				<Field>
-					<FieldLabel htmlFor={lifetimeId}>Cookie lifetime</FieldLabel>
+					<FieldLabel htmlFor={lifetimeId}>
+						{t(messages, "settings.tracking.cookies.lifetime")}
+					</FieldLabel>
 					<Select
 						value={String(cookieDays)}
 						disabled={busy}
@@ -127,8 +131,7 @@ export function TrackingCookies() {
 						</SelectContent>
 					</Select>
 					<FieldDescription>
-						After this a returning visitor counts as somebody new. Shorten it if
-						your policy asks you to.
+						{t(messages, "settings.tracking.cookies.lifetimeHint")}
 					</FieldDescription>
 				</Field>
 			</CardContent>

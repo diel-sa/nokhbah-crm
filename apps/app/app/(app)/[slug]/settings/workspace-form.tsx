@@ -27,12 +27,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import { useWorkspaceSlug } from "@/lib/use-workspace-url";
 import { workspaceUrl } from "@/lib/workspace-url";
 
 export function WorkspaceForm() {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const router = useRouter();
@@ -52,7 +54,7 @@ export function WorkspaceForm() {
 			onSuccess: async (saved) => {
 				await cache.workspace();
 				setDraft(null);
-				toast.success("Workspace saved.");
+				toast.success(t(messages, "settings.workspace.savedToast"));
 
 				if (saved.slug !== slug) {
 					router.replace(workspaceUrl(saved.slug, "/settings"));
@@ -75,9 +77,9 @@ export function WorkspaceForm() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Workspace</CardTitle>
+				<CardTitle>{t(messages, "settings.workspace.title")}</CardTitle>
 				<CardDescription>
-					The name and website of the company using this CRM.
+					{t(messages, "settings.workspace.description")}
 				</CardDescription>
 
 				<CardAction>
@@ -93,7 +95,7 @@ export function WorkspaceForm() {
 						}
 					>
 						{save.isPending ? <Spinner data-icon="inline-start" /> : null}
-						Save
+						{t(messages, "settings.workspace.save")}
 					</Button>
 				</CardAction>
 			</CardHeader>
@@ -111,23 +113,27 @@ export function WorkspaceForm() {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={nameId}>Name</FieldLabel>
+							<FieldLabel htmlFor={nameId}>
+								{t(messages, "settings.workspace.name")}
+							</FieldLabel>
 							<Input
 								id={nameId}
 								value={values.name}
 								onChange={(event) => edit({ name: event.target.value })}
-								placeholder="Acme Inc."
+								placeholder={t(messages, "settings.workspace.namePlaceholder")}
 								autoComplete="organization"
 								disabled={!canRename || save.isPending}
 								required
 							/>
 							<FieldDescription>
-								Shown wherever the CRM refers to your own company.
+								{t(messages, "settings.workspace.nameHint")}
 							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={websiteId}>Website</FieldLabel>
+							<FieldLabel htmlFor={websiteId}>
+								{t(messages, "settings.workspace.website")}
+							</FieldLabel>
 							<InputGroup>
 								<InputGroupAddon>
 									<InputGroupText>https://</InputGroupText>
@@ -145,14 +151,16 @@ export function WorkspaceForm() {
 									disabled={!canRename || save.isPending}
 								/>
 							</InputGroup>
-							<FieldDescription>Your own company's website.</FieldDescription>
+							<FieldDescription>
+								{t(messages, "settings.workspace.websiteHint")}
+							</FieldDescription>
 						</Field>
 					</FieldGroup>
 				</form>
 
 				{canRename ? null : (
 					<p className="text-muted-foreground text-xs">
-						Only an owner or an admin can change this.
+						{t(messages, "settings.workspace.notAllowed")}
 					</p>
 				)}
 			</CardContent>

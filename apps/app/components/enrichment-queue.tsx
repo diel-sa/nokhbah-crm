@@ -29,6 +29,7 @@ import {
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { elapsedLabel, queueFooter } from "@/lib/enrichment-queue";
 import {
 	ENRICHMENT_IDLE_POLL_MS,
@@ -67,6 +68,7 @@ export function EnrichmentQueue() {
 	});
 
 	const rows = queue.data?.rows ?? [];
+	const { messages } = useLocale();
 	const total = queue.data?.total ?? 0;
 	const scheduled = queue.data?.scheduled ?? [];
 	const scheduledTotal = queue.data?.scheduledTotal ?? 0;
@@ -100,14 +102,16 @@ export function EnrichmentQueue() {
 						tone={total > 0 ? "primary" : "neutral"}
 						aria-hidden="true"
 					/>
-					{total > 0 ? `Enriching ${total}` : "Enriching"}
+					{total > 0
+						? tf(messages, "enrichment.enrichingCount", { count: total })
+						: t(messages, "enrichment.enriching")}
 				</Button>
 			</PopoverTrigger>
 
 			<PopoverContent align="end" size="panel">
 				<div className="flex items-center justify-between border-b px-4 py-3">
 					<span className="font-semibold text-popover-foreground text-sm">
-						Enriching now
+						{t(messages, "enrichmentQueue.title")}
 					</span>
 					<span className="font-mono text-muted-foreground text-xs">
 						{total}
@@ -117,11 +121,10 @@ export function EnrichmentQueue() {
 				{visible.length === 0 ? (
 					<div className="flex flex-col gap-1 px-6 py-8 text-center">
 						<span className="font-medium text-popover-foreground text-sm">
-							Nothing right now
+							{t(messages, "enrichmentQueue.emptyTitle")}
 						</span>
 						<span className="text-muted-foreground text-xs">
-							New companies and contacts show up here while your agents look
-							them up.
+							{t(messages, "enrichmentQueue.emptyDesc")}
 						</span>
 					</div>
 				) : (
@@ -135,7 +138,9 @@ export function EnrichmentQueue() {
 				{footer.more > 0 ? (
 					<div className="flex items-center justify-between px-4 py-3 text-xs">
 						<span className="text-muted-foreground">
-							{footer.more} more queued
+							{tf(messages, "enrichmentQueue.moreQueued", {
+								count: footer.more,
+							})}
 						</span>
 						{footer.action === "show-all" ? (
 							<button
@@ -143,7 +148,7 @@ export function EnrichmentQueue() {
 								className="cursor-pointer text-primary"
 								onClick={() => setExpanded(true)}
 							>
-								Show all
+								{t(messages, "enrichmentQueue.showAll")}
 							</button>
 						) : null}
 						{footer.action === "load-more" ? (
@@ -156,7 +161,7 @@ export function EnrichmentQueue() {
 									)
 								}
 							>
-								Load more
+								{t(messages, "enrichmentQueue.loadMore")}
 							</button>
 						) : null}
 					</div>
@@ -278,16 +283,21 @@ function ScheduledSection({
 	onOpen: (row: ScheduledRow) => void;
 }) {
 	const [shown, setShown] = useState(false);
+	const { messages } = useLocale();
 
 	return (
 		<Collapsible className="border-t" open={shown} onOpenChange={setShown}>
 			<CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between px-4 py-3 text-xs hover:bg-muted">
 				<span className="text-muted-foreground">
 					{total === 1
-						? "1 record is booked for a later look"
-						: `${total} records are booked for a later look`}
+						? t(messages, "enrichmentQueue.bookedOne")
+						: tf(messages, "enrichmentQueue.bookedMany", { count: total })}
 				</span>
-				<span className="text-primary">{shown ? "Hide" : "Show"}</span>
+				<span className="text-primary">
+					{shown
+						? t(messages, "enrichmentQueue.hide")
+						: t(messages, "enrichmentQueue.show")}
+				</span>
 			</CollapsibleTrigger>
 
 			<CollapsibleContent className="max-h-60 overflow-y-auto border-t">
@@ -310,7 +320,9 @@ function ScheduledSection({
 
 				{total > rows.length ? (
 					<div className="px-4 py-3 text-muted-foreground text-xs">
-						{total - rows.length} more are booked but not listed here
+						{tf(messages, "enrichmentQueue.moreBooked", {
+							count: total - rows.length,
+						})}
 					</div>
 				) : null}
 			</CollapsibleContent>

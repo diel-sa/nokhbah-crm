@@ -17,6 +17,7 @@ import {
 	EntityLogo,
 	type EntityLogoTone,
 } from "@crm/ui/components/entity-logo";
+import { Money } from "@crm/ui/components/money";
 import {
 	SimpleTable,
 	type SimpleTableColumn,
@@ -216,7 +217,11 @@ export function DashboardSummary() {
 											{deal.amountCents === null ? (
 												<EmptyCellValue />
 											) : (
-												formatMoneyCompact(deal.amountCents, deal.currency)
+												<Money
+													cents={deal.amountCents}
+													currency={deal.currency}
+													compact
+												/>
 											)}
 										</TableCell>
 									</SimpleTableRow>

@@ -1,5 +1,6 @@
 "use client";
 
+import { UiStringsProvider } from "@crm/ui/components/ui-strings";
 import { createContext, useContext, useState } from "react";
 import type { Locale } from "@/lib/i18n/locale";
 import type { Messages } from "@/lib/i18n/messages";
@@ -43,7 +44,16 @@ export function LocaleProvider({
 	};
 
 	return (
-		<LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+		<LocaleContext.Provider value={value}>
+			<UiStringsProvider
+				strings={{
+					...value.messages.ui,
+					...value.messages.common,
+				}}
+			>
+				{children}
+			</UiStringsProvider>
+		</LocaleContext.Provider>
 	);
 }
 

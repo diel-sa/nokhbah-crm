@@ -25,6 +25,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { FieldEntity } from "@/components/crm/fields/fields-entity";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
@@ -47,6 +48,7 @@ export function SavedViewsMenu({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 	const views = useQuery(trpc.savedViews.list.queryOptions({ entity }));
 
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -65,7 +67,7 @@ export function SavedViewsMenu({
 		trpc.savedViews.create.mutationOptions({
 			onSuccess: async () => {
 				await settle();
-				toast.success("View saved.");
+				toast.success(t(messages, "common.viewSaved"));
 				closeDialog();
 			},
 			onError: (error) => toast.error(error.message),
@@ -76,7 +78,7 @@ export function SavedViewsMenu({
 		trpc.savedViews.delete.mutationOptions({
 			onSuccess: async () => {
 				await settle();
-				toast.success("View deleted.");
+				toast.success(t(messages, "common.viewDeleted"));
 			},
 			onError: (error) => toast.error(error.message),
 		}),
@@ -96,15 +98,19 @@ export function SavedViewsMenu({
 						className="justify-start sm:justify-center"
 					>
 						<Bookmark data-icon="inline-start" />
-						Views
+						{t(messages, "common.views")}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="min-w-56">
 					<DropdownMenuItem onSelect={() => setDialogOpen(true)}>
-						Save current view…
+						{t(messages, "common.saveCurrentView")}
 					</DropdownMenuItem>
 					{list.length > 0 && <DropdownMenuSeparator />}
-					{mine.length > 0 && <DropdownMenuLabel>My views</DropdownMenuLabel>}
+					{mine.length > 0 && (
+						<DropdownMenuLabel>
+							{t(messages, "common.myViews")}
+						</DropdownMenuLabel>
+					)}
 					{mine.map((view) => (
 						<ViewItem
 							key={view.id}
@@ -114,7 +120,9 @@ export function SavedViewsMenu({
 						/>
 					))}
 					{shared_.length > 0 && (
-						<DropdownMenuLabel>Shared with the team</DropdownMenuLabel>
+						<DropdownMenuLabel>
+							{t(messages, "common.sharedWithTeam")}
+						</DropdownMenuLabel>
 					)}
 					{shared_.map((view) => (
 						<DropdownMenuItem
@@ -133,11 +141,13 @@ export function SavedViewsMenu({
 			>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Save this view</DialogTitle>
+						<DialogTitle>{t(messages, "common.saveThisView")}</DialogTitle>
 					</DialogHeader>
 					<div className="flex flex-col gap-4">
 						<Field>
-							<FieldLabel htmlFor="saved-view-name">Name</FieldLabel>
+							<FieldLabel htmlFor="saved-view-name">
+								{t(messages, "common.name")}
+							</FieldLabel>
 							<Input
 								id="saved-view-name"
 								value={name}
@@ -147,7 +157,7 @@ export function SavedViewsMenu({
 						</Field>
 						<Field orientation="horizontal">
 							<FieldLabel htmlFor="saved-view-shared">
-								Share with the team
+								{t(messages, "common.shareWithTeam")}
 							</FieldLabel>
 							<Switch
 								id="saved-view-shared"
@@ -158,7 +168,7 @@ export function SavedViewsMenu({
 					</div>
 					<DialogFooter>
 						<Button variant="outline" onClick={closeDialog}>
-							Cancel
+							{t(messages, "common.cancel")}
 						</Button>
 						<Button
 							disabled={name.trim() === "" || create.isPending}
@@ -171,7 +181,7 @@ export function SavedViewsMenu({
 								})
 							}
 						>
-							Save
+							{t(messages, "common.save")}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -189,6 +199,7 @@ function ViewItem({
 	onApply: () => void;
 	onDelete: () => void;
 }) {
+	const { messages } = useLocale();
 	return (
 		<div className="flex items-center gap-1">
 			<DropdownMenuItem className="min-w-0 flex-1" onSelect={onApply}>
@@ -200,7 +211,9 @@ function ViewItem({
 				onSelect={onDelete}
 			>
 				<Close />
-				<span className="sr-only">Delete {view.name}</span>
+				<span className="sr-only">
+					{tf(messages, "common.deleteView", { name: view.name })}
+				</span>
 			</DropdownMenuItem>
 		</div>
 	);

@@ -15,13 +15,14 @@ import { cn } from "@crm/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { type Ref, useId, useState } from "react";
 import { PROPERTY_LABEL, PROPERTY_ROW } from "@/components/detail-sheet";
+import { t, useLocale } from "@/components/locale-provider";
 import { useTRPC } from "@/lib/trpc/client";
 
 export function CompanyPicker({
 	id,
 	value,
 	onValueChange,
-	placeholder = "Choose a company",
+	placeholder,
 	none,
 	selected,
 	disabled,
@@ -39,6 +40,9 @@ export function CompanyPicker({
 	className?: string;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
+	const resolvedPlaceholder =
+		placeholder ?? t(messages, "common.chooseCompany");
 
 	const [query, setQuery] = useState("");
 	const [text, setText] = useSearchInput(query, setQuery);
@@ -77,9 +81,13 @@ export function CompanyPicker({
 			options={options}
 			selectedOption={current}
 			disabled={disabled}
-			placeholder={placeholder}
-			searchPlaceholder="Search companies…"
-			empty={companies.isFetching ? "Searching…" : "No company matches."}
+			placeholder={resolvedPlaceholder}
+			searchPlaceholder={t(messages, "common.searchCompanies")}
+			empty={
+				companies.isFetching
+					? t(messages, "common.searching")
+					: t(messages, "common.noCompanyMatches")
+			}
 			search={text}
 			onSearchChange={setText}
 			stale={stale}
@@ -99,6 +107,7 @@ export function CompanyMenuSearch({
 	inputRef?: Ref<HTMLInputElement>;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 
 	const [query, setQuery] = useState("");
 	const [text, setText] = useSearchInput(query, setQuery);
@@ -117,14 +126,16 @@ export function CompanyMenuSearch({
 		>
 			<CommandInput
 				ref={inputRef}
-				placeholder="Search companies…"
+				placeholder={t(messages, "common.searchCompanies")}
 				value={text}
 				onValueChange={setText}
 				autoFocus
 			/>
 			<CommandList>
 				<CommandEmpty>
-					{companies.isFetching ? "Searching…" : "No company matches."}
+					{companies.isFetching
+						? t(messages, "common.searching")
+						: t(messages, "common.noCompanyMatches")}
 				</CommandEmpty>
 				<CommandGroup>
 					{none && !query.trim() ? (
