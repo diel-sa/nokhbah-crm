@@ -23,6 +23,7 @@ import { StatusIndicator } from "@crm/ui/components/status-indicator";
 import { TableCell } from "@crm/ui/components/table";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { AgentPanel } from "@/components/crm/agent-panel";
 import { InlineCompanyField } from "@/components/crm/company-picker";
 import { contactName } from "@/components/crm/contact-name";
@@ -89,6 +90,7 @@ const DEAL_COLUMNS = [
 export function ContactSheet({ contactId }: { contactId: string }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 	const { tab, setTab } = useRecordSheetView("overview");
 
 	const query = useQuery({
@@ -116,23 +118,23 @@ export function ContactSheet({ contactId }: { contactId: string }) {
 		? [
 				{
 					value: "overview",
-					label: "Overview",
+					label: t(messages, "recordSheet.overview"),
 					content: <ContactOverview contact={contact} />,
 				},
 				{
 					value: "deals",
-					label: "Deals",
+					label: t(messages, "recordSheet.deals"),
 					count: contact.deals.length,
 					content: <ContactDeals contact={contact} />,
 				},
 				{
 					value: "activity",
-					label: "Activity",
+					label: t(messages, "recordSheet.activity"),
 					content: <Timeline anchor={{ contactId: contact.id }} />,
 				},
 				{
 					value: "agent",
-					label: "Agent",
+					label: t(messages, "recordSheet.agent"),
 					content: <AgentPanel record={{ kind: "contact", id: contact.id }} />,
 					keepMounted: true,
 				},

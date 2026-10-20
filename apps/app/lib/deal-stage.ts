@@ -1,5 +1,6 @@
 import { DealStage } from "@crm/db/enums";
 import type { StatusTone } from "@crm/ui/components/status-indicator";
+import type { Messages } from "@/lib/i18n/messages";
 
 const ORDER = [
 	DealStage.DEMO_BOOKED,
@@ -53,7 +54,14 @@ export function dealStageColor(stage: DealStage): string {
 	return OPEN_STAGE_COLORS[OPEN_STAGES.indexOf(stage)] ?? "var(--chart-5)";
 }
 
-export function dealStageLabel(stage: DealStage): string {
+export function dealStageLabel(stage: DealStage, messages?: Messages): string {
+	if (messages) {
+		const section = (messages as Record<string, unknown>).stages as
+			| Record<string, string>
+			| undefined;
+		const label = section?.[stage];
+		if (label) return label;
+	}
 	return PRESENTATION[stage].label;
 }
 

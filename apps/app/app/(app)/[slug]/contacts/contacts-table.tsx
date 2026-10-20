@@ -13,6 +13,7 @@ import { useSearchInput } from "@crm/ui/hooks/use-search-input";
 import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import { CompanyCell } from "@/components/crm/company-cell";
 import { contactName } from "@/components/crm/contact-name";
 import { useFieldColumns } from "@/components/crm/fields/field-columns";
@@ -31,6 +32,17 @@ import { ContactsBulkActions } from "./contacts-bulk-actions";
 import { contactsSearchParams } from "./contacts-search-params";
 
 type ContactRow = RouterOutputs["contacts"]["list"]["rows"][number];
+
+const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+	name: { header: "common.name" },
+	title: { header: "common.title" },
+	email: { header: "common.email" },
+	company: { header: "common.company" },
+	owner: { header: "common.owner" },
+	createdAt: { header: "common.created", label: "common.createdDate" },
+	lastActivity: { header: "common.lastActivity" },
+	archivedAt: { header: "common.archived", label: "common.archivedDate" },
+};
 
 const COLUMNS: DataTableColumn<ContactRow>[] = [
 	{
@@ -147,6 +159,7 @@ export function ContactsTable() {
 	const openRecord = useOpenRecord();
 	const trpc = useTRPC();
 	const prefetchRecord = usePrefetchRecord();
+	const { messages } = useLocale();
 	const table = useTableQuery(contactsSearchParams);
 	const { query, input, setArchived } = table;
 
@@ -196,9 +209,9 @@ export function ContactsTable() {
 	const facets: DataTableFacet[] = [
 		{
 			id: "owner",
-			label: "Owner",
+			label: t(messages, "common.owner"),
 			options: [
-				{ value: "unassigned", label: "Unassigned" },
+				{ value: "unassigned", label: t(messages, "common.unassigned") },
 				...(users.data ?? []).map((user) => ({
 					value: user.id,
 					label: user.name,
@@ -207,16 +220,18 @@ export function ContactsTable() {
 		},
 		{
 			id: "company",
-			label: "Company",
+			label: t(messages, "common.company"),
 			searchable: true,
 			search: companyText,
 			onSearchChange: setCompanyText,
 			stale: companies.isFetching || companyText.trim() !== companyQuery.trim(),
-			empty: companies.isFetching ? "Searching…" : "No company matches.",
+			empty: companies.isFetching
+				? t(messages, "common.searching")
+				: t(messages, "common.noCompanyMatches"),
 			options: [
 				...(companyQuery.trim()
 					? []
-					: [{ value: "none", label: "No company" }]),
+					: [{ value: "none", label: t(messages, "common.noCompany") }]),
 				...(companies.data ?? []).map((company) => ({
 					value: company.id,
 					label: company.name,
@@ -225,28 +240,28 @@ export function ContactsTable() {
 		},
 		{
 			id: "title",
-			label: "Title",
+			label: t(messages, "contacts.facetTitle"),
 			options: Object.keys(facetCounts?.title ?? {})
 				.sort()
 				.map((value) => ({ value, label: value })),
 		},
 		{
 			id: "seniority",
-			label: "Seniority",
+			label: t(messages, "contacts.facetSeniority"),
 			options: Object.keys(facetCounts?.seniority ?? {})
 				.sort()
 				.map((value) => ({ value, label: value })),
 		},
 		{
 			id: "persona",
-			label: "Persona",
+			label: t(messages, "contacts.facetPersona"),
 			options: Object.keys(facetCounts?.persona ?? {})
 				.sort()
 				.map((value) => ({ value, label: value })),
 		},
 		{
 			id: "activity",
-			label: "Activity",
+			label: t(messages, "common.activity"),
 			options: ACTIVITY_FACET_OPTIONS.filter(
 				(option) => (facetCounts?.activity?.[option.value] ?? 0) > 0,
 			),
@@ -257,16 +272,27 @@ export function ContactsTable() {
 	const fieldColumns = useFieldColumns<ContactRow>("CONTACT");
 	const columns = useMemo(
 		() =>
-			input.archived
+			(input.archived
 				? [...COLUMNS, ARCHIVED_COLUMN, ...fieldColumns]
-				: [...COLUMNS, ...fieldColumns],
-		[fieldColumns, input.archived],
+				: [...COLUMNS, ...fieldColumns]
+			).map((column) => {
+				const keys = HEADER_KEYS[column.id];
+				if (!keys) return column;
+				return {
+					...column,
+					header: t(messages, keys.header),
+					label: keys.label ? t(messages, keys.label) : column.label,
+				};
+			}),
+		[fieldColumns, input.archived, messages],
 	);
 
 	return (
 		<DataTable
 			query={query}
-			search={<ListSearch placeholder="Search by name, email or company…" />}
+			search={
+				<ListSearch placeholder={t(messages, "contacts.searchPlaceholder")} />
+			}
 			actions={
 				<>
 					<SavedViewsMenu entity="CONTACT" table={table} />
@@ -277,7 +303,7 @@ export function ContactsTable() {
 						onClick={() => toggleArchived(!input.archived)}
 					>
 						<Archive data-icon="inline-start" />
-						Archived
+						{t(messages, "common.archived")}
 					</Button>
 				</>
 			}
@@ -303,8 +329,8 @@ export function ContactsTable() {
 			onRowClick={(row) => openRecord({ kind: "contact", id: row.id })}
 			empty={
 				input.archived
-					? "No archived contacts."
-					: "No contacts match this view."
+					? t(messages, "contacts.emptyArchived")
+					: t(messages, "contacts.empty")
 			}
 		/>
 	);

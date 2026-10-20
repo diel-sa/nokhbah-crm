@@ -23,7 +23,7 @@ const fontMono = Geist_Mono({
 });
 
 const fontArabic = IBM_Plex_Sans_Arabic({
-	variable: "--font-arabic",
+	variable: "--font-plex-arabic",
 	subsets: ["arabic"],
 	weight: ["400", "500", "600", "700"],
 });

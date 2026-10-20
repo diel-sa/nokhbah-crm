@@ -63,3 +63,15 @@ export function t(messages: Messages, path: string): string {
 	}
 	return String(value ?? path);
 }
+
+export function tf(
+	messages: Messages,
+	path: string,
+	vars: Record<string, string | number>,
+): string {
+	let value = t(messages, path);
+	for (const [key, replacement] of Object.entries(vars)) {
+		value = value.replaceAll(`{${key}}`, String(replacement));
+	}
+	return value;
+}

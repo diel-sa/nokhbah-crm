@@ -10,6 +10,7 @@ import {
 	PageShellLoading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import { LocalizedText } from "@/components/localized-text";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -28,8 +29,12 @@ export default function ContactsPage({
 		<PageShell className="min-h-0">
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>Contacts</PageShellTitle>
-					<PageShellDescription>Everyone in the pipeline.</PageShellDescription>
+					<PageShellTitle>
+						<LocalizedText k="contacts.title" />
+					</PageShellTitle>
+					<PageShellDescription>
+						<LocalizedText k="contacts.description" />
+					</PageShellDescription>
 				</PageShellHeading>
 				<PageShellActions>
 					<CreateContactSheet />

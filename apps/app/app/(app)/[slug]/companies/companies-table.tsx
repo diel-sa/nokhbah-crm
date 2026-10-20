@@ -15,6 +15,7 @@ import {
 import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import { EnrichmentIndicator } from "@/components/crm/enrichment-status";
 import { useFieldColumns } from "@/components/crm/fields/field-columns";
 import { useFieldFacets } from "@/components/crm/fields/field-facets";
@@ -37,6 +38,19 @@ import { CompaniesBulkActions } from "./companies-bulk-actions";
 import { companiesSearchParams } from "./companies-search-params";
 
 type CompanyRow = RouterOutputs["companies"]["list"]["rows"][number];
+
+const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+	name: { header: "common.company" },
+	domain: { header: "common.domain" },
+	industry: { header: "common.industry" },
+	owner: { header: "common.owner" },
+	contacts: { header: "nav.contacts" },
+	deals: { header: "companies.colOpenDeals" },
+	createdAt: { header: "common.created", label: "common.createdDate" },
+	lastActivity: { header: "common.lastActivity" },
+	enrichment: { header: "companies.facetEnrichment", label: "companies.enrichmentStatus" },
+	archivedAt: { header: "common.archived", label: "common.archivedDate" },
+};
 
 const COLUMNS: DataTableColumn<CompanyRow>[] = [
 	{
@@ -174,6 +188,7 @@ export function CompaniesTable() {
 	const openRecord = useOpenRecord();
 	const trpc = useTRPC();
 	const prefetchRecord = usePrefetchRecord();
+	const { messages } = useLocale();
 	const table = useTableQuery(companiesSearchParams);
 	const { query, input, setArchived } = table;
 
@@ -200,9 +215,9 @@ export function CompaniesTable() {
 	const facets: DataTableFacet[] = [
 		{
 			id: "owner",
-			label: "Owner",
+			label: t(messages, "companies.facetOwner"),
 			options: [
-				{ value: "unassigned", label: "Unassigned" },
+				{ value: "unassigned", label: t(messages, "common.unassigned") },
 				...(users.data ?? []).map((user) => ({
 					value: user.id,
 					label: user.name,
@@ -211,21 +226,28 @@ export function CompaniesTable() {
 		},
 		{
 			id: "industry",
-			label: "Industry",
+			label: t(messages, "companies.facetIndustry"),
 			options: Object.keys(facetCounts?.industry ?? {})
 				.sort()
 				.map((value) => ({ value, label: value })),
 		},
 		{
 			id: "enrichment",
-			label: "Enrichment",
-			options: ENRICHMENT_FACET_OPTIONS.filter(
-				(option) => (facetCounts?.enrichment?.[option.value] ?? 0) > 0,
+			label: t(messages, "companies.facetEnrichment"),
+			options: ENRICHMENT_FACET_OPTIONS.flatMap((option) =>
+				(facetCounts?.enrichment?.[option.value] ?? 0) > 0
+					? [
+							{
+								value: option.value,
+								label: t(messages, `enrichment.${option.value}`),
+							},
+						]
+					: [],
 			),
 		},
 		{
 			id: "activity",
-			label: "Activity",
+			label: t(messages, "companies.facetActivity"),
 			options: ACTIVITY_FACET_OPTIONS.filter(
 				(option) => (facetCounts?.activity?.[option.value] ?? 0) > 0,
 			),
@@ -236,16 +258,27 @@ export function CompaniesTable() {
 	const fieldColumns = useFieldColumns<CompanyRow>("COMPANY");
 	const columns = useMemo(
 		() =>
-			input.archived
+			(input.archived
 				? [...COLUMNS, ARCHIVED_COLUMN, ...fieldColumns]
-				: [...COLUMNS, ...fieldColumns],
-		[fieldColumns, input.archived],
+				: [...COLUMNS, ...fieldColumns]
+			).map((column) => {
+				const keys = HEADER_KEYS[column.id];
+				if (!keys) return column;
+				return {
+					...column,
+					header: t(messages, keys.header),
+					label: keys.label ? t(messages, keys.label) : column.label,
+				};
+			}),
+		[fieldColumns, input.archived, messages],
 	);
 
 	return (
 		<DataTable
 			query={query}
-			search={<ListSearch placeholder="Search companies by name or domain…" />}
+			search={
+				<ListSearch placeholder={t(messages, "companies.searchPlaceholder")} />
+			}
 			actions={
 				<>
 					<SavedViewsMenu entity="COMPANY" table={table} />
@@ -256,7 +289,7 @@ export function CompaniesTable() {
 						onClick={() => setArchived(!input.archived)}
 					>
 						<Archive data-icon="inline-start" />
-						Archived
+						{t(messages, "common.archived")}
 					</Button>
 				</>
 			}
@@ -282,8 +315,8 @@ export function CompaniesTable() {
 			onRowClick={(row) => openRecord({ kind: "company", id: row.id })}
 			empty={
 				input.archived
-					? "No archived companies."
-					: "No companies match this view."
+					? t(messages, "companies.emptyArchived")
+					: t(messages, "companies.empty")
 			}
 		/>
 	);

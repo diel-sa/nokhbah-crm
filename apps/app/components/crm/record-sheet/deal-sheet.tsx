@@ -23,6 +23,7 @@ import {
 import { formatMoney } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { t, useLocale } from "@/components/locale-provider";
 import { AgentPanel } from "@/components/crm/agent-panel";
 import { InlineCompanyField } from "@/components/crm/company-picker";
 import { contactName } from "@/components/crm/contact-name";
@@ -123,6 +124,7 @@ const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
 export function DealSheet({ dealId }: { dealId: string }) {
 	const trpc = useTRPC();
 	const openRecord = useOpenRecord();
+	const { messages } = useLocale();
 	const {
 		tab,
 		setTab,
@@ -137,12 +139,12 @@ export function DealSheet({ dealId }: { dealId: string }) {
 		? [
 				{
 					value: "overview",
-					label: "Overview",
+					label: t(messages, "recordSheet.overview"),
 					content: <DealOverview deal={deal} />,
 				},
 				{
 					value: "contacts",
-					label: "Contacts",
+					label: t(messages, "recordSheet.contacts"),
 					count: deal.contacts.length,
 					content: (
 						<DealContacts
@@ -155,12 +157,12 @@ export function DealSheet({ dealId }: { dealId: string }) {
 				},
 				{
 					value: "activity",
-					label: "Activity",
+					label: t(messages, "recordSheet.activity"),
 					content: <Timeline anchor={{ dealId: deal.id }} />,
 				},
 				{
 					value: "agent",
-					label: "Agent",
+					label: t(messages, "recordSheet.agent"),
 					content: <AgentPanel record={{ kind: "deal", id: deal.id }} />,
 					keepMounted: true,
 				},

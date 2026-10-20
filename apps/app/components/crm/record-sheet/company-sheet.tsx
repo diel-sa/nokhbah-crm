@@ -24,6 +24,7 @@ import {
 import { formatMoney } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { AgentPanel } from "@/components/crm/agent-panel";
 import { EnrichmentActions } from "@/components/crm/enrichment-actions";
 import { EnrichmentIndicator } from "@/components/crm/enrichment-status";
@@ -132,6 +133,7 @@ function nextClose(deals: CompanyDeal[]): string | null {
 
 export function CompanySheet({ companyId }: { companyId: string }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 	const {
 		tab,
 		setTab,
@@ -172,12 +174,12 @@ export function CompanySheet({ companyId }: { companyId: string }) {
 		? [
 				{
 					value: "overview",
-					label: "Overview",
+					label: t(messages, "recordSheet.overview"),
 					content: <CompanyOverview company={company} />,
 				},
 				{
 					value: "contacts",
-					label: "Contacts",
+					label: t(messages, "recordSheet.contacts"),
 					count: company.contacts.length,
 					content: (
 						<CompanyContacts
@@ -190,7 +192,7 @@ export function CompanySheet({ companyId }: { companyId: string }) {
 				},
 				{
 					value: "deals",
-					label: "Deals",
+					label: t(messages, "recordSheet.deals"),
 					count: company.deals.length,
 					content: (
 						<CompanyDeals
@@ -203,12 +205,12 @@ export function CompanySheet({ companyId }: { companyId: string }) {
 				},
 				{
 					value: "activity",
-					label: "Activity",
+					label: t(messages, "recordSheet.activity"),
 					content: <Timeline anchor={{ companyId: company.id }} />,
 				},
 				{
 					value: "agent",
-					label: "Agent",
+					label: t(messages, "recordSheet.agent"),
 					content: <AgentPanel record={{ kind: "company", id: company.id }} />,
 					keepMounted: true,
 				},
@@ -267,24 +269,26 @@ export function CompanySheet({ companyId }: { companyId: string }) {
 			stats={
 				company ? (
 					<DetailSheetStats>
-						<DetailSheetStat label="Open pipeline">
+						<DetailSheetStat label={t(messages, "dashboard.openPipeline")}>
 							<span className="tabular-nums">
 								{formatMoney(openValueCents, company.reportingCurrency)}
 							</span>
 							{openUncounted > 0 ? (
 								<span className="text-muted-foreground">
 									{" "}
-									+{openUncounted} unconverted
+									{tf(messages, "deals.unconvertedCount", {
+										count: openUncounted,
+									})}
 								</span>
 							) : null}
 						</DetailSheetStat>
-						<DetailSheetStat label="Open deals">
+						<DetailSheetStat label={t(messages, "overview.openDeals")}>
 							<span className="tabular-nums">{openDeals.length}</span>
 						</DetailSheetStat>
-						<DetailSheetStat label="Next close">
+						<DetailSheetStat label={t(messages, "common.closeDate")}>
 							{closing ? <LocalDay date={closing} /> : <EmptyCellValue />}
 						</DetailSheetStat>
-						<DetailSheetStat label="Owner">
+						<DetailSheetStat label={t(messages, "common.owner")}>
 							<OwnerCell owner={company.owner} />
 						</DetailSheetStat>
 					</DetailSheetStats>

@@ -8,6 +8,7 @@ export const DEFAULT_REPORTING_CURRENCY = "USD";
 
 const CURRENCY_LIST: readonly CurrencyMeta[] = [
 	{ code: "USD", name: "US Dollar", minorUnits: 2 },
+	{ code: "SAR", name: "Saudi Riyal", minorUnits: 2 },
 	{ code: "EUR", name: "Euro", minorUnits: 2 },
 	{ code: "JPY", name: "Japanese Yen", minorUnits: 0 },
 	{ code: "GBP", name: "Pound Sterling", minorUnits: 2 },

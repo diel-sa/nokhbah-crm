@@ -10,6 +10,7 @@ import {
 	PageShellLoading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import { LocalizedText } from "@/components/localized-text";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -28,9 +29,11 @@ export default function CompaniesPage({
 		<PageShell className="min-h-0">
 			<PageShellHeader>
 				<PageShellHeading>
-					<PageShellTitle>Companies</PageShellTitle>
+					<PageShellTitle>
+						<LocalizedText k="companies.title" />
+					</PageShellTitle>
 					<PageShellDescription>
-						Every account in the pipeline.
+						<LocalizedText k="companies.description" />
 					</PageShellDescription>
 				</PageShellHeading>
 				<PageShellActions>

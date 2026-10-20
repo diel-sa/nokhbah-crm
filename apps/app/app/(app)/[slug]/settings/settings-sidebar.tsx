@@ -5,23 +5,24 @@ import { cn } from "@crm/ui/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type SettingsNavItem = {
-	title: string;
+	titleKey: string;
 	href: string;
 };
 
 const ROOT = "/settings";
 
 const ITEMS: SettingsNavItem[] = [
-	{ title: "General", href: ROOT },
-	{ title: "Tracking & Analytics", href: `${ROOT}/tracking` },
-	{ title: "Connections", href: `${ROOT}/connections` },
-	{ title: "Currencies", href: `${ROOT}/currencies` },
-	{ title: "Members", href: `${ROOT}/members` },
-	{ title: "API Keys", href: `${ROOT}/api-keys` },
-	{ title: "SSO", href: `${ROOT}/sso` },
+	{ titleKey: "settings.nav.general", href: ROOT },
+	{ titleKey: "settings.nav.tracking", href: `${ROOT}/tracking` },
+	{ titleKey: "settings.nav.connections", href: `${ROOT}/connections` },
+	{ titleKey: "settings.nav.currencies", href: `${ROOT}/currencies` },
+	{ titleKey: "settings.nav.members", href: `${ROOT}/members` },
+	{ titleKey: "settings.nav.apiKeys", href: `${ROOT}/api-keys` },
+	{ titleKey: "settings.nav.sso", href: `${ROOT}/sso` },
 ];
 
 function isActive(href: string, root: string, pathname: string): boolean {
@@ -29,11 +30,13 @@ function isActive(href: string, root: string, pathname: string): boolean {
 }
 
 function NavLink({
-	item,
+	label,
+	href,
 	active,
 	className,
 }: {
-	item: SettingsNavItem;
+	label: string;
+	href: string;
 	active: boolean;
 	className: string;
 }) {
@@ -49,18 +52,19 @@ function NavLink({
 			)}
 		>
 			<Link
-				href={item.href}
+				href={href}
 				prefetch
 				aria-current={active ? "page" : undefined}
 				transitionTypes={["nav-lateral"]}
 			>
-				{item.title}
+				{label}
 			</Link>
 		</Button>
 	);
 }
 
 export function SettingsSidebarFallback() {
+	const { messages } = useLocale();
 	return (
 		<>
 			<aside className="hidden w-56 shrink-0 border-r md:block [view-transition-name:settings-sidebar]">
@@ -76,7 +80,7 @@ export function SettingsSidebarFallback() {
 							disabled
 							className="w-full justify-start px-3 font-normal text-muted-foreground"
 						>
-							{item.title}
+							{t(messages, item.titleKey)}
 						</Button>
 					))}
 				</nav>
@@ -94,7 +98,7 @@ export function SettingsSidebarFallback() {
 						disabled
 						className="shrink-0 justify-start px-3 font-normal text-muted-foreground"
 					>
-						{item.title}
+						{t(messages, item.titleKey)}
 					</Button>
 				))}
 			</nav>
@@ -105,11 +109,19 @@ export function SettingsSidebarFallback() {
 export function SettingsSidebar() {
 	const pathname = usePathname();
 	const workspaceUrl = useWorkspaceUrl();
+	const { messages } = useLocale();
 
 	const root = workspaceUrl(ROOT);
 	const items = useMemo(
 		() => ITEMS.map((item) => ({ ...item, href: workspaceUrl(item.href) })),
 		[workspaceUrl],
+	);
+	const labels = useMemo(
+		() =>
+			Object.fromEntries(
+				ITEMS.map((item) => [item.href, t(messages, item.titleKey)]),
+			),
+		[messages],
 	);
 
 	return (
@@ -122,7 +134,8 @@ export function SettingsSidebar() {
 					{items.map((item) => (
 						<NavLink
 							key={item.href}
-							item={item}
+							label={labels[item.href] ?? item.href}
+							href={item.href}
 							active={isActive(item.href, root, pathname)}
 							className="w-full px-3"
 						/>
@@ -137,7 +150,8 @@ export function SettingsSidebar() {
 				{items.map((item) => (
 					<NavLink
 						key={item.href}
-						item={item}
+						label={labels[item.href] ?? item.href}
+						href={item.href}
 						active={isActive(item.href, root, pathname)}
 						className="shrink-0 px-3"
 					/>

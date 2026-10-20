@@ -7,6 +7,7 @@ import Phone from "@carbon/icons-react/es/Phone";
 import Task from "@carbon/icons-react/es/Task";
 import type { ActivityType } from "@crm/db/enums";
 import type { CarbonIcon } from "@crm/ui/components/icon";
+import type { Messages } from "@/lib/i18n/messages";
 
 type ActivityPresentation = Record<
 	ActivityType,
@@ -23,7 +24,17 @@ const PRESENTATION: ActivityPresentation = {
 	ENRICHMENT: { icon: MagicWand, label: "Enrichment" },
 };
 
-export function activityLabel(type: ActivityType): string {
+export function activityLabel(
+	type: ActivityType,
+	messages?: Messages,
+): string {
+	if (messages) {
+		const section = (messages as Record<string, unknown>).activities as
+			| Record<string, string>
+			| undefined;
+		const label = section?.[type];
+		if (label) return label;
+	}
 	return PRESENTATION[type].label;
 }
 

@@ -12,6 +12,7 @@ import { useTableSelection } from "@crm/ui/hooks/use-table-selection";
 import { formatMoney } from "@crm/ui/lib/format";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { CLOSING_OPTIONS } from "@/components/crm/closing-window";
 import { CompanyCell } from "@/components/crm/company-cell";
 import { useFieldColumns } from "@/components/crm/fields/field-columns";
@@ -23,13 +24,26 @@ import { DealStageMenu } from "@/components/crm/stage-change";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
 import { LocalDay, LocalRelativeTime } from "@/components/local-date-time";
-import { DEAL_STAGE_OPTIONS } from "@/lib/deal-stage";
+import type { DealStage } from "@crm/db/enums";
+import { dealStageLabel, DEAL_STAGE_OPTIONS } from "@/lib/deal-stage";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { DealsBulkActions } from "./deals-bulk-actions";
 import { dealsSearchParams } from "./deals-search-params";
 
 type DealRow = RouterOutputs["deals"]["list"]["rows"][number];
+
+const HEADER_KEYS: Record<string, { header: string; label?: string }> = {
+	name: { header: "deals.colDeal" },
+	company: { header: "common.company" },
+	stage: { header: "common.stage" },
+	amount: { header: "common.amount" },
+	owner: { header: "common.owner" },
+	expectedCloseDate: { header: "common.closeDate" },
+	createdAt: { header: "common.created", label: "common.createdDate" },
+	lastActivity: { header: "common.lastActivity" },
+	archivedAt: { header: "common.archived", label: "common.archivedDate" },
+};
 
 const COLUMNS: DataTableColumn<DealRow>[] = [
 	{
@@ -148,6 +162,7 @@ export function DealsTable() {
 	const openRecord = useOpenRecord();
 	const trpc = useTRPC();
 	const prefetchRecord = usePrefetchRecord();
+	const { messages } = useLocale();
 	const { query, input, setArchived } = useTableQuery(dealsSearchParams);
 
 	const deals = useQuery({
@@ -186,7 +201,7 @@ export function DealsTable() {
 	const facets: DataTableFacet[] = [
 		{
 			id: "owner",
-			label: "Owner",
+			label: t(messages, "common.owner"),
 			options: (users.data ?? []).flatMap((user) =>
 				(facetCounts?.owner?.[user.id] ?? 0) > 0
 					? [{ value: user.id, label: user.name }]
@@ -195,17 +210,29 @@ export function DealsTable() {
 		},
 		{
 			id: "stage",
-			label: "Stage",
-			options: DEAL_STAGE_OPTIONS.filter(
-				(option) => (facetCounts?.stage?.[option.value] ?? 0) > 0,
+			label: t(messages, "deals.facetStage"),
+			options: DEAL_STAGE_OPTIONS.flatMap((option) =>
+				(facetCounts?.stage?.[option.value] ?? 0) > 0
+					? [
+							{
+								value: option.value,
+								label: dealStageLabel(option.value as DealStage, messages),
+							},
+						]
+					: [],
 			),
 		},
 		{
 			id: "closing",
-			label: "Closing",
+			label: t(messages, "deals.facetClosing"),
 			options: CLOSING_OPTIONS.flatMap((option) =>
 				(facetCounts?.closing?.[option.value] ?? 0) > 0
-					? [{ value: option.value, label: option.label }]
+					? [
+							{
+								value: option.value,
+								label: t(messages, `closing.${option.value}`),
+							},
+						]
 					: [],
 			),
 		},
@@ -221,16 +248,27 @@ export function DealsTable() {
 	const fieldColumns = useFieldColumns<DealRow>("DEAL");
 	const columns = useMemo(
 		() =>
-			input.archived
+			(input.archived
 				? [...COLUMNS, ARCHIVED_COLUMN, ...fieldColumns]
-				: [...COLUMNS, ...fieldColumns],
-		[fieldColumns, input.archived],
+				: [...COLUMNS, ...fieldColumns]
+			).map((column) => {
+				const keys = HEADER_KEYS[column.id];
+				if (!keys) return column;
+				return {
+					...column,
+					header: t(messages, keys.header),
+					label: keys.label ? t(messages, keys.label) : column.label,
+				};
+			}),
+		[fieldColumns, input.archived, messages],
 	);
 
 	return (
 		<DataTable
 			query={query}
-			search={<ListSearch placeholder="Search deals by name or company…" />}
+			search={
+				<ListSearch placeholder={t(messages, "deals.searchPlaceholder")} />
+			}
 			actions={
 				<Button
 					variant={input.archived ? "contrast" : "outline"}
@@ -239,7 +277,7 @@ export function DealsTable() {
 					onClick={() => toggleArchived(!input.archived)}
 				>
 					<Archive data-icon="inline-start" />
-					Archived
+					{t(messages, "common.archived")}
 				</Button>
 			}
 			columns={columns}
@@ -249,10 +287,10 @@ export function DealsTable() {
 			facets={facets}
 			tabs={{
 				id: "status",
-				allLabel: "All deals",
+				allLabel: t(messages, "deals.allDeals"),
 				options: [
-					{ value: "open", label: "Open" },
-					{ value: "closed", label: "Closed" },
+					{ value: "open", label: t(messages, "deals.open") },
+					{ value: "closed", label: t(messages, "deals.closed") },
 				],
 			}}
 			selection={{
@@ -271,21 +309,25 @@ export function DealsTable() {
 			onRowHover={(row) => prefetchRecord({ kind: "deal", id: row.id })}
 			onRowClick={(row) => openRecord({ kind: "deal", id: row.id })}
 			empty={
-				input.archived ? "No archived deals." : "No deals match this view."
+				input.archived
+					? t(messages, "deals.emptyArchived")
+					: t(messages, "deals.empty")
 			}
 			meta={
 				input.archived || openPipelineCents === null ? undefined : (
 					<span>
-						{deals.data?.total ?? 0} deals ·{" "}
+						{deals.data?.total ?? 0} {t(messages, "nav.deals")} ·{" "}
 						<span className="tabular-nums">
 							{formatMoney(openPipelineCents, reportingCurrency)}
 						</span>{" "}
-						open pipeline
+						{t(messages, "deals.openPipelineMeta")}
 						{unconverted && unconverted.count > 0 ? (
 							<span className="text-muted-foreground">
 								{" "}
-								· {unconverted.count} not counted (no{" "}
-								{unconverted.currencies.join(", ")} rate)
+								·{" "}
+								{tf(messages, "deals.notCounted", {
+									currencies: unconverted.currencies.join(", "),
+								})}
 							</span>
 						) : null}
 					</span>

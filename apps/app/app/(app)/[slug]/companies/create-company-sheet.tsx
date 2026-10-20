@@ -32,6 +32,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
@@ -39,18 +40,23 @@ import { useTRPC } from "@/lib/trpc/client";
 
 const UNASSIGNED = "unassigned";
 
-function AddButton(props: ComponentProps<typeof Button>) {
+function AddButton({
+	label,
+	...props
+}: ComponentProps<typeof Button> & { label: string }) {
 	return (
 		<Button {...props}>
 			<Icon icon={Add} data-icon="inline-start" />
-			New company
+			{label}
 		</Button>
 	);
 }
 
 export function CreateCompanySheet() {
+	const { messages } = useLocale();
+	const label = t(messages, "companies.newCompany");
 	return (
-		<Suspense fallback={<AddButton disabled />}>
+		<Suspense fallback={<AddButton label={label} disabled />}>
 			<CreateCompanyForm />
 		</Suspense>
 	);
@@ -60,6 +66,7 @@ function CreateCompanyForm() {
 	const openRecord = useOpenRecord();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const [open, setOpen] = useQueryState(
 		SEARCH_PARAM.dialog.create,
@@ -78,7 +85,7 @@ function CreateCompanyForm() {
 		trpc.companies.create.mutationOptions({
 			onSuccess: async (company) => {
 				await cache.company(company.id);
-				toast.success(`${company.name} added.`);
+				toast.success(tf(messages, "companies.added", { name: company.name }));
 				await setOpen(null);
 				setName("");
 				setDomain("");
@@ -92,14 +99,13 @@ function CreateCompanyForm() {
 	return (
 		<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
 			<SheetTrigger asChild>
-				<AddButton />
+				<AddButton label={t(messages, "companies.newCompany")} />
 			</SheetTrigger>
 			<SheetContent side="right">
 				<SheetHeader>
-					<SheetTitle>New company</SheetTitle>
+					<SheetTitle>{t(messages, "companies.newCompany")}</SheetTitle>
 					<SheetDescription>
-						Give it a name and a domain. The agent fills in the logo,
-						description, industry, address and socials.
+						{t(messages, "companies.newDescription")}
 					</SheetDescription>
 				</SheetHeader>
 
@@ -117,7 +123,7 @@ function CreateCompanyForm() {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={nameId}>Name</FieldLabel>
+							<FieldLabel htmlFor={nameId}>{t(messages, "common.name")}</FieldLabel>
 							<Input
 								id={nameId}
 								value={name}
@@ -129,7 +135,7 @@ function CreateCompanyForm() {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={domainId}>Domain</FieldLabel>
+							<FieldLabel htmlFor={domainId}>{t(messages, "common.domain")}</FieldLabel>
 							<Input
 								id={domainId}
 								value={domain}
@@ -139,19 +145,22 @@ function CreateCompanyForm() {
 								inputMode="url"
 							/>
 							<FieldDescription>
-								A full URL is fine — it is reduced to the bare host, which has
-								to be unique.
+								{t(messages, "companies.domainHint")}
 							</FieldDescription>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor="create-company-owner">Owner</FieldLabel>
+							<FieldLabel htmlFor="create-company-owner">
+								{t(messages, "common.owner")}
+							</FieldLabel>
 							<Select value={ownerId} onValueChange={setOwnerId}>
 								<SelectTrigger id="create-company-owner">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value={UNASSIGNED}>Unassigned</SelectItem>
+									<SelectItem value={UNASSIGNED}>
+										{t(messages, "common.unassigned")}
+									</SelectItem>
 									{(users.data ?? []).map((user) => (
 										<SelectItem key={user.id} value={user.id}>
 											{user.name}
@@ -170,10 +179,10 @@ function CreateCompanyForm() {
 						disabled={create.isPending || name.trim() === ""}
 					>
 						{create.isPending ? <Spinner /> : null}
-						Add company
+						{t(messages, "companies.addCompany")}
 					</Button>
 					<SheetClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">{t(messages, "common.cancel")}</Button>
 					</SheetClose>
 				</SheetFooter>
 			</SheetContent>

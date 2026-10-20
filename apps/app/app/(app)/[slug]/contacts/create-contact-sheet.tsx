@@ -27,6 +27,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { CompanyPicker } from "@/components/crm/company-picker";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
@@ -35,18 +36,23 @@ import { useTRPC } from "@/lib/trpc/client";
 
 const NONE = "none";
 
-function AddButton(props: ComponentProps<typeof Button>) {
+function AddButton({
+	label,
+	...props
+}: ComponentProps<typeof Button> & { label: string }) {
 	return (
 		<Button {...props}>
 			<Icon icon={Add} data-icon="inline-start" />
-			New contact
+			{label}
 		</Button>
 	);
 }
 
 export function CreateContactSheet({ companyId }: { companyId?: string }) {
+	const { messages } = useLocale();
+	const label = t(messages, "contacts.newContact");
 	return (
-		<Suspense fallback={<AddButton disabled />}>
+		<Suspense fallback={<AddButton label={label} disabled />}>
 			<CreateContactForm companyId={companyId} />
 		</Suspense>
 	);
@@ -56,6 +62,7 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 	const openRecord = useOpenRecord();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const [open, setOpen] = useQueryState(
 		SEARCH_PARAM.dialog.create,
@@ -80,7 +87,11 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 			onSuccess: async (contact) => {
 				await cache.contact(contact.id);
 				toast.success(
-					`${[contact.firstName, contact.lastName].filter(Boolean).join(" ")} added.`,
+					tf(messages, "companies.added", {
+						name: [contact.firstName, contact.lastName]
+							.filter(Boolean)
+							.join(" "),
+					}),
 				);
 				await setOpen(null);
 				setFirstName("");
@@ -96,14 +107,13 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 	return (
 		<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
 			<SheetTrigger asChild>
-				<AddButton />
+				<AddButton label={t(messages, "contacts.newContact")} />
 			</SheetTrigger>
 			<SheetContent side="right">
 				<SheetHeader>
-					<SheetTitle>New contact</SheetTitle>
+					<SheetTitle>{t(messages, "contacts.newContact")}</SheetTitle>
 					<SheetDescription>
-						Email addresses are unique, so importing the same person twice
-						updates them rather than duplicating them.
+						{t(messages, "contacts.newDescription")}
 					</SheetDescription>
 				</SheetHeader>
 
@@ -124,7 +134,9 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 				>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor={firstNameId}>First name</FieldLabel>
+							<FieldLabel htmlFor={firstNameId}>
+								{t(messages, "common.firstName")}
+							</FieldLabel>
 							<Input
 								id={firstNameId}
 								value={firstName}
@@ -135,7 +147,9 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={lastNameId}>Last name</FieldLabel>
+							<FieldLabel htmlFor={lastNameId}>
+								{t(messages, "common.lastName")}
+							</FieldLabel>
 							<Input
 								id={lastNameId}
 								value={lastName}
@@ -145,10 +159,11 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={emailId}>Email</FieldLabel>
+							<FieldLabel htmlFor={emailId}>{t(messages, "common.email")}</FieldLabel>
 							<Input
 								id={emailId}
 								type="email"
+								dir="ltr"
 								value={email}
 								onChange={(event) => setEmail(event.target.value)}
 								autoComplete="off"
@@ -156,7 +171,7 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={titleId}>Title</FieldLabel>
+							<FieldLabel htmlFor={titleId}>{t(messages, "common.title")}</FieldLabel>
 							<Input
 								id={titleId}
 								value={title}
@@ -167,23 +182,29 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor="create-contact-company">Company</FieldLabel>
+							<FieldLabel htmlFor="create-contact-company">
+								{t(messages, "common.company")}
+							</FieldLabel>
 							<CompanyPicker
 								id="create-contact-company"
 								value={company}
 								onValueChange={setCompany}
-								none={{ value: NONE, label: "No company" }}
+								none={{ value: NONE, label: t(messages, "common.noCompany") }}
 							/>
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor="create-contact-owner">Owner</FieldLabel>
+							<FieldLabel htmlFor="create-contact-owner">
+								{t(messages, "common.owner")}
+							</FieldLabel>
 							<Select value={ownerId} onValueChange={setOwnerId}>
 								<SelectTrigger id="create-contact-owner">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value={NONE}>Unassigned</SelectItem>
+									<SelectItem value={NONE}>
+										{t(messages, "common.unassigned")}
+									</SelectItem>
 									{(users.data ?? []).map((user) => (
 										<SelectItem key={user.id} value={user.id}>
 											{user.name}
@@ -202,10 +223,10 @@ function CreateContactForm({ companyId }: { companyId?: string }) {
 						disabled={create.isPending || firstName.trim() === ""}
 					>
 						{create.isPending ? <Spinner /> : null}
-						Add contact
+						{t(messages, "contacts.addContact")}
 					</Button>
 					<SheetClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">{t(messages, "common.cancel")}</Button>
 					</SheetClose>
 				</SheetFooter>
 			</SheetContent>
