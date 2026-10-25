@@ -108,7 +108,7 @@ export function DetailSheetHeader({
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button variant="ghost" size="icon-sm" onClick={onBack}>
-								<Icon icon={ArrowLeft} />
+								<Icon icon={ArrowLeft} className="rtl:rotate-180" />
 								<span className="sr-only">
 									{t(messages, "recordSheet.back")}
 								</span>

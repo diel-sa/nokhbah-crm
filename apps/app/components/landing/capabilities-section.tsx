@@ -130,7 +130,10 @@ function AgentBuilderCard() {
 						<span className="min-w-0 grow font-medium text-[13px]/[18px]">
 							{agent}
 						</span>
-						<ArrowRight size={14} className="shrink-0 text-muted-foreground" />
+						<ArrowRight
+							size={14}
+							className="shrink-0 text-muted-foreground rtl:rotate-180"
+						/>
 					</div>
 				))}
 			</div>

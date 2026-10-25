@@ -135,7 +135,10 @@ function SuggestedAction({
 			>
 				{children}
 			</span>
-			<ArrowRight size={16} className="shrink-0 text-muted-foreground" />
+			<ArrowRight
+				size={16}
+				className="shrink-0 text-muted-foreground rtl:rotate-180"
+			/>
 		</div>
 	);
 }

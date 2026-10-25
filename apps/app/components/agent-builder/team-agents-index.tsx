@@ -55,7 +55,7 @@ export function TeamAgentsIndex({ initialAgents }: { initialAgents: Agents }) {
 							</span>
 							<Icon
 								icon={ArrowRight}
-								className="size-4 text-muted-foreground"
+								className="size-4 text-muted-foreground rtl:rotate-180"
 							/>
 						</Link>
 					))}

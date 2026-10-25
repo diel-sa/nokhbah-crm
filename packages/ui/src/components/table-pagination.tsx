@@ -54,7 +54,7 @@ export function TablePagination({
 						disabled={page <= 1}
 						onClick={() => onPageChange(Math.max(1, page - 1))}
 					>
-						<ChevronLeft data-icon="inline-start" />
+						<ChevronLeft data-icon="inline-start" className="rtl:rotate-180" />
 						{strings.previous}
 					</Button>
 					<span className="text-muted-foreground text-xs tabular-nums">
@@ -67,7 +67,7 @@ export function TablePagination({
 						onClick={() => onPageChange(page + 1)}
 					>
 						{strings.next}
-						<ChevronRight data-icon="inline-end" />
+						<ChevronRight data-icon="inline-end" className="rtl:rotate-180" />
 					</Button>
 				</div>
 			)}

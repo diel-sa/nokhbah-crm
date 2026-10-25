@@ -721,8 +721,8 @@ export function DataTable<TRow, TSub = unknown>({
 												<ChevronRight
 													size={12}
 													className={cn(
-														"inline-block transition-transform",
-														isOpen && "rotate-90",
+														"inline-block transition-transform rtl:rotate-180",
+														isOpen && "rotate-90 rtl:rotate-90",
 													)}
 												/>
 											)}

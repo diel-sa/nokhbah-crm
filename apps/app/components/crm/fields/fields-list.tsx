@@ -118,7 +118,7 @@ function DisclosureRow({
 				>
 					<Icon
 						icon={ChevronRight}
-						className="shrink-0 text-muted-foreground"
+						className="shrink-0 text-muted-foreground rtl:rotate-180"
 					/>
 					<span className="flex-1 font-medium text-foreground text-xs">
 						{title}

@@ -1336,7 +1336,11 @@ function ReviewAgentCard({
 							transitionTypes={["nav-forward"]}
 						>
 							{t(messages, "chat.builder.viewDetails")}
-							<Icon icon={ArrowRight} data-icon="inline-end" />
+							<Icon
+								icon={ArrowRight}
+								data-icon="inline-end"
+								className="rtl:rotate-180"
+							/>
 						</Link>
 					</Button>
 				</AgentCardFooter>
@@ -1508,7 +1512,11 @@ function DeployedAgentCard({
 						<Button asChild size="sm">
 							<Link href={workspaceUrl(`/agents/${agent.id}`)}>
 								{t(messages, "chat.builder.openAgent")}
-								<Icon icon={ArrowRight} data-icon="inline-end" />
+								<Icon
+									icon={ArrowRight}
+									data-icon="inline-end"
+									className="rtl:rotate-180"
+								/>
 							</Link>
 						</Button>
 					</div>
@@ -1529,7 +1537,10 @@ function DeployedAgentCard({
 						<span className="min-w-0 flex-1 wrap-break-word text-sm">
 							{suggestion}
 						</span>
-						<Icon icon={ArrowRight} className="size-4 text-muted-foreground" />
+						<Icon
+							icon={ArrowRight}
+							className="size-4 text-muted-foreground rtl:rotate-180"
+						/>
 					</button>
 				))}
 			</div>

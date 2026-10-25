@@ -87,7 +87,7 @@ export function AgentBuilderHome({ name }: { name: string }) {
 							</span>
 							<Icon
 								icon={ArrowRight}
-								className="size-4 text-muted-foreground"
+								className="size-4 text-muted-foreground rtl:rotate-180"
 							/>
 						</button>
 					))}

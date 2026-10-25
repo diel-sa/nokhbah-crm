@@ -142,7 +142,7 @@ function UserMenu({ user, onSignOut }: { user: User; onSignOut: () => void }) {
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={onSignOut}>
-					<Logout />
+					<Logout className="rtl:rotate-180" />
 					{t(messages, "auth.signOut")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>

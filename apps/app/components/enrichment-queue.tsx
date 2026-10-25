@@ -242,7 +242,7 @@ function QueueRowButton({
 					{elapsedLabel(row.state, row.startedAt, now)}
 				</span>
 				<ChevronRight
-					className="hidden size-3.5 text-muted-foreground group-hover:block"
+					className="hidden size-3.5 text-muted-foreground group-hover:block rtl:rotate-180"
 					aria-hidden="true"
 				/>
 				<IndicatorDot tone={STATE_TONE[row.state]} aria-hidden="true" />
