@@ -1,6 +1,7 @@
 "use client";
 
 import { UiStringsProvider } from "@crm/ui/components/ui-strings";
+import { DirectionProvider } from "@radix-ui/react-direction";
 import { createContext, useContext, useState } from "react";
 import type { Locale } from "@/lib/i18n/locale";
 import type { Messages } from "@/lib/i18n/messages";
@@ -45,14 +46,16 @@ export function LocaleProvider({
 
 	return (
 		<LocaleContext.Provider value={value}>
-			<UiStringsProvider
-				strings={{
-					...value.messages.ui,
-					...value.messages.common,
-				}}
-			>
-				{children}
-			</UiStringsProvider>
+			<DirectionProvider dir={locale === "ar" ? "rtl" : "ltr"}>
+				<UiStringsProvider
+					strings={{
+						...value.messages.ui,
+						...value.messages.common,
+					}}
+				>
+					{children}
+				</UiStringsProvider>
+			</DirectionProvider>
 		</LocaleContext.Provider>
 	);
 }
