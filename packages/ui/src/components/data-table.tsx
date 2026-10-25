@@ -136,7 +136,7 @@ const HIDE_BELOW_CLASS = {
 
 const ALIGN_CLASS = {
 	left: "",
-	right: "text-right",
+	right: "text-end",
 	center: "text-center",
 } as const;
 
@@ -583,7 +583,7 @@ export function DataTable<TRow, TSub = unknown>({
 
 			<Table
 				className={cn(
-					"table-fixed [&_td:first-child]:pl-4 [&_th:first-child]:pl-4 [&_td:last-child]:pr-4 [&_th:last-child]:pr-4",
+					"table-fixed [&_td:first-child]:ps-4 [&_th:first-child]:ps-4 [&_td:last-child]:pe-4 [&_th:last-child]:pe-4",
 					tableClassName,
 				)}
 				containerClassName="min-h-0 flex-1 overflow-auto rounded-lg border bg-card"

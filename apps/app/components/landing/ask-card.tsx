@@ -50,7 +50,7 @@ export function AskCard() {
 				))}
 			</div>
 
-			<div className="flex h-11 shrink-0 items-center gap-2.5 rounded-md border border-border bg-[#1A1A1A] pr-1.5 pl-3.5 transition-colors focus-within:border-ring">
+			<div className="flex h-11 shrink-0 items-center gap-2.5 rounded-md border border-border bg-[#1A1A1A] pe-1.5 ps-3.5 transition-colors focus-within:border-ring">
 				<span
 					className={cn(
 						"min-w-0 grow truncate text-[13px]/[18px]",

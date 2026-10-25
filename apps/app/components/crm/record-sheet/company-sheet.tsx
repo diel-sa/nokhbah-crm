@@ -107,7 +107,7 @@ function companyConsequence(company: Company, messages: Messages): string {
 }
 
 const CONTACT_COLUMNS = (messages: Messages) => [
-	{ id: "primary", srLabel: "Primary", width: "w-10", className: "pl-5" },
+	{ id: "primary", srLabel: "Primary", width: "w-10", className: "ps-5" },
 	{
 		id: "name",
 		header: t(messages, "companySheet.contactColumns.name"),
@@ -538,7 +538,7 @@ function CompanyContacts({
 							clickable
 							onClick={() => openRecord({ kind: "contact", id: contact.id })}
 						>
-							<TableCell className="w-10 py-2.5 pl-5">
+							<TableCell className="w-10 py-2.5 ps-5">
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<Button
@@ -667,7 +667,7 @@ function CompanyDeals({
 						clickable
 						onClick={() => openRecord({ kind: "deal", id: deal.id })}
 					>
-						<TableCell className="truncate py-2.5 pr-3 pl-5 font-medium">
+						<TableCell className="truncate py-2.5 pe-3 ps-5 font-medium">
 							{deal.name}
 						</TableCell>
 						<TableCell className="px-3 py-2.5">

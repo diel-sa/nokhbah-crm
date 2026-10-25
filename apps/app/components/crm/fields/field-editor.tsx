@@ -155,7 +155,7 @@ function Coverage({ field }: { field: FieldRecord }) {
 						className="font-medium text-foreground"
 						label={`Filled on ${filled} of ${total} ${noun}`}
 					/>
-					<span className="pl-4 text-muted-foreground text-xs">
+					<span className="ps-4 text-muted-foreground text-xs">
 						{covered ? ALL_FILLED : `${total - filled} still to go`}
 					</span>
 				</div>

@@ -80,7 +80,7 @@ const DEAL_COLUMNS = (messages: Messages) => [
 		id: "deal",
 		header: t(messages, "contactSheet.dealColumns.deal"),
 		width: "w-[32%]",
-		className: "pl-5",
+		className: "ps-5",
 	},
 	{
 		id: "role",
@@ -679,7 +679,7 @@ function ContactDeals({ contact }: { contact: Contact }) {
 					clickable
 					onClick={() => openRecord({ kind: "deal", id: deal.id })}
 				>
-					<TableCell className="truncate py-2.5 pr-3 pl-5 font-medium">
+					<TableCell className="truncate py-2.5 pe-3 ps-5 font-medium">
 						{deal.name}
 					</TableCell>
 					<TableCell className="truncate px-3 py-2.5 text-muted-foreground">

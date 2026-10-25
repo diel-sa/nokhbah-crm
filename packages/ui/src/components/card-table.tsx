@@ -17,7 +17,7 @@ export function CardTable({
 }) {
 	return (
 		<SimpleTable
-			className="min-w-[48rem] table-fixed [&_td:first-child]:pl-4 [&_td:last-child]:pr-4 [&_th:first-child]:pl-4 [&_th:last-child]:pr-4"
+			className="min-w-[48rem] table-fixed [&_td:first-child]:ps-4 [&_td:last-child]:pe-4 [&_th:first-child]:ps-4 [&_th:last-child]:pe-4"
 			columns={columns}
 		>
 			{children}

@@ -112,7 +112,7 @@ function ReportedValue({ deal }: { deal: Deal }) {
 }
 
 const CONTACT_COLUMNS = [
-	{ id: "name", header: "Name", width: "w-[28%]", className: "pl-5" },
+	{ id: "name", header: "Name", width: "w-[28%]", className: "ps-5" },
 	{ id: "role", header: "Role", width: "w-[20%]" },
 	{ id: "title", header: "Title", width: "w-[22%]" },
 	{ id: "email", header: "Email", width: "w-[22%]" },
@@ -508,7 +508,7 @@ function DealContacts({
 						clickable
 						onClick={() => openRecord({ kind: "contact", id: contact.id })}
 					>
-						<TableCell className="truncate py-2.5 pr-3 pl-5 font-medium">
+						<TableCell className="truncate py-2.5 pe-3 ps-5 font-medium">
 							<span className="flex min-w-0 items-center gap-2">
 								<PersonAvatar
 									src={contact.imageUrl}

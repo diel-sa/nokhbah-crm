@@ -118,7 +118,7 @@ export function ShareChatDialog({
 				showCloseButton={false}
 				className="w-[440px] max-w-[calc(100%-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[440px]"
 			>
-				<DialogHeader className="relative gap-1 border-b p-5 pr-14">
+				<DialogHeader className="relative gap-1 border-b p-5 pe-14">
 					<DialogTitle className="font-semibold text-sm">
 						{t(messages, "chat.share.shareChat")}
 					</DialogTitle>
@@ -185,7 +185,7 @@ export function ShareChatDialog({
 							/>
 
 							{shared === true ? (
-								<div className="flex h-9 items-center gap-3 rounded-md border bg-background py-[3px] pr-[3px] pl-4">
+								<div className="flex h-9 items-center gap-3 rounded-md border bg-background py-[3px] pe-[3px] ps-4">
 									<span className="min-w-0 flex-1 truncate font-mono text-xs">
 										{shareToken
 											? `${workspaceUrl(`/chat/${shareToken.slice(0, 12)}`)}…`

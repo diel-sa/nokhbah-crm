@@ -81,7 +81,7 @@ export function DealListResultTable({ result }: { result: DealListResult }) {
 		<section aria-label={title} className="flex w-full flex-col gap-3">
 			<SimpleTable
 				columns={columnsOf(messages)}
-				className="min-w-[56rem] table-fixed [&_td:first-child]:pl-4 [&_td:last-child]:pr-4 [&_th:first-child]:pl-4 [&_th:last-child]:pr-4"
+				className="min-w-[56rem] table-fixed [&_td:first-child]:ps-4 [&_td:last-child]:pe-4 [&_th:first-child]:ps-4 [&_th:last-child]:pe-4"
 				headerHeight="h-11"
 			>
 				{count === 0 ? (

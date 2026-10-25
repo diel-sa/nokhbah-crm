@@ -76,7 +76,7 @@ export function ChatReferenceChip({
 	}
 
 	return (
-		<span className="flex min-w-0 max-w-full items-center gap-1 rounded-sm border bg-background py-0.5 pr-1 pl-0.5 text-left">
+		<span className="flex min-w-0 max-w-full items-center gap-1 rounded-sm border bg-background py-0.5 pe-1 ps-0.5 text-start">
 			{identity}
 			{onRemove ? (
 				<button
