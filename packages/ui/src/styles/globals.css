@@ -254,17 +254,17 @@
 		   so overriding the variable here (not the font-family) beats them.
 		   !important keeps the Arabic stack ahead of unlayered font-module
 		   classes and any utility-layer font-family. */
-		--font-sans: "IBM Plex Sans Arabic",
-			var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+		--font-sans:
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
 			var(--font-geist-sans, "Geist"), sans-serif !important;
-		font-family: "IBM Plex Sans Arabic",
-			var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+		font-family:
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
 			var(--font-geist-sans, "Geist"), sans-serif !important;
 	}
 
 	html[dir="rtl"] body {
-		font-family: "IBM Plex Sans Arabic",
-			var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+		font-family:
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
 			var(--font-geist-sans, "Geist"), sans-serif !important;
 	}
 

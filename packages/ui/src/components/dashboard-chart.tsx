@@ -514,30 +514,30 @@ function DonutStat({
 						<Label
 							content={({ viewBox }) => {
 								if (!viewBox || !("cx" in viewBox)) return null;
+								const cx = viewBox.cx ?? 0;
+								const cy = viewBox.cy ?? 0;
+								// The center content can be a React node (e.g. <Money>
+								// with the riyal SVG), which cannot live inside SVG
+								// <text>. Render it through a foreignObject instead.
+								const box = innerRadius * 1.9;
 								return (
-									<text
-										x={viewBox.cx}
-										y={viewBox.cy}
-										textAnchor="middle"
-										dominantBaseline="middle"
+									<foreignObject
+										x={cx - box / 2}
+										y={cy - box / 2}
+										width={box}
+										height={box}
 									>
-										<tspan
-											x={viewBox.cx}
-											y={viewBox.cy}
-											className="fill-foreground font-medium text-2xl tabular-nums"
-										>
-											{String(centerValue ?? "")}
-										</tspan>
-										{centerLabel != null ? (
-											<tspan
-												x={viewBox.cx}
-												y={(viewBox.cy ?? 0) + 20}
-												className="fill-muted-foreground text-xs"
-											>
-												{String(centerLabel)}
-											</tspan>
-										) : null}
-									</text>
+										<div className="flex h-full w-full flex-col items-center justify-center gap-0.5">
+											<span className="font-medium text-2xl tabular-nums text-foreground">
+												{centerValue ?? ""}
+											</span>
+											{centerLabel != null ? (
+												<span className="text-muted-foreground text-xs">
+													{centerLabel}
+												</span>
+											) : null}
+										</div>
+									</foreignObject>
 								);
 							}}
 						/>
