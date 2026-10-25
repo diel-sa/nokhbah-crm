@@ -28,6 +28,7 @@ import {
 } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import { type ReactNode, useRef, useState } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import {
 	Sheet,
 	SheetContent,
@@ -98,6 +99,8 @@ export function DetailSheetHeader({
 	onBack?: () => void;
 	onClose: () => void;
 }) {
+	const { messages } = useLocale();
+
 	return (
 		<SheetHeader className={cn("gap-0 border-b py-3", GUTTER)}>
 			<div className="flex items-start gap-3">
@@ -106,10 +109,12 @@ export function DetailSheetHeader({
 						<TooltipTrigger asChild>
 							<Button variant="ghost" size="icon-sm" onClick={onBack}>
 								<Icon icon={ArrowLeft} />
-								<span className="sr-only">Back</span>
+								<span className="sr-only">
+									{t(messages, "recordSheet.back")}
+								</span>
 							</Button>
 						</TooltipTrigger>
-						<TooltipContent>Back</TooltipContent>
+						<TooltipContent>{t(messages, "recordSheet.back")}</TooltipContent>
 					</Tooltip>
 				) : null}
 
@@ -138,7 +143,7 @@ export function DetailSheetHeader({
 					) : null}
 					<Button variant="ghost" size="icon-sm" onClick={onClose}>
 						<Icon icon={Close} />
-						<span className="sr-only">Close</span>
+						<span className="sr-only">{t(messages, "recordSheet.close")}</span>
 					</Button>
 				</div>
 			</div>

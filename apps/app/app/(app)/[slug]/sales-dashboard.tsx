@@ -8,18 +8,15 @@ import {
 } from "@crm/ui/components/card";
 import type { ChartConfig } from "@crm/ui/components/chart";
 import { DashboardRow, StatGroup } from "@crm/ui/components/dashboard";
+import { Money } from "@crm/ui/components/money";
 import { StatCard, type StatDelta } from "@crm/ui/components/stat-card";
-import {
-	formatCount,
-	formatMoney,
-	formatMoneyCompact,
-	formatPercent,
-} from "@crm/ui/lib/format";
+import { formatPercent } from "@crm/ui/lib/format";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AreaTrend, DonutStat } from "@/components/dashboard-charts";
 import { t, tf, useLocale } from "@/components/locale-provider";
 import { dealStageColor, dealStageLabel } from "@/lib/deal-stage";
+import { formatCountL } from "@/lib/i18n/format-count";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
@@ -65,9 +62,12 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 		unconverted,
 	} = summary;
 
-	const money = (cents: number) => formatMoneyCompact(cents, reportingCurrency);
-	const exact = (value: number | string) =>
-		formatMoney(Number(value), reportingCurrency);
+	const money = (cents: number) => (
+		<Money cents={cents} currency={reportingCurrency} compact />
+	);
+	const exact = (value: number | string) => (
+		<Money cents={Number(value)} currency={reportingCurrency} />
+	);
 
 	const hasTrend = trend.some((point) => point.won > 0 || point.created > 0);
 
@@ -96,12 +96,25 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 						wonPrevMonth.valueCents,
 						t(messages, "dashboard.vsLastMonth"),
 					)}
-					description={`${formatCount(wonThisMonth.count, "deal")} · ${money(wonPrevMonth.valueCents)} ${t(messages, "dashboard.lastMonth")}`}
+					description={
+						<>
+							{formatCountL(messages, wonThisMonth.count, "deal")} ·{" "}
+							{money(wonPrevMonth.valueCents)}{" "}
+							{t(messages, "dashboard.lastMonth")}
+						</>
+					}
 				/>
 				<StatCard
 					label={t(messages, "dashboard.openPipeline")}
 					value={money(pipeline.totalCents)}
-					description={`${formatCount(pipeline.totalDeals, "deal")} ${t(messages, "dashboard.inProgress")} · ${money(closingThisMonthTotal.valueCents)} ${t(messages, "dashboard.dueThisMonth")}`}
+					description={
+						<>
+							{formatCountL(messages, pipeline.totalDeals, "deal")}{" "}
+							{t(messages, "dashboard.inProgress")} ·{" "}
+							{money(closingThisMonthTotal.valueCents)}{" "}
+							{t(messages, "dashboard.dueThisMonth")}
+						</>
+					}
 				/>
 				<StatCard
 					label={tf(messages, "dashboard.winRate", {

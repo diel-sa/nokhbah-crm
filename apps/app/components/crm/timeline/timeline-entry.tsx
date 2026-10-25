@@ -9,7 +9,11 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { RecordLink } from "@/components/crm/record-sheet/record-link";
 import { LocalDateTime, LocalRelativeTime } from "@/components/local-date-time";
-import { activityLabel } from "@/lib/activity-presentation";
+import { t, useLocale } from "@/components/locale-provider";
+import {
+	activityLabel,
+	activitySubjectLabel,
+} from "@/lib/activity-presentation";
 import { dealStageLabel } from "@/lib/deal-stage";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -47,6 +51,7 @@ export function TimelineEntry({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const complete = useMutation(
 		trpc.activities.complete.mutationOptions({
@@ -70,13 +75,13 @@ export function TimelineEntry({
 	const synced = entry.meta?.synced === true;
 	const author = synced
 		? entry.emailThread
-			? "via Gmail"
-			: "via Calendar"
+			? t(messages, "activitySubjects.viaGmail")
+			: t(messages, "activitySubjects.viaCalendar")
 		: entry.createdBy.name;
 
 	const headline = change
-		? `${dealStageLabel(change.from)} → ${dealStageLabel(change.to)}`
-		: entry.subject;
+		? `${dealStageLabel(change.from, messages)} → ${dealStageLabel(change.to, messages)}`
+		: activitySubjectLabel(entry.subject, entry.type, messages);
 
 	const here = anchorId(anchor);
 	const deal = entry.deal && entry.deal.id !== here ? entry.deal : null;
@@ -94,13 +99,17 @@ export function TimelineEntry({
 					<Checkbox
 						checked={done}
 						disabled={complete.isPending}
-						aria-label={done ? "Mark as not done" : "Mark as done"}
+						aria-label={
+							done
+								? t(messages, "activitySubjects.markNotDone")
+								: t(messages, "activitySubjects.markDone")
+						}
 						onCheckedChange={(checked) =>
 							complete.mutate({ id: entry.id, completed: checked === true })
 						}
 					/>
 				) : (
-					<span role="img" aria-label={activityLabel(entry.type)}>
+					<span role="img" aria-label={activityLabel(entry.type, messages)}>
 						<ActivityIcon type={entry.type} />
 					</span>
 				)}
@@ -133,7 +142,7 @@ export function TimelineEntry({
 
 						{!headline && !entry.body ? (
 							<p className="text-muted-foreground">
-								{activityLabel(entry.type)}
+								{activityLabel(entry.type, messages)}
 							</p>
 						) : null}
 					</div>
@@ -171,7 +180,9 @@ export function TimelineEntry({
 								tone={overdue ? "error" : "info"}
 								label={
 									<>
-										{overdue ? "Overdue" : "Due"}{" "}
+										{overdue
+											? t(messages, "activitySubjects.overdue")
+											: t(messages, "activitySubjects.due")}{" "}
 										<LocalRelativeTime date={entry.dueAt} />
 									</>
 								}

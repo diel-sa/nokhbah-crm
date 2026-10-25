@@ -74,7 +74,25 @@
 		"deleteView": "Delete {name}",
 		"chooseCompany": "Choose a company",
 		"searchCompanies": "Search companies…",
-		"noDateYet": "No date yet"
+		"noDateYet": "No date yet",
+		"counts": {
+			"deal": {
+				"one": "deal",
+				"other": "deals"
+			},
+			"contact": {
+				"one": "contact",
+				"other": "contacts"
+			},
+			"company": {
+				"one": "company",
+				"other": "companies"
+			},
+			"record": {
+				"one": "record",
+				"other": "records"
+			}
+		}
 	},
 	"settings": {
 		"title": "Settings",
@@ -255,7 +273,7 @@
 			"nameLabel": "Name",
 			"namePlaceholder": "okta",
 			"nameHint": "Names the sign-in button. Cannot be changed later.",
-			"issuerLabel": "Issuer URL",
+			"issuerLabel": "Issuer",
 			"issuerHint": "Where discovery lives.",
 			"domainLabel": "Email domain",
 			"domainHint": "Comma-separate several.",
@@ -355,7 +373,11 @@
 				"honourDntHint": "Record nothing at all when the browser asks not to be tracked",
 				"lifetime": "Cookie lifetime",
 				"lifetimeHint": "After this a returning visitor counts as somebody new. Shorten it if your policy asks you to.",
-				"savedToast": "Cookie lifetime saved."
+				"savedToast": "Cookie lifetime saved.",
+				"lifetime13m": "13 months",
+				"lifetime6m": "6 months",
+				"lifetimeSession": "Session only",
+				"days": "days"
 			},
 			"domains": {
 				"title": "Allowed domains",
@@ -706,7 +728,274 @@
 		"contacts": "Contacts",
 		"deals": "Deals",
 		"activity": "Activity",
-		"agent": "Agent"
+		"agent": "Agent",
+		"back": "Back",
+		"close": "Close",
+		"recordCouldNotLoad": "This record could not be loaded"
+	},
+	"companySheet": {
+		"titleFallback": "Company",
+		"about": "About",
+		"details": "Details",
+		"links": "Links",
+		"name": "Name",
+		"domain": "Domain",
+		"website": "Website",
+		"phone": "Phone",
+		"email": "Email",
+		"city": "City",
+		"country": "Country",
+		"owner": "Owner",
+		"unassigned": "Unassigned",
+		"noContactsTitle": "No contacts yet",
+		"noContactsDescription": "Everyone you talk to at {company} lives here — add the first person and their calls, emails and notes hang off them.",
+		"addContact": "Add contact",
+		"primaryContact": "Primary contact",
+		"makePrimary": "Make primary",
+		"contactColumns": {
+			"name": "Name",
+			"title": "Title",
+			"email": "Email",
+			"owner": "Owner"
+		},
+		"noDealsTitle": "No deals yet",
+		"noDealsDescription": "Nothing is being sold to {company} right now. Open one and it joins the pipeline and the forecast.",
+		"newDeal": "New deal",
+		"dealColumns": {
+			"deal": "Deal",
+			"stage": "Stage",
+			"amount": "Amount",
+			"closeDate": "Close date",
+			"owner": "Owner"
+		},
+		"agentResearching": "Agent is researching",
+		"notKnownYet": "Not known yet",
+		"pendingFields": {
+			"industry": "industry",
+			"description": "description",
+			"socialLinks": "social links"
+		},
+		"deleteConsequence": {
+			"oneDeal": "Its one deal and everything filed against the account go too.",
+			"allDeals": "All {count} of its deals and everything filed against the account go too.",
+			"noDeals": "Everything filed against the account goes too.",
+			"onePerson": " The one person who works there stays in the CRM, without a company.",
+			"manyPeople": " The {count} people who work there stay in the CRM, without a company."
+		},
+		"recordActions": {
+			"moreActions": "More actions",
+			"archive": "Archive company",
+			"restore": "Restore company",
+			"deleteForever": "Delete company forever",
+			"deleteForeverTitle": "Delete {name} forever?",
+			"deleteForeverConfirm": "Delete forever",
+			"archivedToast": "{name} was archived.",
+			"restoredToast": "{name} was restored.",
+			"purgedToast": "{name} was deleted forever."
+		},
+		"reEnrich": "Re-enrich",
+		"research": "Research",
+		"enrichQueuedToast": "Looking it up — this page will update when it finishes.",
+		"enrichRunningToast": "Already running.",
+		"researchQueuedToast": "Researching — the brief lands on the timeline when it finishes.",
+		"researchRunningToast": "Already researching.",
+		"agentPanel": {
+			"title": "Ask about this company",
+			"blurb": "It reads their site and our own history with them, and shows its working.",
+			"placeholder": "What do they sell?",
+			"suggestion1": "What do they do?",
+			"suggestion2": "What do we know here?",
+			"suggestion3": "What has changed recently?"
+		},
+		"websiteActivity": "Website activity",
+		"pageViews": "Page views",
+		"lastSeen": "last seen",
+		"originalSource": "Original source",
+		"topPage": "Top page",
+		"views": "views",
+		"latestSource": "Latest source",
+		"firstSeen": "First seen",
+		"campaign": "Campaign",
+		"unknownChannel": "Unknown",
+		"newConversation": "New conversation",
+		"nothingYet": "Nothing yet",
+		"untitled": "Untitled",
+		"deleteConversation": "Delete this conversation",
+		"conversationDeletedToast": "Conversation deleted."
+	},
+	"timeline": {
+		"tabs": {
+			"all": "All",
+			"notes": "Notes",
+			"email": "Email",
+			"meetings": "Meetings",
+			"upcoming": "Upcoming",
+			"done": "Done"
+		},
+		"empty": {
+			"all": {
+				"title": "Nothing has happened yet",
+				"description": "Calls, notes, emails and meetings all land here. Log the first one above, or wait for Gmail and Calendar to sync."
+			},
+			"notes": {
+				"title": "No notes",
+				"description": "Notes are what you write down for the next person to read — what they care about, who else is involved, what you promised."
+			},
+			"email": {
+				"title": "No email",
+				"description": "Threads appear here as they are synced from Gmail. Nothing from before this mailbox was connected is imported."
+			},
+			"meetings": {
+				"title": "No meetings",
+				"description": "Calendar events with someone from this record on them show up here, past and upcoming."
+			},
+			"upcoming": {
+				"title": "Nothing outstanding",
+				"description": "Tasks you have not finished appear here, and at the top of the All tab until they are done."
+			},
+			"done": {
+				"title": "Nothing finished yet",
+				"description": "Tasks move here once you tick them off."
+			}
+		},
+		"today": "Today",
+		"yesterday": "Yesterday",
+		"outstanding": "Outstanding",
+		"showOlder": "Show older",
+		"dueDate": "Due date",
+		"addTask": "Add task",
+		"logType": "Log {type}",
+		"composerAriaLabel": "What happened",
+		"composerPlaceholder": {
+			"NOTE": "Log a note, call, email, meeting or task…",
+			"CALL": "What came out of the call?",
+			"EMAIL": "What was said?",
+			"MEETING": "What came out of the meeting?",
+			"TASK": "What needs doing?"
+		},
+		"viaGmail": "via Gmail",
+		"viaCalendar": "via Calendar",
+		"markAsDone": "Mark as done",
+		"markAsNotDone": "Mark as not done",
+		"overdue": "Overdue",
+		"due": "Due",
+		"oneMessage": "1 message",
+		"manyMessages": "{count} messages",
+		"openInMailbox": "Open in {mailboxName}",
+		"allDay": "All day",
+		"joinCall": "Join call"
+	},
+	"fields": {
+		"sheetTitle": "Fields",
+		"subtitle": {
+			"company": "This shapes every company in your CRM.",
+			"contact": "This shapes every contact in your CRM.",
+			"deal": "This shapes every deal in your CRM."
+		},
+		"standardFields": "Standard fields",
+		"reorderAndHideOnly": "reorder and hide only",
+		"suggestedFields": "Suggested fields",
+		"oneClickToAdd": "one click to add",
+		"add": "Add",
+		"customFields": "Custom fields",
+		"dragToOrder": "Drag to order",
+		"archived": "Archived",
+		"valuesKeptHidden": "values kept, hidden everywhere",
+		"newField": "New field",
+		"orderNote": "Order here is the order on the sheet",
+		"manualOnly": "Manual only",
+		"tableNote": "also a column on the table",
+		"filterNote": "also a filter",
+		"noCustomFieldsTitle": "No custom fields yet",
+		"noCustomFieldsBody": "Create dynamic fields that your agents can research and pre-fill.",
+		"errorTitle": "We could not load your fields",
+		"errorBody": "Your fields are still there. Try again in a moment, before you create anything new.",
+		"retry": "Try again",
+		"label": "Label",
+		"key": "Key",
+		"keyHelp": "What the API and your agents call it. Set from the label, fixed once saved — renaming the label later never breaks a caller.",
+		"letAgentsFill": "Let your agents fill this",
+		"agentHelp": "They propose a value with a source, and never overwrite yours.",
+		"briefLabel": "What counts as an answer",
+		"briefHelp": "Leave it empty and your agents work from the label and type alone.",
+		"type": "Type",
+		"options": "Options",
+		"addOption": "Add option",
+		"allFilled": "Nothing left to fill",
+		"optionLabel": "Option {index}",
+		"createField": "Create field",
+		"cancel": "Cancel",
+		"saveChanges": "Save changes",
+		"archive": "Archive",
+		"restore": "Restore",
+		"fillRest": "Fill the rest",
+		"none": "None",
+		"formerMember": "Former member",
+		"showOnSheet": {
+			"COMPANY": "Show on the company sheet",
+			"CONTACT": "Show on the contact sheet",
+			"DEAL": "Show on the deal sheet"
+		},
+		"offerAsColumn": {
+			"COMPANY": "Offer as a column on the Companies table",
+			"CONTACT": "Offer as a column on the Contacts table",
+			"DEAL": "Offer as a column on the Deals table"
+		},
+		"offerAsFilter": {
+			"COMPANY": "Offer as a filter on the Companies table",
+			"CONTACT": "Offer as a filter on the Contacts table",
+			"DEAL": "Offer as a filter on the Deals table"
+		},
+		"filledOn": "Filled on {filled} of {total} {noun}",
+		"stillToGo": "{count} still to go",
+		"agentsWillPickUp": "Your agents will pick this up.",
+		"archiveFieldTitle": "Archive {label}?",
+		"archiveFieldDescription": "Hidden everywhere. Its values are kept.",
+		"archiveFieldConfirm": "Archive field",
+		"edit": "Edit",
+		"required": "required",
+		"moreFor": "More for {label}",
+		"typeHints": {
+			"TEXT": "Text — a short line",
+			"LONG_TEXT": "Long text — a paragraph",
+			"NUMBER": "Number",
+			"DATE": "Date",
+			"CHECKBOX": "Checkbox — yes or no",
+			"SELECT": "Select — one of a fixed list",
+			"URL": "URL",
+			"EMAIL": "Email",
+			"PHONE": "Phone",
+			"USER": "User — someone in the workspace"
+		},
+		"standardField": {
+			"name": "Name",
+			"domain": "Domain",
+			"website": "Website",
+			"phone": "Phone",
+			"email": "Email",
+			"city": "City",
+			"country": "Country",
+			"owner": "Owner",
+			"firstName": "First name",
+			"lastName": "Last name",
+			"title": "Title",
+			"linkedin": "LinkedIn",
+			"github": "GitHub",
+			"company": "Company",
+			"amount": "Amount",
+			"currency": "Currency",
+			"closeDate": "Close date",
+			"stage": "Stage"
+		},
+		"template": {
+			"accountType": "Account type · Prospect, Customer, Partner, Churned",
+			"segment": "Segment · Enterprise, Mid-Market, SMB",
+			"territory": "Territory · AMER, EMEA, APAC",
+			"lifecycleStage": "Lifecycle stage · Lead, MQL, SQL, Opportunity, Customer",
+			"leadSource": "Lead source · Inbound, Outbound, Event",
+			"icpFitScore": "ICP fit score · Number",
+			"bdrOwner": "BDR owner · User"
+		}
 	},
 	"stages": {
 		"DEMO_BOOKED": "Demo booked",
@@ -770,7 +1059,8 @@
 		"noResults": "No results",
 		"showingOf": "Showing {start}–{end} of {total}",
 		"previous": "Previous",
-		"next": "Next"
+		"next": "Next",
+		"datePlaceholder": "Select a date"
 	},
 	"enrichmentQueue": {
 		"title": "Enriching now",
@@ -1059,6 +1349,125 @@
 			"ended": "This conversation has ended.",
 			"startNew": "Start a new conversation",
 			"ask": "Ask"
+		},
+		"fileSizeB": "{size} B",
+		"fileSizeKB": "{size} KB",
+		"fileSizeMB": "{size} MB"
+	},
+	"currencyNames": {
+		"USD": "US Dollar",
+		"SAR": "Saudi Riyal",
+		"EUR": "Euro",
+		"JPY": "Japanese Yen",
+		"GBP": "Pound Sterling",
+		"CNY": "Chinese Yuan",
+		"AUD": "Australian Dollar",
+		"CAD": "Canadian Dollar",
+		"CHF": "Swiss Franc",
+		"HKD": "Hong Kong Dollar",
+		"SGD": "Singapore Dollar",
+		"ZAR": "South African Rand"
+	},
+	"recordActions": {
+		"moreActions": "More actions",
+		"fallbackName": "The {kind}",
+		"restore": "Restore {kind}",
+		"deleteForever": "Delete {kind} forever",
+		"archive": "Archive {kind}",
+		"deleteTitle": "Delete {name} forever?",
+		"cancel": "Cancel",
+		"deleteConfirm": "Delete forever",
+		"archivedToast": "{name} was archived.",
+		"restoredToast": "{name} was restored.",
+		"purgedToast": "{name} was deleted forever."
+	},
+	"recordKinds": {
+		"company": "company",
+		"contact": "contact",
+		"deal": "deal"
+	},
+	"enrichmentActions": {
+		"reEnrich": "Re-enrich",
+		"research": "Research",
+		"enrichQueued": "Looking it up — this page will update when it finishes.",
+		"enrichRunning": "Already running.",
+		"researchQueued": "Researching — the brief lands on the timeline when it finishes.",
+		"researchRunning": "Already researching.",
+		"contactQueued": "Taking another look — this page will update when it finishes."
+	},
+	"contactSheet": {
+		"titleFallback": "Contact",
+		"primaryContactUpdatedToast": "Primary contact updated.",
+		"primaryContactAt": "Primary contact at {company}",
+		"emailAction": "Email",
+		"makePrimary": "Make primary",
+		"deleteConsequence": "Their notes, agent conversations and everything the agent found go too; emails and meetings stay filed against the company.",
+		"deleteConsequenceEmail": " The sync will not bring {email} back — only adding them yourself will.",
+		"stats": {
+			"company": "Company",
+			"email": "Email",
+			"phone": "Phone",
+			"owner": "Owner"
+		},
+		"details": "Details",
+		"firstName": "First name",
+		"lastName": "Last name",
+		"title": "Title",
+		"titlePlaceholder": "Head of Security",
+		"email": "Email",
+		"phone": "Phone",
+		"linkedin": "LinkedIn",
+		"x": "X",
+		"github": "GitHub",
+		"noCompany": "No company",
+		"owner": "Owner",
+		"unassigned": "Unassigned",
+		"links": "Links",
+		"background": "Background",
+		"source": "Source",
+		"currentRole": "Current role",
+		"tenure": "Tenure",
+		"seniority": "Seniority",
+		"function": "Function",
+		"based": "Based",
+		"previously": "Previously",
+		"oneRole": "1 role",
+		"manyRoles": "{count} roles",
+		"weKnowThem": "We know them",
+		"emails": "Emails",
+		"lastReply": "last reply",
+		"neverReplied": "{name} has never replied",
+		"meetings": "Meetings",
+		"nextMeeting": "Next meeting",
+		"meetingFallback": "Meeting",
+		"alsoHere": "Also here",
+		"noDealsTitle": "Not on any deals",
+		"noDealsDescription": "{name} is not attached to anything being sold yet. Deals are opened on the company, then people are added to them.",
+		"dealColumns": {
+			"deal": "Deal",
+			"role": "Role",
+			"stage": "Stage",
+			"amount": "Amount",
+			"owner": "Owner"
 		}
+	},
+	"timeAgo": {
+		"justNow": "Just now",
+		"ago": "{t} ago",
+		"in": "in {t}",
+		"minute": "m",
+		"hour": "h",
+		"day": "d"
+	},
+	"activitySubjects": {
+		"stageChanged": "Stage changed",
+		"companyFromInbox": "Company added from your inbox",
+		"contactFromInbox": "Contact added from your inbox",
+		"viaGmail": "via Gmail",
+		"viaCalendar": "via Calendar",
+		"markDone": "Mark as done",
+		"markNotDone": "Mark as not done",
+		"overdue": "Overdue",
+		"due": "Due"
 	}
 }

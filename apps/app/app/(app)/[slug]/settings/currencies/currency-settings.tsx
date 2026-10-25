@@ -28,12 +28,14 @@ import {
 import { Spinner } from "@crm/ui/components/spinner";
 import { StatusIndicator } from "@crm/ui/components/status-indicator";
 import { TableCell } from "@crm/ui/components/table";
-import { formatCount } from "@crm/ui/lib/format";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { LocalRelativeTime } from "@/components/local-date-time";
 import { t, useLocale } from "@/components/locale-provider";
+import { localizedCurrencyName } from "@/lib/i18n/currency-name";
+import { formatCountL } from "@/lib/i18n/format-count";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
@@ -190,7 +192,7 @@ export function CurrencySettings() {
 							<SelectContent>
 								{CURRENCIES.map((entry) => (
 									<SelectItem key={entry.code} value={entry.code}>
-										{entry.code} · {entry.name}
+										{entry.code} · {localizedCurrencyName(entry.code, messages)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -353,7 +355,7 @@ export function CurrencySettings() {
 					<CardDescription>
 						{unconverted.count === 0
 							? t(messages, "settings.currencies.allConvertible")
-							: `${formatCount(unconverted.count, "deal")} ${t(messages, "settings.currencies.unconverted")}`}
+							: `${formatCountL(messages, unconverted.count, "deal")} ${t(messages, "settings.currencies.unconverted")}`}
 						{refreshedAt ? (
 							<>
 								{" "}

@@ -10,6 +10,7 @@ import {
 	PopoverTrigger,
 } from "@crm/ui/components/popover";
 import { selectTriggerVariants } from "@crm/ui/components/select";
+import { useUiStrings } from "@crm/ui/components/ui-strings";
 import { formatDay, fromDay, toDay } from "@crm/ui/lib/format";
 import { cn } from "@crm/ui/lib/utils";
 import type { VariantProps } from "class-variance-authority";
@@ -19,7 +20,7 @@ export function DatePicker({
 	id,
 	value,
 	onChange,
-	placeholder = "Select a date",
+	placeholder,
 	variant,
 }: {
 	id?: string;
@@ -27,6 +28,8 @@ export function DatePicker({
 	onChange: (next: string) => void;
 	placeholder?: string;
 } & VariantProps<typeof selectTriggerVariants>) {
+	const strings = useUiStrings();
+	const resolvedPlaceholder = placeholder ?? strings.datePlaceholder;
 	const [open, setOpen] = useState(false);
 	const selected = fromDay(value);
 	const thisYear = new Date().getFullYear();
@@ -48,7 +51,7 @@ export function DatePicker({
 					className={cn(selectTriggerVariants({ variant }), "w-full")}
 				>
 					<span className="line-clamp-1">
-						{selected ? formatDay(value) : placeholder}
+						{selected ? formatDay(value) : resolvedPlaceholder}
 					</span>
 					<Icon
 						icon={CalendarGlyph}
@@ -75,7 +78,7 @@ export function DatePicker({
 							className="w-full justify-start"
 							onClick={() => choose("")}
 						>
-							Clear
+							{strings.clear}
 						</Button>
 					</div>
 				) : null}

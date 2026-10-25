@@ -37,7 +37,7 @@ type CartesianProps = {
 	showXAxis?: boolean;
 	showLegend?: boolean;
 	formatX?: (value: string) => string;
-	formatValue?: (value: number | string) => string;
+	formatValue?: (value: number | string) => React.ReactNode;
 };
 
 function seriesKeys(config: ChartConfig, series?: string[]) {
@@ -46,7 +46,7 @@ function seriesKeys(config: ChartConfig, series?: string[]) {
 
 const tooltip = (
 	formatX?: (value: string) => string,
-	formatValue?: (value: number | string) => string,
+	formatValue?: (value: number | string) => React.ReactNode,
 ) => (
 	<ChartTooltip
 		cursor={false}
@@ -379,7 +379,7 @@ function BarStat({
 	className?: string;
 	height?: number;
 	onBarClick?: (key: string) => void;
-	formatValue?: (value: number | string) => string;
+	formatValue?: (value: number | string) => React.ReactNode;
 }) {
 	const config: ChartConfig = Object.fromEntries(
 		data.map((d) => [d.key, { label: d.label, color: d.color }]),
@@ -454,7 +454,7 @@ function DonutStat({
 	centerValue?: React.ReactNode;
 	centerLabel?: React.ReactNode;
 	onSliceClick?: (key: string) => void;
-	formatValue?: (value: number | string) => string;
+	formatValue?: (value: number | string) => React.ReactNode;
 }) {
 	const config: ChartConfig = Object.fromEntries(
 		data.map((d) => [d.key, { label: d.label, color: d.color }]),

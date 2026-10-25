@@ -74,7 +74,25 @@
 		"deleteView": "حذف {name}",
 		"chooseCompany": "اختر شركة",
 		"searchCompanies": "ابحث عن شركة…",
-		"noDateYet": "بدون تاريخ بعد"
+		"noDateYet": "بدون تاريخ بعد",
+		"counts": {
+			"deal": {
+				"one": "صفقة",
+				"other": "صفقات"
+			},
+			"contact": {
+				"one": "جهة اتصال",
+				"other": "جهات اتصال"
+			},
+			"company": {
+				"one": "شركة",
+				"other": "شركات"
+			},
+			"record": {
+				"one": "سجل",
+				"other": "سجلات"
+			}
+		}
 	},
 	"settings": {
 		"title": "الإعدادات",
@@ -255,7 +273,7 @@
 			"nameLabel": "الاسم",
 			"namePlaceholder": "okta",
 			"nameHint": "يحدد اسم زر تسجيل الدخول. لا يمكن تغييره لاحقاً.",
-			"issuerLabel": "عنوان Issuer",
+			"issuerLabel": "جهة الإصدار",
 			"issuerHint": "مكان اكتشاف الإعدادات.",
 			"domainLabel": "نطاق البريد الإلكتروني",
 			"domainHint": "افصل بين عدة نطاقات بفاصلة.",
@@ -265,13 +283,13 @@
 			"redirectLabel": "عنوان إعادة التوجيه (Redirect URI)",
 			"redirectHint": "أضف هذا لدى المزود قبل الحفظ.",
 			"savedToast": "تم حفظ {name}.",
-			"searchPlaceholder": "البحث بالاسم أو النطاق أو Issuer…",
+			"searchPlaceholder": "البحث بالاسم أو النطاق أو جهة الإصدار…",
 			"empty": "لا يوجد مزود هوية بعد — الجميع يسجّل الدخول عبر Google.",
 			"colProvider": "المزود",
 			"openid": "OpenID Connect",
 			"clientSuffix": "عميل …{digits}",
 			"colDomain": "نطاق البريد الإلكتروني",
-			"colIssuer": "Issuer",
+			"colIssuer": "جهة الإصدار",
 			"colRedirect": "عنوان إعادة التوجيه",
 			"removeSr": "إزالة {name}",
 			"removeTitle": "إزالة {name}؟",
@@ -355,7 +373,11 @@
 				"honourDntHint": "عدم تسجيل أي شيء على الإطلاق عندما يطلب المتصفح عدم التتبع",
 				"lifetime": "مدة بقاء الملف",
 				"lifetimeHint": "بعد ذلك يُحسب الزائر العائد شخصاً جديداً. قصّرها إذا طلبت سياستك ذلك.",
-				"savedToast": "تم حفظ مدة بقاء الملف."
+				"savedToast": "تم حفظ مدة بقاء الملف.",
+				"lifetime13m": "13 شهراً",
+				"lifetime6m": "6 أشهر",
+				"lifetimeSession": "الجلسة فقط",
+				"days": "يوماً"
 			},
 			"domains": {
 				"title": "النطاقات المسموحة",
@@ -706,7 +728,274 @@
 		"contacts": "جهات الاتصال",
 		"deals": "الصفقات",
 		"activity": "النشاط",
-		"agent": "الوكيل"
+		"agent": "الوكيل",
+		"back": "رجوع",
+		"close": "إغلاق",
+		"recordCouldNotLoad": "تعذر تحميل هذا السجل"
+	},
+	"companySheet": {
+		"titleFallback": "شركة",
+		"about": "نبذة",
+		"details": "التفاصيل",
+		"links": "الروابط",
+		"name": "الاسم",
+		"domain": "النطاق",
+		"website": "الموقع الإلكتروني",
+		"phone": "الهاتف",
+		"email": "البريد الإلكتروني",
+		"city": "المدينة",
+		"country": "الدولة",
+		"owner": "المسؤول",
+		"unassigned": "غير مُعيَّن",
+		"noContactsTitle": "لا توجد جهات اتصال بعد",
+		"noContactsDescription": "كل من تتحدث معه في {company} موجود هنا — أضف أول شخص وتتعلق به مكالماته ورسائله الإلكترونية وملاحظاته.",
+		"addContact": "إضافة جهة اتصال",
+		"primaryContact": "جهة الاتصال الرئيسية",
+		"makePrimary": "تعيين كرئيسية",
+		"contactColumns": {
+			"name": "الاسم",
+			"title": "المسمى الوظيفي",
+			"email": "البريد الإلكتروني",
+			"owner": "المسؤول"
+		},
+		"noDealsTitle": "لا توجد صفقات بعد",
+		"noDealsDescription": "لا يُباع شيء لـ {company} حالياً. افتح صفقة واحدة لتنضم إلى خط الصفقات والتوقعات.",
+		"newDeal": "صفقة جديدة",
+		"dealColumns": {
+			"deal": "الصفقة",
+			"stage": "المرحلة",
+			"amount": "المبلغ",
+			"closeDate": "تاريخ الإغلاق",
+			"owner": "المسؤول"
+		},
+		"agentResearching": "الوكيل يبحث",
+		"notKnownYet": "لم يُعرف بعد",
+		"pendingFields": {
+			"industry": "القطاع",
+			"description": "الوصف",
+			"socialLinks": "روابط التواصل"
+		},
+		"deleteConsequence": {
+			"oneDeal": "تُحذف صفقتها الوحيدة وكل ما سُجّل على الحساب أيضاً.",
+			"allDeals": "تُحذف جميع صفقاتها الـ {count} وكل ما سُجّل على الحساب أيضاً.",
+			"noDeals": "يُحذف أيضاً كل ما سُجّل على الحساب.",
+			"onePerson": " يبقى الشخص الوحيد الذي يعمل هناك في النظام، بدون شركة.",
+			"manyPeople": " يبقى {count} من الأشخاص الذين يعملون هناك في النظام، بدون شركة."
+		},
+		"recordActions": {
+			"moreActions": "مزيد من الإجراءات",
+			"archive": "أرشفة الشركة",
+			"restore": "استعادة الشركة",
+			"deleteForever": "حذف الشركة نهائياً",
+			"deleteForeverTitle": "حذف {name} نهائياً؟",
+			"deleteForeverConfirm": "حذف نهائي",
+			"archivedToast": "تمت أرشفة {name}.",
+			"restoredToast": "تمت استعادة {name}.",
+			"purgedToast": "تم حذف {name} نهائياً."
+		},
+		"reEnrich": "إثراء مُجدد",
+		"research": "بحث",
+		"enrichQueuedToast": "جارٍ البحث — ستُحدَّث هذه الصفحة عند الانتهاء.",
+		"enrichRunningToast": "يعمل بالفعل.",
+		"researchQueuedToast": "جارٍ البحث — يصل الملخص إلى الخط الزمني عند الانتهاء.",
+		"researchRunningToast": "يجري البحث بالفعل.",
+		"agentPanel": {
+			"title": "اسأل عن هذه الشركة",
+			"blurb": "يقرأ موقعها وتاريخنا معها، ويُظهر عمله.",
+			"placeholder": "ماذا تبيع؟",
+			"suggestion1": "ماذا تعمل؟",
+			"suggestion2": "ما الذي نعرفه هنا؟",
+			"suggestion3": "ما الذي تغيّر مؤخراً؟"
+		},
+		"websiteActivity": "نشاط الموقع",
+		"pageViews": "مشاهدات الصفحات",
+		"lastSeen": "آخر ظهور",
+		"originalSource": "المصدر الأصلي",
+		"topPage": "أهم صفحة",
+		"views": "مشاهدة",
+		"latestSource": "آخر مصدر",
+		"firstSeen": "أول ظهور",
+		"campaign": "الحملة",
+		"unknownChannel": "غير معروف",
+		"newConversation": "محادثة جديدة",
+		"nothingYet": "لا شيء بعد",
+		"untitled": "بدون عنوان",
+		"deleteConversation": "حذف هذه المحادثة",
+		"conversationDeletedToast": "تم حذف المحادثة."
+	},
+	"timeline": {
+		"tabs": {
+			"all": "الكل",
+			"notes": "ملاحظات",
+			"email": "بريد إلكتروني",
+			"meetings": "اجتماعات",
+			"upcoming": "قادمة",
+			"done": "منجزة"
+		},
+		"empty": {
+			"all": {
+				"title": "لم يحدث شيء بعد",
+				"description": "تصل المكالمات والملاحظات والرسائل الإلكترونية والاجتماعات جميعها هنا. سجّل الأولى منها أعلاه، أو انتظر مزامنة Gmail وCalendar."
+			},
+			"notes": {
+				"title": "لا توجد ملاحظات",
+				"description": "الملاحظات هي ما تكتبه للشخص التالي ليقرأه — ما يهتمون به، ومن المشاركين، وما وعدت به."
+			},
+			"email": {
+				"title": "لا يوجد بريد إلكتروني",
+				"description": "تظهر السلاسل هنا بمجرد مزامنتها من Gmail. لا يُستورد شيء من قبل توصيل صندوق البريد هذا."
+			},
+			"meetings": {
+				"title": "لا توجد اجتماعات",
+				"description": "تظهر هنا أحداث التقويم مع شخص من هذا السجل، السابقة والقادمة."
+			},
+			"upcoming": {
+				"title": "لا يوجد شيء معلّق",
+				"description": "تظهر هنا المهام التي لم تُنهها، وفي أعلى تبويب الكل حتى تُنجز."
+			},
+			"done": {
+				"title": "لم تُنجز شيء بعد",
+				"description": "تنتقل المهام هنا بمجرد وضع علامة عليها."
+			}
+		},
+		"today": "اليوم",
+		"yesterday": "أمس",
+		"outstanding": "معلّقة",
+		"showOlder": "عرض الأقدم",
+		"dueDate": "تاريخ الاستحقاق",
+		"addTask": "إضافة مهمة",
+		"logType": "تسجيل {type}",
+		"composerAriaLabel": "ما الذي حدث",
+		"composerPlaceholder": {
+			"NOTE": "سجّل ملاحظة أو مكالمة أو بريداً إلكترونياً أو اجتماعاً أو مهمة…",
+			"CALL": "ما نتيجة المكالمة؟",
+			"EMAIL": "ما الذي قيل؟",
+			"MEETING": "ما نتيجة الاجتماع؟",
+			"TASK": "ما الذي يجب فعله؟"
+		},
+		"viaGmail": "عبر Gmail",
+		"viaCalendar": "عبر Calendar",
+		"markAsDone": "وضع علامة منجز",
+		"markAsNotDone": "إلغاء علامة المنجز",
+		"overdue": "متأخرة",
+		"due": "مستحقة",
+		"oneMessage": "رسالة واحدة",
+		"manyMessages": "{count} رسائل",
+		"openInMailbox": "فتح في {mailboxName}",
+		"allDay": "طوال اليوم",
+		"joinCall": "انضمام للمكالمة"
+	},
+	"fields": {
+		"sheetTitle": "الحقول",
+		"subtitle": {
+			"company": "هذا يشكل كل شركة في نظام إدارة علاقات العملاء (CRM) الخاص بك.",
+			"contact": "هذا يشكل كل جهة اتصال في نظام إدارة علاقات العملاء (CRM) الخاص بك.",
+			"deal": "هذا يشكل كل صفقة في نظام إدارة علاقات العملاء (CRM) الخاص بك."
+		},
+		"standardFields": "الحقول القياسية",
+		"reorderAndHideOnly": "إعادة الترتيب والإخفاء فقط",
+		"suggestedFields": "الحقول المقترحة",
+		"oneClickToAdd": "نقرة واحدة للإضافة",
+		"add": "إضافة",
+		"customFields": "الحقول المخصصة",
+		"dragToOrder": "اسحب للترتيب",
+		"archived": "المؤرشفة",
+		"valuesKeptHidden": "القيم محفوظة، مخفية في كل مكان",
+		"newField": "حقل جديد",
+		"orderNote": "الترتيب هنا هو الترتيب في البطاقة",
+		"manualOnly": "يدوي فقط",
+		"tableNote": "عمود أيضاً في الجدول",
+		"filterNote": "عامل تصفية أيضاً",
+		"noCustomFieldsTitle": "لا توجد حقول مخصصة بعد",
+		"noCustomFieldsBody": "أنشئ حقولاً ديناميكية يمكن لوكلائك البحث عنها وتعبئتها مسبقاً.",
+		"errorTitle": "تعذر تحميل حقولك",
+		"errorBody": "حقولك لا تزال موجودة. حاول مرة أخرى بعد لحظة، قبل إنشاء أي شيء جديد.",
+		"retry": "حاول مرة أخرى",
+		"label": "التسمية",
+		"key": "المفتاح",
+		"keyHelp": "ما يناديه API والوكلاء. يُحدَّد من التسمية، ويُثبَّت بعد الحفظ — تغيير التسمية لاحقاً لا يكسر المستدعي أبداً.",
+		"letAgentsFill": "دع الوكلاء يملؤون هذا",
+		"agentHelp": "يقترحون قيمة مع مصدر، ولا يكتبون على قيمتك أبداً.",
+		"briefLabel": "ما الذي يُعتبر إجابة",
+		"briefHelp": "اتركه فارغاً ويعمل الوكلاء من التسمية والنوع وحدهما.",
+		"type": "النوع",
+		"options": "الخيارات",
+		"addOption": "إضافة خيار",
+		"allFilled": "لا يوجد شيء متبقٍ للتعبئة",
+		"optionLabel": "الخيار {index}",
+		"createField": "إنشاء حقل",
+		"cancel": "إلغاء",
+		"saveChanges": "حفظ التغييرات",
+		"archive": "أرشفة",
+		"restore": "استعادة",
+		"fillRest": "تعبئة الباقي",
+		"none": "لا شيء",
+		"formerMember": "عضو سابق",
+		"showOnSheet": {
+			"COMPANY": "إظهار في بطاقة الشركة",
+			"CONTACT": "إظهار في بطاقة جهة الاتصال",
+			"DEAL": "إظهار في بطاقة الصفقة"
+		},
+		"offerAsColumn": {
+			"COMPANY": "عرض كعمود في جدول الشركات",
+			"CONTACT": "عرض كعمود في جدول جهات الاتصال",
+			"DEAL": "عرض كعمود في جدول الصفقات"
+		},
+		"offerAsFilter": {
+			"COMPANY": "عرض كعامل تصفية في جدول الشركات",
+			"CONTACT": "عرض كعامل تصفية في جدول جهات الاتصال",
+			"DEAL": "عرض كعامل تصفية في جدول الصفقات"
+		},
+		"filledOn": "مُعبَّأ في {filled} من {total} {noun}",
+		"stillToGo": "{count} متبقية",
+		"agentsWillPickUp": "سيتولى الوكلاء هذا.",
+		"archiveFieldTitle": "أرشفة {label}؟",
+		"archiveFieldDescription": "مخفي في كل مكان. قيمه محفوظة.",
+		"archiveFieldConfirm": "أرشفة الحقل",
+		"edit": "تعديل",
+		"required": "مطلوب",
+		"moreFor": "مزيد لـ {label}",
+		"typeHints": {
+			"TEXT": "نص — سطر قصير",
+			"LONG_TEXT": "نص طويل — فقرة",
+			"NUMBER": "رقم",
+			"DATE": "تاريخ",
+			"CHECKBOX": "مربع اختيار — نعم أو لا",
+			"SELECT": "اختيار — واحد من قائمة ثابتة",
+			"URL": "URL",
+			"EMAIL": "بريد إلكتروني",
+			"PHONE": "هاتف",
+			"USER": "مستخدم — شخص في مساحة العمل"
+		},
+		"standardField": {
+			"name": "الاسم",
+			"domain": "النطاق",
+			"website": "الموقع الإلكتروني",
+			"phone": "الهاتف",
+			"email": "البريد الإلكتروني",
+			"city": "المدينة",
+			"country": "الدولة",
+			"owner": "المسؤول",
+			"firstName": "الاسم الأول",
+			"lastName": "اسم العائلة",
+			"title": "المسمى الوظيفي",
+			"linkedin": "LinkedIn",
+			"github": "GitHub",
+			"company": "الشركة",
+			"amount": "المبلغ",
+			"currency": "العملة",
+			"closeDate": "تاريخ الإغلاق",
+			"stage": "المرحلة"
+		},
+		"template": {
+			"accountType": "نوع الحساب · Prospect، Customer، Partner، Churned",
+			"segment": "الشريحة · Enterprise، Mid-Market، SMB",
+			"territory": "الإقليم · AMER، EMEA، APAC",
+			"lifecycleStage": "مرحلة دورة الحياة · Lead، MQL، SQL، Opportunity، Customer",
+			"leadSource": "مصدر العميل المحتمل · Inbound، Outbound، Event",
+			"icpFitScore": "درجة تناسب ICP · Number",
+			"bdrOwner": "مالك BDR · User"
+		}
 	},
 	"stages": {
 		"DEMO_BOOKED": "عرض توضيحي محجوز",
@@ -723,7 +1012,7 @@
 		"EMAIL": "بريد إلكتروني",
 		"MEETING": "اجتماع",
 		"TASK": "مهمة",
-		"STAGE_CHANGE": "تغيير مرحلة",
+		"STAGE_CHANGE": "تغيير المرحلة",
 		"ENRICHMENT": "إثراء بيانات"
 	},
 	"enrichment": {
@@ -770,7 +1059,8 @@
 		"noResults": "لا توجد نتائج",
 		"showingOf": "إظهار {start}–{end} من أصل {total}",
 		"previous": "السابق",
-		"next": "التالي"
+		"next": "التالي",
+		"datePlaceholder": "اختر تاريخاً"
 	},
 	"enrichmentQueue": {
 		"title": "جارٍ الإثراء الآن",
@@ -1059,6 +1349,125 @@
 			"ended": "انتهت هذه المحادثة.",
 			"startNew": "بدء محادثة جديدة",
 			"ask": "اسأل"
+		},
+		"fileSizeB": "{size} بايت",
+		"fileSizeKB": "{size} كيلو بايت",
+		"fileSizeMB": "{size} ميجا بايت"
+	},
+	"currencyNames": {
+		"USD": "دولار أمريكي",
+		"SAR": "ريال سعودي",
+		"EUR": "يورو",
+		"JPY": "ين ياباني",
+		"GBP": "جنيه إسترليني",
+		"CNY": "يوان صيني",
+		"AUD": "دولار أسترالي",
+		"CAD": "دولار كندي",
+		"CHF": "فرنك سويسري",
+		"HKD": "دولار هونغ كونغ",
+		"SGD": "دولار سنغافوري",
+		"ZAR": "راند جنوب أفريقي"
+	},
+	"recordActions": {
+		"moreActions": "المزيد من الإجراءات",
+		"fallbackName": "{kind}",
+		"restore": "استعادة {kind}",
+		"deleteForever": "حذف {kind} نهائياً",
+		"archive": "أرشفة {kind}",
+		"deleteTitle": "حذف {name} نهائياً؟",
+		"cancel": "إلغاء",
+		"deleteConfirm": "حذف نهائي",
+		"archivedToast": "تمت أرشفة {name}.",
+		"restoredToast": "تمت استعادة {name}.",
+		"purgedToast": "تم حذف {name} نهائياً."
+	},
+	"recordKinds": {
+		"company": "الشركة",
+		"contact": "جهة الاتصال",
+		"deal": "الصفقة"
+	},
+	"enrichmentActions": {
+		"reEnrich": "إثراء مجدد",
+		"research": "بحث",
+		"enrichQueued": "جارٍ البحث — ستتحدث هذه الصفحة عند الانتهاء.",
+		"enrichRunning": "يعمل بالفعل.",
+		"researchQueued": "جارٍ البحث — سيظهر الملخص على الخط الزمني عند الانتهاء.",
+		"researchRunning": "البحث قيد التشغيل بالفعل.",
+		"contactQueued": "جارٍ إعادة النظر — ستتحدث هذه الصفحة عند الانتهاء."
+	},
+	"contactSheet": {
+		"titleFallback": "جهة اتصال",
+		"primaryContactUpdatedToast": "تم تحديث جهة الاتصال الرئيسية.",
+		"primaryContactAt": "جهة الاتصال الرئيسية في {company}",
+		"emailAction": "بريد إلكتروني",
+		"makePrimary": "تعيين كرئيسية",
+		"deleteConsequence": "تُحذف ملاحظاته ومحادثاته مع الوكيل وكل ما وجده الوكيل أيضاً؛ وتبقى الرسائل والاجتماعات مُسجَّلة على الشركة.",
+		"deleteConsequenceEmail": " لن تُعيد المزامنة {email} تلقائياً — لن يعود إلا بإضافته بنفسك.",
+		"stats": {
+			"company": "الشركة",
+			"email": "البريد الإلكتروني",
+			"phone": "الهاتف",
+			"owner": "المسؤول"
+		},
+		"details": "التفاصيل",
+		"firstName": "الاسم الأول",
+		"lastName": "اسم العائلة",
+		"title": "المسمى الوظيفي",
+		"titlePlaceholder": "رئيس الأمن",
+		"email": "البريد الإلكتروني",
+		"phone": "الهاتف",
+		"linkedin": "LinkedIn",
+		"x": "X",
+		"github": "GitHub",
+		"noCompany": "بدون شركة",
+		"owner": "المسؤول",
+		"unassigned": "غير مُعيَّن",
+		"links": "الروابط",
+		"background": "الخلفية",
+		"source": "المصدر",
+		"currentRole": "الدور الحالي",
+		"tenure": "مدة الخدمة",
+		"seniority": "المستوى الوظيفي",
+		"function": "الوظيفة",
+		"based": "الموقع",
+		"previously": "سابقاً",
+		"oneRole": "دور واحد",
+		"manyRoles": "{count} أدوار",
+		"weKnowThem": "نعرفهم",
+		"emails": "الرسائل",
+		"lastReply": "آخر رد",
+		"neverReplied": "{name} لم يرد أبداً",
+		"meetings": "الاجتماعات",
+		"nextMeeting": "الاجتماع القادم",
+		"meetingFallback": "اجتماع",
+		"alsoHere": "موجودون هنا أيضاً",
+		"noDealsTitle": "ليس على أي صفقات",
+		"noDealsDescription": "{name} غير مرتبط بأي شيء يُباع حتى الآن. تُفتح الصفقات على الشركة، ثم يُضاف الأشخاص إليها.",
+		"dealColumns": {
+			"deal": "الصفقة",
+			"role": "الدور",
+			"stage": "المرحلة",
+			"amount": "المبلغ",
+			"owner": "المسؤول"
 		}
+	},
+	"timeAgo": {
+		"justNow": "الآن",
+		"ago": "منذ {t}",
+		"in": "بعد {t}",
+		"minute": "د",
+		"hour": "س",
+		"day": "ي"
+	},
+	"activitySubjects": {
+		"stageChanged": "تغيير المرحلة",
+		"companyFromInbox": "شركة أُضيفت من بريدك",
+		"contactFromInbox": "جهة اتصال أُضيفت من بريدك",
+		"viaGmail": "عبر Gmail",
+		"viaCalendar": "عبر Calendar",
+		"markDone": "تحديد كمنجزة",
+		"markNotDone": "إلغاء التحديد كمنجزة",
+		"overdue": "متأخرة",
+		"due": "تستحق"
 	}
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyCellValue } from "@crm/ui/components/empty-cell";
+import { Money } from "@crm/ui/components/money";
 import {
 	SimpleTable,
 	type SimpleTableColumn,
@@ -119,12 +120,10 @@ export function DealListResultTable({ result }: { result: DealListResult }) {
 									{deal.amount === null ? (
 										<EmptyCellValue />
 									) : (
-										<span className="tabular-nums">
-											{formatMoney(
-												Math.round(deal.amount * 100),
-												deal.currency,
-											)}
-										</span>
+										<Money
+											cents={Math.round(deal.amount * 100)}
+											currency={deal.currency}
+										/>
 									)}
 								</TableCell>
 								<TableCell className="overflow-hidden px-3 py-3">

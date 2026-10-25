@@ -11,7 +11,7 @@ import {
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 } from "@crm/ui/components/dropdown-menu";
-import { formatCount } from "@crm/ui/lib/format";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -22,11 +22,14 @@ import {
 	reportBulk,
 } from "@/components/crm/bulk-actions";
 import { CompanyMenuSearch } from "@/components/crm/company-picker";
+import { useLocale } from "@/components/locale-provider";
+import { formatCountL } from "@/lib/i18n/format-count";
+import type { Messages } from "@/lib/i18n/messages";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
-function contacts(count: number): string {
-	return formatCount(count, "contact");
+function contacts(count: number, messages: Messages): string {
+	return formatCountL(messages, count, "contact");
 }
 
 export function ContactsBulkActions({
@@ -38,6 +41,7 @@ export function ContactsBulkActions({
 	onDone: () => void;
 	archived: boolean;
 }) {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const users = useQuery(trpc.users.list.queryOptions());
@@ -51,7 +55,10 @@ export function ContactsBulkActions({
 		trpc.contacts.bulkAssignOwner.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.contact();
-				reportBulk(result, (count) => `${contacts(count)} reassigned.`);
+				reportBulk(
+					result,
+					(count) => `${formatCountL(messages, count, "contact")} reassigned.`,
+				);
 				onDone();
 			},
 			onError,
@@ -62,7 +69,7 @@ export function ContactsBulkActions({
 		trpc.contacts.bulkSetCompany.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.contact();
-				reportBulk(result, (count) => `${contacts(count)} moved.`);
+				reportBulk(result, (count) => `${contacts(count, messages)} moved.`);
 				onDone();
 			},
 			onError,
@@ -75,7 +82,8 @@ export function ContactsBulkActions({
 				await cache.contact();
 				reportBulk(
 					result,
-					(count) => `Looking up ${contacts(count)} — the table will update.`,
+					(count) =>
+						`Looking up ${contacts(count, messages)} — the table will update.`,
 				);
 				onDone();
 			},
@@ -87,7 +95,10 @@ export function ContactsBulkActions({
 		trpc.contacts.bulkArchive.mutationOptions({
 			onSuccess: async (result, variables) => {
 				await cache.removedMany({ kind: "contact", ids: variables.ids });
-				reportBulk(result, (count) => `${contacts(count)} archived.`);
+				reportBulk(
+					result,
+					(count) => `${formatCountL(messages, count, "contact")} archived.`,
+				);
 				onDone();
 			},
 			onError,
@@ -98,7 +109,7 @@ export function ContactsBulkActions({
 		trpc.contacts.bulkRestore.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.contact();
-				reportBulk(result, (count) => `${contacts(count)} restored.`);
+				reportBulk(result, (count) => `${contacts(count, messages)} restored.`);
 				onDone();
 			},
 			onError,
@@ -109,7 +120,10 @@ export function ContactsBulkActions({
 		trpc.contacts.bulkPurge.mutationOptions({
 			onSuccess: async (result, variables) => {
 				await cache.removedMany({ kind: "contact", ids: variables.ids });
-				reportBulk(result, (count) => `${contacts(count)} deleted forever.`);
+				reportBulk(
+					result,
+					(count) => `${contacts(count, messages)} deleted forever.`,
+				);
 				setConfirming(false);
 				onDone();
 			},
@@ -143,7 +157,7 @@ export function ContactsBulkActions({
 				<BulkDeleteDialog
 					open={confirming}
 					onOpenChange={setConfirming}
-					title={`Delete ${contacts(ids.length)} forever?`}
+					title={`Delete ${contacts(ids.length, messages)} forever?`}
 					description="Their email addresses are suppressed, so the inbox sync will not file them again. This cannot be undone."
 					onConfirm={() => purge.mutate({ ids })}
 				/>

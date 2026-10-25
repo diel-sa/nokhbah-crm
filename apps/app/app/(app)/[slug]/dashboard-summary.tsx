@@ -26,7 +26,6 @@ import {
 import { Spinner } from "@crm/ui/components/spinner";
 import { StatusIndicator } from "@crm/ui/components/status-indicator";
 import { TableCell } from "@crm/ui/components/table";
-import { formatMoneyCompact } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
@@ -37,7 +36,7 @@ import { RecordLink } from "@/components/crm/record-sheet/record-link";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { LocalRelativeTime } from "@/components/local-date-time";
 import { t, tf, useLocale } from "@/components/locale-provider";
-import { activityLabel } from "@/lib/activity-presentation";
+import { activitySubjectLabel } from "@/lib/activity-presentation";
 import { dealStageColor } from "@/lib/deal-stage";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
@@ -329,7 +328,7 @@ export function DashboardSummary() {
 							<SimpleTableRow key={entry.id}>
 								<TableCell className={CELL}>
 									<span className="truncate">
-										{entry.subject ?? activityLabel(entry.type, messages)}
+										{activitySubjectLabel(entry.subject, entry.type, messages)}
 									</span>
 								</TableCell>
 								<TableCell className={`${CELL} hidden md:table-cell`}>

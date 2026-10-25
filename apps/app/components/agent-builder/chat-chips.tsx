@@ -17,6 +17,7 @@ import {
 import { cn } from "@crm/ui/lib/utils";
 import Image from "next/image";
 import { tf, useLocale } from "@/components/locale-provider";
+import type { Messages } from "@/lib/i18n/messages";
 
 type ChatChipVariant = "default" | "composer";
 
@@ -136,7 +137,7 @@ export function ChatAttachmentChip({
 	variant?: ChatChipVariant;
 }) {
 	const { messages } = useLocale();
-	const label = `${attachment.name} · ${formatBytes(attachment.size)}`;
+	const label = `${attachment.name} · ${formatBytes(attachment.size, messages)}`;
 	const image = isPreviewableImage(attachment.type)
 		? (attachment.previewUrl ??
 			(attachment.contentBase64
@@ -228,10 +229,13 @@ export function ChatCommandChip({
 	);
 }
 
-function formatBytes(bytes: number): string {
-	if (bytes < 1024) return `${bytes} B`;
-	if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function formatBytes(bytes: number, messages: Messages): string {
+	if (bytes < 1024) return tf(messages, "chat.fileSizeB", { size: bytes });
+	if (bytes < 1024 * 1024)
+		return tf(messages, "chat.fileSizeKB", { size: Math.round(bytes / 1024) });
+	return tf(messages, "chat.fileSizeMB", {
+		size: Number((bytes / (1024 * 1024)).toFixed(1)),
+	});
 }
 
 function isPreviewableImage(mediaType: string): boolean {

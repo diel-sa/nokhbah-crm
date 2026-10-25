@@ -29,6 +29,25 @@ export function activityLabel(type: ActivityType, messages?: Messages): string {
 	return localized ?? PRESENTATION[type].label;
 }
 
+const SUBJECT_KEYS = {
+	"Stage changed": "stageChanged",
+	"Company added from your inbox": "companyFromInbox",
+	"Contact added from your inbox": "contactFromInbox",
+} satisfies Record<string, keyof Messages["activitySubjects"]>;
+
+export function activitySubjectLabel(
+	subject: string | null | undefined,
+	type: ActivityType,
+	messages?: Messages,
+): string {
+	const key = subject
+		? SUBJECT_KEYS[subject as keyof typeof SUBJECT_KEYS]
+		: undefined;
+	if (messages && key) return messages.activitySubjects[key];
+	if (subject) return subject;
+	return activityLabel(type, messages);
+}
+
 export function activityIcon(type: ActivityType): CarbonIcon {
 	return PRESENTATION[type].icon;
 }

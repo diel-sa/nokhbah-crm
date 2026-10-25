@@ -21,7 +21,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@crm/ui/components/tooltip";
-import { formatMoney } from "@crm/ui/lib/format";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AgentPanel } from "@/components/crm/agent-panel";
@@ -324,9 +323,12 @@ function DealOverview({ deal }: { deal: Deal }) {
 							}
 							save({ amountCents: Math.round(parsed * 100) });
 						}}
-						render={(value) =>
-							formatMoney(Math.round(Number(value) * 100), currency)
-						}
+						render={(value) => (
+							<Money
+								cents={Math.round(Number(value) * 100)}
+								currency={currency}
+							/>
+						)}
 					/>
 					<InlineSelectField
 						label="Currency"

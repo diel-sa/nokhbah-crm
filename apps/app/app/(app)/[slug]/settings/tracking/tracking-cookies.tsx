@@ -21,8 +21,19 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId } from "react";
 import { toast } from "sonner";
 import { t, useLocale } from "@/components/locale-provider";
+import type { Messages } from "@/lib/i18n/messages";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
+
+function localizedLifetimeLabel(days: number, messages: Messages): string {
+	if (days === 0)
+		return t(messages, "settings.tracking.cookies.lifetimeSession");
+	if (days === 13 * 30)
+		return t(messages, "settings.tracking.cookies.lifetime13m");
+	if (days === 6 * 30)
+		return t(messages, "settings.tracking.cookies.lifetime6m");
+	return `${days} ${t(messages, "settings.tracking.cookies.days")}`;
+}
 
 const TOGGLES = [
 	{
@@ -125,7 +136,7 @@ export function TrackingCookies() {
 						<SelectContent>
 							{cookieLifetimes.map((lifetime) => (
 								<SelectItem key={lifetime.days} value={String(lifetime.days)}>
-									{lifetime.label}
+									{localizedLifetimeLabel(lifetime.days, messages)}
 								</SelectItem>
 							))}
 						</SelectContent>

@@ -33,8 +33,7 @@ export default function ApiKeysSettingsPage({
 						<LocalizedText k="settings.pages.apiKeys" />
 					</PageShellTitle>
 					<PageShellDescription>
-						Personal keys for calling the CRM API. Each one acts as you —
-						anything it can read or change is exactly what you can.
+						<LocalizedText k="settings.pages.apiKeysDescription" />
 					</PageShellDescription>
 				</PageShellHeading>
 

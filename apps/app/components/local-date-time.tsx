@@ -1,20 +1,65 @@
 "use client";
 
+import type { Messages } from "@/lib/i18n/messages";
 import { InlineScript } from "./inline-script";
+import { useLocale } from "./locale-provider";
 
 const DAY_MS = 86_400_000;
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
 const dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
-const relativeDateFormatter = new Intl.RelativeTimeFormat(undefined, {
-	numeric: "auto",
-});
 const LOCAL_DAY_OPTIONS = {
 	month: "short",
 	day: "numeric",
 	year: "numeric",
 } as const;
-const LOCAL_DATE_TIME_SCRIPT = `{var s="time[data-local-date-kind]",f=function(n){try{var k=n.dataset.localDateKind,v=n.dataset.localDateValue,e=n.dataset.localDateEnd,o=JSON.parse(n.dataset.localDateOptions||"{}"),d=new Date(v),t=d.getTime(),x=Date.now()-t,a=Math.abs(x),r;if(k==="date-time")r=new Intl.DateTimeFormat(void 0,o).format(d);else if(k==="date-range")r=new Intl.DateTimeFormat(void 0,o).formatRange(d,new Date(e));else if(k==="day")r=new Intl.DateTimeFormat(void 0,o).format(new Date(v+"T00:00:00"));else if(k==="relative-date"){var z=new Date(),q=(Date.UTC(z.getFullYear(),z.getMonth(),z.getDate())-Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/${DAY_MS};r=new Intl.RelativeTimeFormat(void 0,{numeric:"auto"}).format(-q,"day")}else if(!Number.isFinite(t))r="—";else if(a<${MINUTE_MS})r="just now";else if(a>=${30 * DAY_MS})r=new Intl.DateTimeFormat(void 0,{month:"short",day:"numeric"}).format(d);else{var u=a<${HOUR_MS}?Math.floor(a/${MINUTE_MS})+"m":a<${DAY_MS}?Math.floor(a/${HOUR_MS})+"h":Math.floor(a/${DAY_MS})+"d";r=x<0?"in "+u:u+" ago"}n.textContent=r}catch{}};var c=function(r){if(r.nodeType===1&&r.matches&&r.matches(s))f(r);if(r.querySelectorAll)r.querySelectorAll(s).forEach(f)};c(document);new MutationObserver(function(m){m.forEach(function(r){r.addedNodes.forEach(c)})}).observe(document.documentElement,{childList:true,subtree:true})}`;
+
+type TimeStrings = {
+	now: string;
+	ago: string;
+	in: string;
+	minute: string;
+	hour: string;
+	day: string;
+};
+
+function timeStrings(messages: Messages): TimeStrings {
+	return {
+		now: messages.timeAgo.justNow,
+		ago: messages.timeAgo.ago,
+		in: messages.timeAgo.in,
+		minute: messages.timeAgo.minute,
+		hour: messages.timeAgo.hour,
+		day: messages.timeAgo.day,
+	};
+}
+
+// Locale-specific literals for the pre-hydration script. Must stay in sync
+// with the `timeAgo` message catalog.
+const SCRIPT_TIME_STRINGS = {
+	en: {
+		now: "just now",
+		ago: "{t} ago",
+		in: "in {t}",
+		minute: "m",
+		hour: "h",
+		day: "d",
+	},
+	ar: {
+		now: "الآن",
+		ago: "منذ {t}",
+		in: "بعد {t}",
+		minute: "د",
+		hour: "س",
+		day: "ي",
+	},
+} satisfies Record<string, TimeStrings>;
+
+function scriptTimeStringsJson(): string {
+	return JSON.stringify(SCRIPT_TIME_STRINGS).replace(/"/g, '\\"');
+}
+
+const LOCAL_DATE_TIME_SCRIPT = `{try{var W=JSON.parse("${scriptTimeStringsJson()}");var L=(document.documentElement.lang||"en").slice(0,2).toLowerCase();var w=W[L]||W.en;var s="time[data-local-date-kind]",f=function(n){try{var k=n.dataset.localDateKind,v=n.dataset.localDateValue,e=n.dataset.localDateEnd,o=JSON.parse(n.dataset.localDateOptions||"{}"),d=new Date(v),t=d.getTime(),x=Date.now()-t,a=Math.abs(x),r;if(k==="date-time")r=new Intl.DateTimeFormat(L,o).format(d);else if(k==="date-range")r=new Intl.DateTimeFormat(L,o).formatRange(d,new Date(e));else if(k==="day")r=new Intl.DateTimeFormat(L,o).format(new Date(v+"T00:00:00"));else if(k==="relative-date"){var z=new Date(),q=(Date.UTC(z.getFullYear(),z.getMonth(),z.getDate())-Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/${DAY_MS};r=new Intl.RelativeTimeFormat(L,{numeric:"auto"}).format(-q,"day")}else if(!Number.isFinite(t))r="—";else if(a<${MINUTE_MS})r=w.now;else if(a>=${30 * DAY_MS})r=new Intl.DateTimeFormat(L,{month:"short",day:"numeric"}).format(d);else{var u=a<${HOUR_MS}?Math.floor(a/${MINUTE_MS})+w.minute:a<${DAY_MS}?Math.floor(a/${HOUR_MS})+w.hour:Math.floor(a/${DAY_MS})+w.day;r=x<0?w.in.replace("{t}",u):w.ago.replace("{t}",u)}n.textContent=r}catch{}};var c=function(r){if(r.nodeType===1&&r.matches&&r.matches(s))f(r);if(r.querySelectorAll)r.querySelectorAll(s).forEach(f)};c(document);new MutationObserver(function(m){m.forEach(function(r){r.addedNodes.forEach(c)})}).observe(document.documentElement,{childList:true,subtree:true})}catch{}}`;
 
 export function LocalDateTime({
 	date,
@@ -23,12 +68,13 @@ export function LocalDateTime({
 	date: string;
 	options: Intl.DateTimeFormatOptions;
 }) {
+	const { locale } = useLocale();
 	return (
 		<LocalTime
 			kind="date-time"
 			date={date}
 			options={options}
-			fallback={getDateTimeFormatter(options).format(new Date(date))}
+			fallback={getDateTimeFormatter(locale, options).format(new Date(date))}
 		/>
 	);
 }
@@ -42,13 +88,14 @@ export function LocalDateTimeRange({
 	end: string;
 	options: Intl.DateTimeFormatOptions;
 }) {
+	const { locale } = useLocale();
 	return (
 		<LocalTime
 			kind="date-range"
 			date={start}
 			end={end}
 			options={options}
-			fallback={getDateTimeFormatter(options).formatRange(
+			fallback={getDateTimeFormatter(locale, options).formatRange(
 				new Date(start),
 				new Date(end),
 			)}
@@ -57,33 +104,38 @@ export function LocalDateTimeRange({
 }
 
 export function LocalRelativeDate({ date }: { date: string }) {
+	const { locale } = useLocale();
 	return (
 		<LocalTime
 			kind="relative-date"
 			date={date}
-			fallback={formatRelativeDate(date)}
+			fallback={formatRelativeDate(date, locale)}
 		/>
 	);
 }
 
 export function LocalRelativeTime({ date }: { date: string }) {
+	const { locale, messages } = useLocale();
 	return (
 		<LocalTime
 			kind="relative-time"
 			date={date}
-			fallback={formatRelativeTime(date)}
+			fallback={formatRelativeTime(date, locale, timeStrings(messages))}
 		/>
 	);
 }
 
 export function LocalDay({ date }: { date: string }) {
+	const { locale } = useLocale();
 	const day = date.slice(0, 10);
 	return (
 		<LocalTime
 			kind="day"
 			date={day}
 			options={LOCAL_DAY_OPTIONS}
-			fallback={getDateTimeFormatter(LOCAL_DAY_OPTIONS).format(dayDate(day))}
+			fallback={getDateTimeFormatter(locale, LOCAL_DAY_OPTIONS).format(
+				dayDate(day),
+			)}
 		/>
 	);
 }
@@ -119,32 +171,42 @@ function LocalTime({
 	);
 }
 
-function formatRelativeDate(date: string): string {
+function formatRelativeDate(date: string, locale: string): string {
 	const now = new Date();
 	const then = new Date(date);
 	const days = (calendarDay(now) - calendarDay(then)) / DAY_MS;
-	return relativeDateFormatter.format(-days, "day");
+	return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
+		-days,
+		"day",
+	);
 }
 
-function formatRelativeTime(date: string): string {
+function formatRelativeTime(
+	date: string,
+	locale: string,
+	strings: TimeStrings,
+): string {
 	const then = new Date(date).getTime();
 	if (!Number.isFinite(then)) return "—";
 	const difference = Date.now() - then;
 	const absolute = Math.abs(difference);
-	if (absolute < MINUTE_MS) return "just now";
+	if (absolute < MINUTE_MS) return strings.now;
 	if (absolute >= 30 * DAY_MS) {
-		return getDateTimeFormatter({ month: "short", day: "numeric" }).format(
-			new Date(then),
-		);
+		return getDateTimeFormatter(locale, {
+			month: "short",
+			day: "numeric",
+		}).format(new Date(then));
 	}
 
 	const distance =
 		absolute < HOUR_MS
-			? `${Math.floor(absolute / MINUTE_MS)}m`
+			? `${Math.floor(absolute / MINUTE_MS)}${strings.minute}`
 			: absolute < DAY_MS
-				? `${Math.floor(absolute / HOUR_MS)}h`
-				: `${Math.floor(absolute / DAY_MS)}d`;
-	return difference < 0 ? `in ${distance}` : `${distance} ago`;
+				? `${Math.floor(absolute / HOUR_MS)}${strings.hour}`
+				: `${Math.floor(absolute / DAY_MS)}${strings.day}`;
+	return difference < 0
+		? strings.in.replace("{t}", distance)
+		: strings.ago.replace("{t}", distance);
 }
 
 function calendarDay(date: Date): number {
@@ -156,13 +218,14 @@ function dayDate(day: string): Date {
 }
 
 function getDateTimeFormatter(
+	locale: string,
 	options: Intl.DateTimeFormatOptions,
 ): Intl.DateTimeFormat {
-	const key = JSON.stringify(options);
+	const key = `${locale}:${JSON.stringify(options)}`;
 	const cached = dateTimeFormatters.get(key);
 	if (cached) return cached;
 
-	const formatter = new Intl.DateTimeFormat(undefined, options);
+	const formatter = new Intl.DateTimeFormat(locale, options);
 	dateTimeFormatters.set(key, formatter);
 	return formatter;
 }

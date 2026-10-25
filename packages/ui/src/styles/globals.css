@@ -251,14 +251,21 @@
 
 	html[dir="rtl"] {
 		/* Utilities like `.font-sans` resolve var(--font-sans) at the usage site,
-		   so overriding the variable here (not the font-family) beats them. */
+		   so overriding the variable here (not the font-family) beats them.
+		   We also set font-family explicitly in case the variable chain is slow
+		   or overridden by a component-level declaration. */
 		--font-sans:
-			var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+			var(--font-geist-sans, "Geist"), sans-serif;
+		font-family:
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
 			var(--font-geist-sans, "Geist"), sans-serif;
 	}
 
 	html[dir="rtl"] body {
-		font-family: var(--font-arabic), var(--font-sans);
+		font-family:
+			"IBM Plex Sans Arabic", var(--font-plex-arabic, "IBM Plex Sans Arabic"),
+			var(--font-geist-sans, "Geist"), sans-serif;
 	}
 
 	* {

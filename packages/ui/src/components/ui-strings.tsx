@@ -23,6 +23,7 @@ export type UiStrings = {
 	showingOf: string;
 	previous: string;
 	next: string;
+	datePlaceholder: string;
 };
 
 const DEFAULT_STRINGS: UiStrings = {
@@ -46,6 +47,7 @@ const DEFAULT_STRINGS: UiStrings = {
 	showingOf: "Showing {start}–{end} of {total}",
 	previous: "Previous",
 	next: "Next",
+	datePlaceholder: "Select a date",
 };
 
 const UiStringsContext = createContext<UiStrings>(DEFAULT_STRINGS);

@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 	manifest: "/site.webmanifest",
 };
 
-const LOCALE_BOOT_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);if(m&&m[1]==='ar'){document.documentElement.lang='ar';document.documentElement.dir='rtl';}}catch(e){}`;
+const LOCALE_BOOT_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);if(m&&m[1]==='ar'){document.documentElement.lang='ar';document.documentElement.dir='rtl';document.documentElement.style.fontFamily='"IBM Plex Sans Arabic", sans-serif';}}catch(e){}`;
 
 export default function RootLayout({
 	children,

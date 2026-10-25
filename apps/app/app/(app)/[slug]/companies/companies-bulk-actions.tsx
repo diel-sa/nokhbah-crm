@@ -8,7 +8,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 } from "@crm/ui/components/dropdown-menu";
-import { formatCount } from "@crm/ui/lib/format";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,11 +18,14 @@ import {
 	BulkOwnerMenu,
 	reportBulk,
 } from "@/components/crm/bulk-actions";
+import { useLocale } from "@/components/locale-provider";
+import { formatCountL } from "@/lib/i18n/format-count";
+import type { Messages } from "@/lib/i18n/messages";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
-function companies(count: number): string {
-	return formatCount(count, "company", "companies");
+function companies(count: number, messages: Messages): string {
+	return formatCountL(messages, count, "company");
 }
 
 export function CompaniesBulkActions({
@@ -34,6 +37,7 @@ export function CompaniesBulkActions({
 	onDone: () => void;
 	archived: boolean;
 }) {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const users = useQuery(trpc.users.list.queryOptions());
@@ -45,7 +49,10 @@ export function CompaniesBulkActions({
 		trpc.companies.bulkAssignOwner.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.company();
-				reportBulk(result, (count) => `${companies(count)} reassigned.`);
+				reportBulk(
+					result,
+					(count) => `${formatCountL(messages, count, "company")} reassigned.`,
+				);
 				onDone();
 			},
 			onError,
@@ -58,7 +65,8 @@ export function CompaniesBulkActions({
 				await cache.company();
 				reportBulk(
 					result,
-					(count) => `Looking up ${companies(count)} — the table will update.`,
+					(count) =>
+						`Looking up ${companies(count, messages)} — the table will update.`,
 				);
 				onDone();
 			},
@@ -70,7 +78,10 @@ export function CompaniesBulkActions({
 		trpc.companies.bulkArchive.mutationOptions({
 			onSuccess: async (result, variables) => {
 				await cache.removedMany({ kind: "company", ids: variables.ids });
-				reportBulk(result, (count) => `${companies(count)} archived.`);
+				reportBulk(
+					result,
+					(count) => `${formatCountL(messages, count, "company")} archived.`,
+				);
 				onDone();
 			},
 			onError,
@@ -81,7 +92,10 @@ export function CompaniesBulkActions({
 		trpc.companies.bulkRestore.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.company();
-				reportBulk(result, (count) => `${companies(count)} restored.`);
+				reportBulk(
+					result,
+					(count) => `${companies(count, messages)} restored.`,
+				);
 				onDone();
 			},
 			onError,
@@ -92,7 +106,10 @@ export function CompaniesBulkActions({
 		trpc.companies.bulkPurge.mutationOptions({
 			onSuccess: async (result, variables) => {
 				await cache.removedMany({ kind: "company", ids: variables.ids });
-				reportBulk(result, (count) => `${companies(count)} deleted forever.`);
+				reportBulk(
+					result,
+					(count) => `${companies(count, messages)} deleted forever.`,
+				);
 				setConfirming(false);
 				onDone();
 			},
@@ -126,7 +143,7 @@ export function CompaniesBulkActions({
 				<BulkDeleteDialog
 					open={confirming}
 					onOpenChange={setConfirming}
-					title={`Delete ${companies(ids.length)} forever?`}
+					title={`Delete ${companies(ids.length, messages)} forever?`}
 					description="This cannot be undone."
 					onConfirm={() => purge.mutate({ ids })}
 				/>
