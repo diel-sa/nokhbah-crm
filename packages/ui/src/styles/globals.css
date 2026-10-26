@@ -317,6 +317,11 @@
 	html[dir="rtl"] .text-right {
 		text-align: left;
 	}
+	html[dir="rtl"]
+		[data-slot="switch"][data-state="checked"]
+		> [data-slot="switch-thumb"] {
+		transform: translateX(calc(-100% + 2px));
+	}
 }
 
 @layer utilities {
