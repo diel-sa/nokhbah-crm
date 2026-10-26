@@ -317,10 +317,15 @@
 	html[dir="rtl"] .text-right {
 		text-align: left;
 	}
+	/* Switch thumb: Tailwind v4 compiles translate-x-* to the `translate`
+	   property driven by --tw-translate-x, so overriding the variable (not
+	   adding transform, which would stack and cancel the movement) mirrors
+	   the checked thumb to the inline-start edge. !important beats the
+	   utilities layer, which declares the same variable. */
 	html[dir="rtl"]
 		[data-slot="switch"][data-state="checked"]
 		> [data-slot="switch-thumb"] {
-		transform: translateX(calc(-100% + 2px));
+		--tw-translate-x: calc(-100% + 2px) !important;
 	}
 }
 
