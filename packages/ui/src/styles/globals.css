@@ -327,6 +327,18 @@
 		> [data-slot="switch-thumb"] {
 		--tw-translate-x: calc(-100% + 2px) !important;
 	}
+	/* Technical values stay readable in Arabic: code blocks and URL/email
+	   inputs render LTR and left-aligned regardless of the interface locale;
+	   labels and surrounding layout remain RTL. */
+	html[dir="rtl"] pre {
+		direction: ltr;
+		text-align: left;
+	}
+	html[dir="rtl"] input[type="url"],
+	html[dir="rtl"] input[type="email"] {
+		direction: ltr;
+		text-align: left;
+	}
 }
 
 @layer utilities {

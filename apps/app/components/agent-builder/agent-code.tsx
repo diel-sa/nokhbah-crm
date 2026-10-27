@@ -189,7 +189,7 @@ export function AgentCode({
 					</div>
 				</div>
 
-				<div className="overflow-hidden rounded-lg border">
+				<div dir="ltr" className="overflow-hidden rounded-lg border">
 					<div className="flex h-9 shrink-0 items-stretch overflow-x-auto border-b bg-muted/40">
 						{files.map((entry) => (
 							<button

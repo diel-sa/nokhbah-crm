@@ -147,7 +147,10 @@ export function TrackingScript() {
 							{t(messages, "settings.tracking.script.pasteHtml")}
 						</AccordionTrigger>
 						<AccordionContent className="flex flex-col gap-4">
-							<pre className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5">
+							<pre
+								dir="ltr"
+								className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5"
+							>
 								<span className="text-code-accent">{"<script"}</span>
 								{"\n  src="}
 								<span className="text-code-string">{`"${scriptUrl}"`}</span>
@@ -169,7 +172,10 @@ export function TrackingScript() {
 							{t(messages, "settings.tracking.script.gtm")}
 						</AccordionTrigger>
 						<AccordionContent className="flex flex-col gap-4">
-							<pre className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5">
+							<pre
+								dir="ltr"
+								className="overflow-x-auto rounded-md border bg-muted p-4 font-mono text-code-foreground text-xs/5"
+							>
 								<span className="text-code-accent">{"<script"}</span>
 								{"\n  src="}
 								<span className="text-code-string">{`"${scriptUrl}?site=${siteId}"`}</span>

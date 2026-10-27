@@ -42,7 +42,7 @@ export function CreatedApiKeyDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				<InputGroup>
+				<InputGroup dir="ltr">
 					<InputGroupInput
 						value={apiKey?.key ?? ""}
 						readOnly
