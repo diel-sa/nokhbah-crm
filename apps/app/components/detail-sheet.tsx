@@ -311,6 +311,7 @@ export function DetailSheetPending({
 	fields: string[];
 	running: boolean;
 }) {
+	const { messages } = useLocale();
 	if (fields.length === 0) return null;
 
 	return (
@@ -324,7 +325,12 @@ export function DetailSheetPending({
 					)}
 				/>
 				<span className="font-medium text-xs">
-					{running ? "Agent is researching" : "Not known yet"}
+					{t(
+						messages,
+						running
+							? "companySheet.agentResearching"
+							: "companySheet.notKnownYet",
+					)}
 				</span>
 			</div>
 			<p className="text-pretty text-muted-foreground text-xs/5">
