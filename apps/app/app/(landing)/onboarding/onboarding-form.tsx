@@ -87,7 +87,7 @@ export function OnboardingForm({ placeholder }: { placeholder: string }) {
 							id={slugId}
 						name="slug"
 						value={slug}
-						 onChange={(event) => {
+						onChange={(event) => {
 								slugEdited.current = true;
 								setSlug(workspaceSlugDraft(event.target.value));
 						}}
