@@ -11,6 +11,7 @@ import { ThreadMessage } from "@crm/ui/components/thread-message";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LocalDateTime } from "@/components/local-date-time";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useTRPC } from "@/lib/trpc/client";
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -28,6 +29,7 @@ export function EmailThreadEntry({
 	messageCount: number;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 	const [opened, setOpened] = useState(false);
 
 	const thread = useQuery({
@@ -45,7 +47,9 @@ export function EmailThreadEntry({
 		>
 			<AccordionItem value={threadId}>
 				<AccordionTrigger variant="subtle">
-					{messageCount === 1 ? "1 message" : `${messageCount} messages`}
+					{messageCount === 1
+						? t(messages, "timeline.oneMessage")
+						: tf(messages, "timeline.manyMessages", { count: messageCount })}
 				</AccordionTrigger>
 
 				<AccordionContent>
@@ -74,6 +78,7 @@ export function EmailThreadEntry({
 									}
 									direction={message.direction}
 									body={message.body}
+									emptyBody={t(messages, "timeline.noMessageBody")}
 									action={
 										message.mailboxUrl ? (
 											<a
@@ -82,7 +87,11 @@ export function EmailThreadEntry({
 												rel="noreferrer"
 												className="text-muted-foreground underline underline-offset-3 hover:text-foreground"
 											>
-												Open in {message.mailboxName}
+												{tf(messages, "timeline.openInMailbox", {
+													mailboxName:
+														message.mailboxName ??
+														t(messages, "timeline.mailbox"),
+												})}
 											</a>
 										) : null
 									}

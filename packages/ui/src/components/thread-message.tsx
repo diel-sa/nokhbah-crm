@@ -10,6 +10,7 @@ function ThreadMessage({
 	direction,
 	body,
 	action,
+	emptyBody,
 	className,
 	...props
 }: Omit<React.ComponentProps<"article">, "children"> & {
@@ -20,6 +21,7 @@ function ThreadMessage({
 	direction: "INBOUND" | "OUTBOUND";
 	body: string | null;
 	action?: React.ReactNode;
+	emptyBody?: string;
 }) {
 	const outbound = direction === "OUTBOUND";
 
@@ -59,7 +61,7 @@ function ThreadMessage({
 					</p>
 				) : (
 					<p className="text-muted-foreground text-xs italic">
-						No message body.
+						{emptyBody ?? "No message body."}
 					</p>
 				)}
 

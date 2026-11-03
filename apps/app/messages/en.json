@@ -881,9 +881,17 @@
 		"due": "Due",
 		"oneMessage": "1 message",
 		"manyMessages": "{count} messages",
+		"noMessageBody": "No message body.",
 		"openInMailbox": "Open in {mailboxName}",
+		"mailbox": "mailbox",
 		"allDay": "All day",
-		"joinCall": "Join call"
+		"joinCall": "Join call",
+		"attendeeResponses": {
+			"accepted": "Accepted",
+			"declined": "Declined",
+			"tentative": "Maybe",
+			"needsAction": "No reply"
+		}
 	},
 	"fields": {
 		"sheetTitle": "Fields",

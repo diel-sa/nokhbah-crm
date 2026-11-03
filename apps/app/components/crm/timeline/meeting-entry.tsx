@@ -6,6 +6,7 @@ import {
 	LocalDateTime,
 	LocalDateTimeRange,
 } from "@/components/local-date-time";
+import { t, useLocale } from "@/components/locale-provider";
 import { useTRPC } from "@/lib/trpc/client";
 
 const RANGE_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -36,6 +37,7 @@ export function MeetingEntry({
 	conferenceUrl: string | null;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 
 	const event = useQuery({
 		...trpc.google.event.queryOptions({ eventId }),
@@ -47,7 +49,8 @@ export function MeetingEntry({
 			<span className="text-muted-foreground text-xs">
 				{isAllDay ? (
 					<>
-						<LocalDateTime date={startsAt} options={DAY_OPTIONS} /> · All day
+						<LocalDateTime date={startsAt} options={DAY_OPTIONS} /> ·{" "}
+						{t(messages, "timeline.allDay")}
 					</>
 				) : (
 					<LocalDateTimeRange
@@ -59,7 +62,10 @@ export function MeetingEntry({
 			</span>
 
 			{event.data?.attendees && event.data.attendees.length > 0 ? (
-				<AttendeeList attendees={event.data.attendees} />
+				<AttendeeList
+					attendees={event.data.attendees}
+					responseLabels={messages.timeline.attendeeResponses}
+				/>
 			) : null}
 
 			{conferenceUrl ? (
@@ -69,7 +75,7 @@ export function MeetingEntry({
 					rel="noreferrer"
 					className="text-muted-foreground text-xs underline underline-offset-3 hover:text-foreground"
 				>
-					Join call
+					{t(messages, "timeline.joinCall")}
 				</a>
 			) : null}
 		</div>

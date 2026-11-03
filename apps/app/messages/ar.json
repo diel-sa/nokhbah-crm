@@ -881,9 +881,17 @@
 		"due": "مستحقة",
 		"oneMessage": "رسالة واحدة",
 		"manyMessages": "{count} رسائل",
+		"noMessageBody": "لا يوجد نص للرسالة.",
 		"openInMailbox": "فتح في {mailboxName}",
+		"mailbox": "صندوق البريد",
 		"allDay": "طوال اليوم",
-		"joinCall": "انضمام للمكالمة"
+		"joinCall": "انضمام للمكالمة",
+		"attendeeResponses": {
+			"accepted": "مقبول",
+			"declined": "مرفوض",
+			"tentative": "ربما",
+			"needsAction": "لا يوجد رد"
+		}
 	},
 	"fields": {
 		"sheetTitle": "الحقول",

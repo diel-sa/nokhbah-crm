@@ -37,11 +37,13 @@ const RESPONSE_LABEL: Record<string, string> = {
 function AttendeeList({
 	attendees,
 	max = 5,
+	responseLabels,
 	className,
 	...props
 }: Omit<React.ComponentProps<"div">, "children"> & {
 	attendees: readonly Attendee[];
 	max?: number;
+	responseLabels?: Partial<Record<keyof typeof RESPONSE_LABEL, string>>;
 }) {
 	if (attendees.length === 0) return null;
 
@@ -75,7 +77,11 @@ function AttendeeList({
 								<StatusIndicator
 									tone={RESPONSE_TONE[attendee.responseStatus ?? "needsAction"] ?? "neutral"}
 									label={
+										responseLabels?.[
+											attendee.responseStatus as keyof typeof RESPONSE_LABEL
+										] ??
 										RESPONSE_LABEL[attendee.responseStatus ?? "needsAction"] ??
+										responseLabels?.needsAction ??
 										"No reply"
 									}
 								/>

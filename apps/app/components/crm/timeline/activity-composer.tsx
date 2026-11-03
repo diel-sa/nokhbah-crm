@@ -19,6 +19,7 @@ import { ToggleGroup, ToggleGroupItem } from "@crm/ui/components/toggle-group";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { activityLabel } from "@/lib/activity-presentation";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -29,22 +30,10 @@ const TYPES = ["NOTE", "CALL", "EMAIL", "MEETING", "TASK"] as const;
 
 type ComposableType = (typeof TYPES)[number];
 
-const dueFormat = new Intl.DateTimeFormat("en-US", {
-	month: "short",
-	day: "numeric",
-});
-
-const PLACEHOLDER = {
-	NOTE: "Log a note, call, email, meeting or task…",
-	CALL: "What came out of the call?",
-	EMAIL: "What was said?",
-	MEETING: "What came out of the meeting?",
-	TASK: "What needs doing?",
-} satisfies Record<ComposableType, string>;
-
 export function ActivityComposer({ anchor }: { anchor: TimelineAnchor }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { locale, messages } = useLocale();
 
 	const [type, setType] = useState<ComposableType>("NOTE");
 	const [draft, setDraft] = useState("");
@@ -90,8 +79,8 @@ export function ActivityComposer({ anchor }: { anchor: TimelineAnchor }) {
 				<InputGroupTextarea
 					value={draft}
 					onChange={(event) => setDraft(event.target.value)}
-					placeholder={PLACEHOLDER[type]}
-					aria-label="What happened"
+					placeholder={t(messages, `timeline.composerPlaceholder.${type}`)}
+					aria-label={t(messages, "timeline.composerAriaLabel")}
 					onKeyDown={(event) => {
 						if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
 							event.preventDefault();
@@ -113,10 +102,10 @@ export function ActivityComposer({ anchor }: { anchor: TimelineAnchor }) {
 							<ToggleGroupItem
 								key={option}
 								value={option}
-								aria-label={activityLabel(option)}
+								aria-label={activityLabel(option, messages)}
 							>
 								<ActivityIcon type={option} />
-								{activityLabel(option)}
+								{activityLabel(option, messages)}
 							</ToggleGroupItem>
 						))}
 					</ToggleGroup>
@@ -126,7 +115,12 @@ export function ActivityComposer({ anchor }: { anchor: TimelineAnchor }) {
 							<PopoverTrigger asChild>
 								<InputGroupButton variant="ghost" size="xs">
 									<Icon icon={Calendar} data-icon="inline-start" />
-									{dueAt ? dueFormat.format(dueAt) : "Due date"}
+									{dueAt
+										? new Intl.DateTimeFormat(locale, {
+												month: "short",
+												day: "numeric",
+											}).format(dueAt)
+										: t(messages, "timeline.dueDate")}
 								</InputGroupButton>
 							</PopoverTrigger>
 							<PopoverContent size="fit" align="start">
@@ -149,7 +143,11 @@ export function ActivityComposer({ anchor }: { anchor: TimelineAnchor }) {
 							disabled={create.isPending}
 						>
 							{create.isPending ? <Spinner /> : null}
-							{isTask ? "Add task" : `Log ${activityLabel(type).toLowerCase()}`}
+							{isTask
+								? t(messages, "timeline.addTask")
+								: tf(messages, "timeline.logType", {
+										type: activityLabel(type, messages).toLowerCase(),
+									})}
 						</InputGroupButton>
 					)}
 				</InputGroupAddon>

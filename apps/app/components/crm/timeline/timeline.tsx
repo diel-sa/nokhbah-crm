@@ -14,6 +14,8 @@ import { cn } from "@crm/ui/lib/utils";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { DetailSheetEmpty, SECTION_TITLE } from "@/components/detail-sheet";
+import { t, useLocale } from "@/components/locale-provider";
+import type { Messages } from "@/lib/i18n/messages";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useTRPC } from "@/lib/trpc/client";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -31,47 +33,6 @@ export type TimelineAnchor =
 	| { contactId: string }
 	| { dealId: string };
 
-const TAB_LABELS = {
-	all: "All",
-	notes: "Notes",
-	email: "Email",
-	meetings: "Meetings",
-	upcoming: "Upcoming",
-	done: "Done",
-} satisfies Record<TimelineTab, string>;
-
-const EMPTY_STATES = {
-	all: {
-		title: "Nothing has happened yet",
-		description:
-			"Calls, notes, emails and meetings all land here. Log the first one above, or wait for Gmail and Calendar to sync.",
-	},
-	notes: {
-		title: "No notes",
-		description:
-			"Notes are what you write down for the next person to read — what they care about, who else is involved, what you promised.",
-	},
-	email: {
-		title: "No email",
-		description:
-			"Threads appear here as they are synced from Gmail. Nothing from before this mailbox was connected is imported.",
-	},
-	meetings: {
-		title: "No meetings",
-		description:
-			"Calendar events with someone from this record on them show up here, past and upcoming.",
-	},
-	upcoming: {
-		title: "Nothing outstanding",
-		description:
-			"Tasks you have not finished appear here, and at the top of the All tab until they are done.",
-	},
-	done: {
-		title: "Nothing finished yet",
-		description: "Tasks move here once you tick them off.",
-	},
-} satisfies Record<TimelineTab, { title: string; description: string }>;
-
 const EMPTY_ICONS = {
 	all: Time,
 	notes: Chat,
@@ -81,14 +42,12 @@ const EMPTY_ICONS = {
 	done: Checkmark,
 } satisfies Record<TimelineTab, CarbonIcon>;
 
-const dayFormat = new Intl.DateTimeFormat("en-US", {
-	weekday: "short",
-	month: "short",
-	day: "numeric",
-	year: "numeric",
-});
-
-function dayLabel(day: string, local: boolean): string {
+function dayLabel(
+	day: string,
+	local: boolean,
+	locale: string,
+	messages: Messages,
+): string {
 	const now = new Date();
 	const today = dayKey(now.toISOString(), local);
 	const yesterdayDate = local
@@ -96,12 +55,22 @@ function dayLabel(day: string, local: boolean): string {
 		: new Date(Date.now() - 86_400_000);
 	const yesterday = dayKey(yesterdayDate.toISOString(), local);
 
-	if (day === today) return "Today";
-	if (day === yesterday) return "Yesterday";
-	return dayFormat.format(new Date(`${day}T00:00:00`));
+	if (day === today) return t(messages, "timeline.today");
+	if (day === yesterday) return t(messages, "timeline.yesterday");
+	return new Intl.DateTimeFormat(locale, {
+		weekday: "short",
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	}).format(new Date(`${day}T00:00:00`));
 }
 
-function byDay(entries: TimelineEntryData[], local: boolean) {
+function byDay(
+	entries: TimelineEntryData[],
+	local: boolean,
+	locale: string,
+	messages: Messages,
+) {
 	const groups = new Map<
 		string,
 		{ day: string; label: string; entries: TimelineEntryData[] }
@@ -114,7 +83,11 @@ function byDay(entries: TimelineEntryData[], local: boolean) {
 		if (group) {
 			group.entries.push(entry);
 		} else {
-			groups.set(day, { day, label: dayLabel(day, local), entries: [entry] });
+			groups.set(day, {
+				day,
+				label: dayLabel(day, local, locale, messages),
+				entries: [entry],
+			});
 		}
 	}
 
@@ -157,6 +130,7 @@ function TimelineDay({
 export function Timeline({ anchor }: { anchor: TimelineAnchor }) {
 	const trpc = useTRPC();
 	const hydrated = useHydrated();
+	const { locale, messages } = useLocale();
 
 	const [tab, setTab] = useQueryState(
 		SEARCH_PARAM.record.timeline,
@@ -200,7 +174,7 @@ export function Timeline({ anchor }: { anchor: TimelineAnchor }) {
 				>
 					{TIMELINE_TABS.map((option) => (
 						<ToggleGroupItem key={option} value={option}>
-							{TAB_LABELS[option]}
+							{t(messages, `timeline.tabs.${option}`)}
 							{counts.data?.[option] ? (
 								<span className="tabular-nums opacity-60">
 									{counts.data[option]}
@@ -218,20 +192,20 @@ export function Timeline({ anchor }: { anchor: TimelineAnchor }) {
 			) : entries.length === 0 && pinnedEntries.length === 0 ? (
 				<DetailSheetEmpty
 					icon={EMPTY_ICONS[tab]}
-					title={EMPTY_STATES[tab].title}
-					description={EMPTY_STATES[tab].description}
+					title={t(messages, `timeline.empty.${tab}.title`)}
+					description={t(messages, `timeline.empty.${tab}.description`)}
 				/>
 			) : (
 				<div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-4">
 					{pinnedEntries.length > 0 ? (
 						<TimelineDay
-							label="Outstanding"
+							label={t(messages, "timeline.outstanding")}
 							entries={pinnedEntries}
 							anchor={anchor}
 						/>
 					) : null}
 
-					{byDay(entries, hydrated).map((group) => (
+					{byDay(entries, hydrated, locale, messages).map((group) => (
 						<TimelineDay
 							key={group.day}
 							label={group.label}
@@ -249,7 +223,7 @@ export function Timeline({ anchor }: { anchor: TimelineAnchor }) {
 							onClick={() => history.fetchNextPage()}
 						>
 							{history.isFetchingNextPage ? <Spinner /> : null}
-							Show older
+							{t(messages, "timeline.showOlder")}
 						</Button>
 					) : null}
 				</div>
