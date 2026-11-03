@@ -51,7 +51,7 @@ export function TimelineEntry({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
-	const { messages } = useLocale();
+	const { locale, messages } = useLocale();
 
 	const complete = useMutation(
 		trpc.activities.complete.mutationOptions({
@@ -80,7 +80,7 @@ export function TimelineEntry({
 		: entry.createdBy.name;
 
 	const headline = change
-		? `${dealStageLabel(change.from, messages)} → ${dealStageLabel(change.to, messages)}`
+		? `${dealStageLabel(change.from, messages)} ${locale === "ar" ? "←" : "→"} ${dealStageLabel(change.to, messages)}`
 		: activitySubjectLabel(entry.subject, entry.type, messages);
 
 	const here = anchorId(anchor);
