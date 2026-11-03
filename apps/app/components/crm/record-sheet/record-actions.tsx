@@ -52,7 +52,7 @@ function useRecordActionHandlers(record: RecordRef) {
 			kind: t(messages, `recordKinds.${record.kind}` as const),
 		});
 
-	const onError = (error: { message: string }) => toast.error(error.message);
+	const onError = () => toast.error(t(messages, "recordActions.error"));
 
 	const archive = useMutation(
 		trpc[RECORD_PROCEDURES[record.kind]].archive.mutationOptions({

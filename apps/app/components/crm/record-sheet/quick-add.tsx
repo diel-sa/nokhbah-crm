@@ -16,7 +16,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { contactName } from "@/components/crm/contact-name";
-import { t, useLocale } from "@/components/locale-provider";
+import { t, tf, useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 
@@ -174,6 +174,7 @@ export function AttachDealContact({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const [contactId, setContactId] = useState("");
 	const [role, setRole] = useState("");
@@ -193,26 +194,28 @@ export function AttachDealContact({
 				await cache.deal(dealId);
 				toast.success(
 					person
-						? `${contactName(person)} is on the deal.`
-						: "Added to the deal.",
+						? tf(messages, "dealSheet.contactAddedToast", {
+								name: contactName(person),
+							})
+						: t(messages, "dealSheet.contactAddedFallbackToast"),
 				);
 				onDone();
 			},
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(t(messages, "dealSheet.attachContactError")),
 		}),
 	);
 
 	const nobody = !options.isPending && candidates.length === 0;
 
 	const placeholder = options.isPending
-		? "Loading…"
+		? t(messages, "dealSheet.loadingContacts")
 		: nobody
-			? `Everybody at ${companyName} is already on it`
-			: "Choose somebody";
+			? tf(messages, "dealSheet.everyoneAttached", { company: companyName })
+			: t(messages, "dealSheet.chooseContact");
 
 	return (
 		<QuickAddForm
-			submitLabel="Add to deal"
+			submitLabel={t(messages, "dealSheet.addToDeal")}
 			pending={attach.isPending}
 			ready={contactId !== ""}
 			onCancel={onDone}
@@ -221,7 +224,9 @@ export function AttachDealContact({
 			}
 		>
 			<Field>
-				<FieldLabel htmlFor={personId}>Person</FieldLabel>
+				<FieldLabel htmlFor={personId}>
+					{t(messages, "dealSheet.person")}
+				</FieldLabel>
 				<Select value={contactId} onValueChange={setContactId}>
 					<SelectTrigger id={personId} className="w-full" disabled={nobody}>
 						<SelectValue placeholder={placeholder} />
@@ -237,12 +242,14 @@ export function AttachDealContact({
 				</Select>
 			</Field>
 			<Field>
-				<FieldLabel htmlFor={roleId}>Role</FieldLabel>
+				<FieldLabel htmlFor={roleId}>
+					{t(messages, "dealSheet.role")}
+				</FieldLabel>
 				<Input
 					id={roleId}
 					value={role}
 					onChange={(event) => setRole(event.target.value)}
-					placeholder="Champion"
+					placeholder={t(messages, "dealSheet.rolePlaceholder")}
 					autoComplete="off"
 				/>
 			</Field>

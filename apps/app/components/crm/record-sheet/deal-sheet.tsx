@@ -54,7 +54,8 @@ import {
 	LocalDay,
 	LocalRelativeTime,
 } from "@/components/local-date-time";
-import { t, useLocale } from "@/components/locale-provider";
+import { t, tf, useLocale } from "@/components/locale-provider";
+import { localizedCurrencyName } from "@/lib/i18n/currency-name";
 import { savingField } from "@/lib/pending-field";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -66,37 +67,48 @@ import { useOpenRecord, useRecordSheetView } from "./record-stack";
 
 type Deal = RouterOutputs["deals"]["byId"];
 
-const CURRENCY_OPTIONS = CURRENCIES.map((entry) => ({
-	value: entry.code,
-	label: `${entry.code} · ${entry.name}`,
-}));
-
 function dealCurrency(currency: string) {
 	return normalizeCurrency(currency) || currency;
 }
 
-function currencyOptions(currency: string) {
-	if (CURRENCY_OPTIONS.some((option) => option.value === currency)) {
-		return CURRENCY_OPTIONS;
+function currencyOptions(
+	currency: string,
+	messages: ReturnType<typeof useLocale>["messages"],
+) {
+	const options = CURRENCIES.map((entry) => ({
+		value: entry.code,
+		label: `${entry.code} · ${localizedCurrencyName(entry.code, messages)}`,
+	}));
+
+	if (options.some((option) => option.value === currency)) {
+		return options;
 	}
 
 	return [
-		{ value: currency, label: `${currency} — no longer supported` },
-		...CURRENCY_OPTIONS,
+		{
+			value: currency,
+			label: tf(messages, "dealSheet.unsupportedCurrency", { currency }),
+		},
+		...options,
 	];
 }
 
 function ReportedValue({ deal }: { deal: Deal }) {
+	const { messages } = useLocale();
 	const currency = dealCurrency(deal.currency);
 
 	if (currency === deal.reportingCurrency) return null;
 	if (deal.amountCents === null) return null;
 
 	return (
-		<DetailSheetProperty label={`In ${deal.reportingCurrency}`}>
+		<DetailSheetProperty
+			label={tf(messages, "dealSheet.reportingCurrency", {
+				currency: deal.reportingCurrency,
+			})}
+		>
 			{deal.baseAmountCents === null ? (
 				<span className="text-muted-foreground">
-					No {currency} rate — left out of totals
+					{tf(messages, "dealSheet.noCurrencyRate", { currency })}
 				</span>
 			) : (
 				<span className="text-muted-foreground">
@@ -111,13 +123,36 @@ function ReportedValue({ deal }: { deal: Deal }) {
 	);
 }
 
-const CONTACT_COLUMNS = [
-	{ id: "name", header: "Name", width: "w-[28%]", className: "ps-5" },
-	{ id: "role", header: "Role", width: "w-[20%]" },
-	{ id: "title", header: "Title", width: "w-[22%]" },
-	{ id: "email", header: "Email", width: "w-[22%]" },
-	{ id: "remove", srLabel: "Remove", width: "w-10" },
-];
+function contactColumns(messages: ReturnType<typeof useLocale>["messages"]) {
+	return [
+		{
+			id: "name",
+			header: t(messages, "dealSheet.contactColumns.name"),
+			width: "w-[28%]",
+			className: "ps-5",
+		},
+		{
+			id: "role",
+			header: t(messages, "dealSheet.contactColumns.role"),
+			width: "w-[20%]",
+		},
+		{
+			id: "title",
+			header: t(messages, "dealSheet.contactColumns.title"),
+			width: "w-[22%]",
+		},
+		{
+			id: "email",
+			header: t(messages, "dealSheet.contactColumns.email"),
+			width: "w-[22%]",
+		},
+		{
+			id: "remove",
+			srLabel: t(messages, "dealSheet.contactColumns.remove"),
+			width: "w-10",
+		},
+	];
+}
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
 	month: "short",
@@ -176,8 +211,8 @@ export function DealSheet({ dealId }: { dealId: string }) {
 	return (
 		<RecordSheetFrame
 			loading={query.isPending}
-			error={query.error?.message ?? null}
-			title={deal?.name ?? "Deal"}
+			error={query.error ? t(messages, "dealSheet.loadError") : null}
+			title={deal?.name ?? t(messages, "dealSheet.titleFallback")}
 			description={
 				deal ? (
 					<button
@@ -211,7 +246,9 @@ export function DealSheet({ dealId }: { dealId: string }) {
 						<RecordActions
 							record={{ kind: "deal", id: deal.id }}
 							name={deal.name}
-							consequence={`Its stage history, notes and agent conversations go too. ${deal.company.name} and the ${deal.contacts.length === 1 ? "person" : "people"} on it stay in the CRM.`}
+							consequence={tf(messages, "dealSheet.deleteConsequence", {
+								company: deal.company.name,
+							})}
 							archivedAt={deal.archivedAt}
 						/>
 					</>
@@ -220,7 +257,7 @@ export function DealSheet({ dealId }: { dealId: string }) {
 			stats={
 				deal ? (
 					<DetailSheetStats>
-						<DetailSheetStat label="Amount">
+						<DetailSheetStat label={t(messages, "dealSheet.stats.amount")}>
 							{deal.amountCents === null ? (
 								<EmptyCellValue />
 							) : (
@@ -230,17 +267,19 @@ export function DealSheet({ dealId }: { dealId: string }) {
 								/>
 							)}
 						</DetailSheetStat>
-						<DetailSheetStat label="Expected close">
+						<DetailSheetStat
+							label={t(messages, "dealSheet.stats.expectedClose")}
+						>
 							{deal.expectedCloseDate ? (
 								<LocalDay date={deal.expectedCloseDate} />
 							) : (
 								<EmptyCellValue />
 							)}
 						</DetailSheetStat>
-						<DetailSheetStat label="In stage">
+						<DetailSheetStat label={t(messages, "dealSheet.stats.inStage")}>
 							<LocalRelativeTime date={deal.stageChangedAt} />
 						</DetailSheetStat>
-						<DetailSheetStat label="Owner">
+						<DetailSheetStat label={t(messages, "dealSheet.stats.owner")}>
 							<OwnerCell owner={deal.owner} />
 						</DetailSheetStat>
 					</DetailSheetStats>
@@ -256,13 +295,14 @@ export function DealSheet({ dealId }: { dealId: string }) {
 function DealOverview({ deal }: { deal: Deal }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const users = useQuery(trpc.users.list.queryOptions());
 
 	const update = useMutation(
 		trpc.deals.update.mutationOptions({
 			onSuccess: () => cache.deal(deal.id, { settle: "record" }),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(t(messages, "dealSheet.saveError")),
 		}),
 	);
 
@@ -280,35 +320,38 @@ function DealOverview({ deal }: { deal: Deal }) {
 
 	return (
 		<DetailSheetBody>
-			<DetailSheetSection title="Stage">
+			<DetailSheetSection title={t(messages, "dealSheet.stage")}>
 				<StageStepper dealId={deal.id} stage={deal.stage} />
 
 				{deal.closedReason ? (
 					<DetailSheetProperties>
-						<DetailSheetProperty label="Closed">
+						<DetailSheetProperty label={t(messages, "dealSheet.closed")}>
 							{deal.closedAt ? (
 								<LocalDateTime date={deal.closedAt} options={DATE_OPTIONS} />
 							) : (
 								<EmptyCellValue />
 							)}
 						</DetailSheetProperty>
-						<DetailSheetProperty label="Reason" wide>
+						<DetailSheetProperty label={t(messages, "dealSheet.reason")} wide>
 							{deal.closedReason}
 						</DetailSheetProperty>
 					</DetailSheetProperties>
 				) : null}
 			</DetailSheetSection>
 
-			<DetailSheetSection title="Details" action={<FieldsCog kind="deal" />}>
+			<DetailSheetSection
+				title={t(messages, "dealSheet.details")}
+				action={<FieldsCog kind="deal" />}
+			>
 				<DetailSheetProperties>
 					<InlineField
-						label="Name"
+						label={t(messages, "dealSheet.name")}
 						value={deal.name}
 						saving={isSaving("name")}
 						onSave={(name) => name && save({ name })}
 					/>
 					<InlineField
-						label="Amount"
+						label={t(messages, "dealSheet.amount")}
 						value={
 							deal.amountCents === null ? null : String(deal.amountCents / 100)
 						}
@@ -318,7 +361,7 @@ function DealOverview({ deal }: { deal: Deal }) {
 							if (next === "") return save({ amountCents: null });
 							const parsed = Number.parseFloat(next);
 							if (!Number.isFinite(parsed) || parsed < 0) {
-								toast.error("Amount has to be a number.");
+								toast.error(t(messages, "dealSheet.amountInvalid"));
 								return;
 							}
 							save({ amountCents: Math.round(parsed * 100) });
@@ -331,26 +374,27 @@ function DealOverview({ deal }: { deal: Deal }) {
 						)}
 					/>
 					<InlineSelectField
-						label="Currency"
+						label={t(messages, "dealSheet.currency")}
 						value={currency}
-						options={currencyOptions(currency)}
+						options={currencyOptions(currency, messages)}
 						onSave={(currency) => save({ currency })}
 					/>
 					<ReportedValue deal={deal} />
 					<InlineDateField
-						label="Close date"
+						label={t(messages, "dealSheet.closeDate")}
 						value={deal.expectedCloseDate}
 						saving={isSaving("expectedCloseDate")}
 						onSave={(next) => save({ expectedCloseDate: next || null })}
 					/>
 					<InlineCompanyField
+						label={t(messages, "dealSheet.company")}
 						value={deal.company.id}
 						company={deal.company}
 						saving={isSaving("companyId")}
 						onSave={(companyId) => save({ companyId })}
 					/>
 					<InlineSelectField
-						label="Owner"
+						label={t(messages, "dealSheet.owner")}
 						value={deal.owner.id}
 						options={(users.data ?? []).map((user) => ({
 							value: user.id,
@@ -366,11 +410,13 @@ function DealOverview({ deal }: { deal: Deal }) {
 				</DetailSheetProperties>
 			</DetailSheetSection>
 
-			<DetailSheetSection title="Description">
+			<DetailSheetSection title={t(messages, "dealSheet.description")}>
 				<InlineTextArea
-					label="Description"
+					label={t(messages, "dealSheet.description")}
 					value={deal.description}
-					placeholder={`What ${deal.company.name} is buying, why now, and what stands in the way.`}
+					placeholder={tf(messages, "dealSheet.descriptionPlaceholder", {
+						company: deal.company.name,
+					})}
 					saving={isSaving("description")}
 					onSave={(description) => save({ description })}
 				/>
@@ -383,34 +429,37 @@ function DealOverview({ deal }: { deal: Deal }) {
 
 function WhereItStands({ deal }: { deal: Deal }) {
 	const openRecord = useOpenRecord();
+	const { messages } = useLocale();
 
 	return (
-		<DetailSheetSection title="Where it stands">
+		<DetailSheetSection title={t(messages, "dealSheet.whereItStands")}>
 			<DetailSheetProperties>
-				<DetailSheetProperty label="Opened">
+				<DetailSheetProperty label={t(messages, "dealSheet.opened")}>
 					<LocalDateTime date={deal.createdAt} options={DATE_OPTIONS} />
 				</DetailSheetProperty>
 
-				<DetailSheetProperty label="In stage since">
+				<DetailSheetProperty label={t(messages, "dealSheet.inStageSince")}>
 					<LocalDateTime date={deal.stageChangedAt} options={DATE_OPTIONS} />
 				</DetailSheetProperty>
 
 				{deal.closedAt ? (
-					<DetailSheetProperty label="Closed">
+					<DetailSheetProperty label={t(messages, "dealSheet.closed")}>
 						<LocalDateTime date={deal.closedAt} options={DATE_OPTIONS} />
 					</DetailSheetProperty>
 				) : null}
 
 				{deal.closedReason ? (
-					<DetailSheetProperty label="Reason" wide>
+					<DetailSheetProperty label={t(messages, "dealSheet.reason")} wide>
 						{deal.closedReason}
 					</DetailSheetProperty>
 				) : null}
 
-				<DetailSheetProperty label="On it" wide>
+				<DetailSheetProperty label={t(messages, "dealSheet.onIt")} wide>
 					{deal.contacts.length === 0 ? (
 						<span className="text-muted-foreground">
-							Nobody from {deal.company.name} is attached yet.
+							{tf(messages, "dealSheet.nobodyAttached", {
+								company: deal.company.name,
+							})}
 						</span>
 					) : (
 						<span className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
@@ -454,18 +503,19 @@ function DealContacts({
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const openRecord = useOpenRecord();
+	const { messages } = useLocale();
 
 	const detach = useMutation(
 		trpc.deals.detachContact.mutationOptions({
 			onSuccess: () => cache.deal(deal.id, { settle: "record" }),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(t(messages, "dealSheet.removeContactError")),
 		}),
 	);
 
 	const setRole = useMutation(
 		trpc.deals.setContactRole.mutationOptions({
 			onSuccess: () => cache.deal(deal.id, { settle: "record" }),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(t(messages, "dealSheet.roleError")),
 		}),
 	);
 
@@ -484,12 +534,14 @@ function DealContacts({
 				{adding ? null : (
 					<DetailSheetEmpty
 						icon={UserMultiple}
-						title="No contacts on this deal"
-						description={`Nobody from ${deal.company.name} is attached yet. Bring the people you are selling to onto the deal and it says who to chase.`}
+						title={t(messages, "dealSheet.noContactsTitle")}
+						description={tf(messages, "dealSheet.noContactsDescription", {
+							company: deal.company.name,
+						})}
 						action={
 							<Button variant="outline" size="sm" onClick={onAdd}>
 								<Icon icon={Add} data-icon="inline-start" />
-								Add contact
+								{t(messages, "dealSheet.addContact")}
 							</Button>
 						}
 					/>
@@ -501,7 +553,7 @@ function DealContacts({
 	return (
 		<>
 			{form}
-			<SimpleTable variant="panel" columns={CONTACT_COLUMNS}>
+			<SimpleTable variant="panel" columns={contactColumns(messages)}>
 				{deal.contacts.map((contact) => (
 					<SimpleTableRow
 						key={contact.id}
@@ -521,9 +573,11 @@ function DealContacts({
 						</TableCell>
 						<TableCell className="truncate px-1 py-2.5">
 							<InlineTextCell
-								label={`Role on this deal for ${contactName(contact)}`}
+								label={tf(messages, "dealSheet.contactRoleLabel", {
+									name: contactName(contact),
+								})}
 								value={contact.role}
-								placeholder="Champion"
+								placeholder={t(messages, "dealSheet.rolePlaceholder")}
 								saving={
 									setRole.isPending &&
 									setRole.variables?.contactId === contact.id
@@ -560,19 +614,23 @@ function DealContacts({
 									>
 										<Icon icon={Close} />
 										<span className="sr-only">
-											Take {contactName(contact)} off this deal
+											{tf(messages, "dealSheet.removeContactLabel", {
+												name: contactName(contact),
+											})}
 										</span>
 									</Button>
 								</TooltipTrigger>
-								<TooltipContent>Take off this deal</TooltipContent>
+								<TooltipContent>
+									{t(messages, "dealSheet.removeContact")}
+								</TooltipContent>
 							</Tooltip>
 						</TableCell>
 					</SimpleTableRow>
 				))}
 
 				<AddRow
-					label="Add contact"
-					columns={CONTACT_COLUMNS.length}
+					label={t(messages, "dealSheet.addContact")}
+					columns={contactColumns(messages).length}
 					onClick={onAdd}
 				/>
 			</SimpleTable>

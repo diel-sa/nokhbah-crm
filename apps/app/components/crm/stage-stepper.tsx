@@ -5,6 +5,7 @@ import { cn } from "@crm/ui/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DealStageIndicator } from "@/components/crm/deal-stage";
+import { useLocale } from "@/components/locale-provider";
 import { dealStageLabel, isClosedStage, OPEN_STAGES } from "@/lib/deal-stage";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -20,14 +21,15 @@ export function StageStepper({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 
 	const setStage = useMutation(
 		trpc.deals.setStage.mutationOptions({
 			onSuccess: async (result) => {
 				await cache.deal(dealId);
-				if (result.changed) toast.success("Stage updated.");
+				if (result.changed) toast.success(messages.dealSheet.stageUpdated);
 			},
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(messages.dealSheet.stageError),
 		}),
 	);
 
@@ -59,7 +61,7 @@ export function StageStepper({
 								{current && option === DealStage.CLOSED_WON ? (
 									<DealStageIndicator stage={stage} className="text-xs" />
 								) : (
-									dealStageLabel(option)
+									dealStageLabel(option, messages)
 								)}
 							</span>
 						</button>
