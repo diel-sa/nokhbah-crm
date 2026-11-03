@@ -3,5 +3,10 @@ import { Icon } from "@crm/ui/components/icon";
 import { activityIcon } from "@/lib/activity-presentation";
 
 export function ActivityIcon({ type }: { type: ActivityType }) {
-	return <Icon icon={activityIcon(type)} />;
+	return (
+		<Icon
+			icon={activityIcon(type)}
+			className={type === "STAGE_CHANGE" ? "rtl:rotate-180" : undefined}
+		/>
+	);
 }
