@@ -266,7 +266,10 @@ export function ContactsTable() {
 			label: t(messages, "common.activity"),
 			options: ACTIVITY_FACET_OPTIONS.filter(
 				(option) => (facetCounts?.activity?.[option.value] ?? 0) > 0,
-			),
+			).map((option) => ({
+				...option,
+				label: t(messages, `activityRecency.${option.value}`),
+			})),
 		},
 		...fieldFacets,
 	];

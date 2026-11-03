@@ -242,20 +242,23 @@ export function CompaniesTable() {
 			options: ENRICHMENT_FACET_OPTIONS.flatMap((option) =>
 				(facetCounts?.enrichment?.[option.value] ?? 0) > 0
 					? [
-							{
-								value: option.value,
-								label: t(messages, `enrichment.${option.value}`),
-							},
-						]
+						{
+							value: option.value,
+							label: t(messages, `enrichment.${option.value}`),
+						},
+					]
 					: [],
 			),
 		},
 		{
-			id: "activity",
+			 id: "activity",
 			label: t(messages, "companies.facetActivity"),
 			options: ACTIVITY_FACET_OPTIONS.filter(
 				(option) => (facetCounts?.activity?.[option.value] ?? 0) > 0,
-			),
+			).map((option) => ({
+				...option,
+				label: t(messages, `activityRecency.${option.value}`),
+			})),
 		},
 		...fieldFacets,
 	];
