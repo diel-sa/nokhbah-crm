@@ -967,7 +967,20 @@
 		}
 	},
 	"fields": {
+		"loading": "Loading fields…",
 		"sheetTitle": "Fields",
+		"entityName": {
+			"COMPANY": "Company",
+			"CONTACT": "Contact",
+			"DEAL": "Deal"
+		},
+		"entityPlural": {
+			"COMPANY": "Companies",
+			"CONTACT": "Contacts",
+			"DEAL": "Deals"
+		},
+		"coverageSubtitle": "{entity} · {filled} of {total} filled",
+		"optionCount": "{count} options",
 		"subtitle": {
 			"company": "This shapes every company in your CRM.",
 			"contact": "This shapes every contact in your CRM.",
@@ -992,6 +1005,12 @@
 		"errorTitle": "We could not load your fields",
 		"errorBody": "Your fields are still there. Try again in a moment, before you create anything new.",
 		"retry": "Try again",
+		"saveError": "Could not save this field. Try again.",
+		"archiveError": "Could not archive this field. Try again.",
+		"restoreError": "Could not restore this field. Try again.",
+		"reorderError": "Could not reorder fields. Try again.",
+		"suggestionError": "Could not add this field. Try again.",
+		"backfillError": "Could not fill the remaining values. Try again.",
 		"label": "Label",
 		"key": "Key",
 		"keyHelp": "What the API and your agents call it. Set from the label, fixed once saved — renaming the label later never breaks a caller.",
@@ -1004,6 +1023,7 @@
 		"addOption": "Add option",
 		"allFilled": "Nothing left to fill",
 		"optionLabel": "Option {index}",
+		"removeOption": "Remove {label}",
 		"createField": "Create field",
 		"cancel": "Cancel",
 		"saveChanges": "Save changes",
@@ -1011,6 +1031,7 @@
 		"restore": "Restore",
 		"fillRest": "Fill the rest",
 		"none": "None",
+		"unassigned": "Unassigned",
 		"formerMember": "Former member",
 		"showOnSheet": {
 			"COMPANY": "Show on the company sheet",
@@ -1036,6 +1057,18 @@
 		"edit": "Edit",
 		"required": "required",
 		"moreFor": "More for {label}",
+		"typeName": {
+			"TEXT": "Text",
+			"LONG_TEXT": "Long text",
+			"NUMBER": "Number",
+			"DATE": "Date",
+			"CHECKBOX": "Checkbox",
+			"SELECT": "Select",
+			"URL": "URL",
+			"EMAIL": "Email",
+			"PHONE": "Phone",
+			"USER": "User"
+		},
 		"typeHints": {
 			"TEXT": "Text — a short line",
 			"LONG_TEXT": "Long text — a paragraph",

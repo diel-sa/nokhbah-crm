@@ -8,14 +8,10 @@ import {
 	useFieldsSheet,
 } from "@/components/crm/record-sheet/record-stack";
 import { DetailSheet, DetailSheetHeader } from "@/components/detail-sheet";
+import { t, useLocale } from "@/components/locale-provider";
 import { useTRPC } from "@/lib/trpc/client";
 import { FieldEditor } from "./field-editor";
-import {
-	ENTITY_TABS,
-	NEW_FIELD,
-	SHEET_TITLE,
-	subtitleFor,
-} from "./fields-copy";
+import { fieldFormat, fieldText, subtitleFor } from "./fields-copy";
 import { entityOf } from "./fields-entity";
 import { FieldsList } from "./fields-list";
 
@@ -33,6 +29,7 @@ function FieldsSheetBody({
 	onClose: () => void;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 	const entity = entityOf(kind);
 
 	const query = useQuery(
@@ -50,16 +47,23 @@ function FieldsSheetBody({
 	});
 
 	if (field) {
-		const entityLabel = ENTITY_TABS.find((tab) => tab.kind === kind)?.label;
+		const entityLabel = fieldText(messages, `entityName.${entity}`);
 		const filled = coverage.data;
 
 		return (
 			<>
 				<DetailSheetHeader
-					title={editing?.label ?? (editingKey ? "" : NEW_FIELD)}
+					title={
+						editing?.label ??
+						(editingKey ? "" : fieldText(messages, "newField"))
+					}
 					description={
 						filled
-							? `${entityLabel} · ${filled.filled} of ${filled.total} filled`
+							? fieldFormat(messages, "coverageSubtitle", {
+									entity: entityLabel,
+									filled: filled.filled,
+									total: filled.total,
+								})
 							: entityLabel
 					}
 					onBack={() => onEdit(null)}
@@ -67,7 +71,7 @@ function FieldsSheetBody({
 				/>
 				{editingKey && query.isPending ? (
 					<div className="flex min-h-0 flex-1 items-center justify-center">
-						<Spinner />
+						<Spinner aria-label={t(messages, "fields.loading")} />
 					</div>
 				) : (
 					<FieldEditor
@@ -84,8 +88,8 @@ function FieldsSheetBody({
 	return (
 		<>
 			<DetailSheetHeader
-				title={SHEET_TITLE}
-				description={subtitleFor(kind)}
+				title={fieldText(messages, "sheetTitle")}
+				description={subtitleFor(messages, kind)}
 				onClose={onClose}
 				note={
 					<Tabs
@@ -93,9 +97,9 @@ function FieldsSheetBody({
 						onValueChange={(next) => onEntity(next as RecordKind)}
 					>
 						<TabsList>
-							{ENTITY_TABS.map((tab) => (
-								<TabsTrigger key={tab.kind} value={tab.kind}>
-									{tab.label}
+							{(["company", "contact", "deal"] as const).map((tab) => (
+								<TabsTrigger key={tab} value={tab}>
+									{fieldText(messages, `entityPlural.${entityOf(tab)}`)}
 								</TabsTrigger>
 							))}
 						</TabsList>

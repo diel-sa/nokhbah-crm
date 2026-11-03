@@ -2,11 +2,7 @@
 
 import Add from "@carbon/icons-react/es/Add";
 import Close from "@carbon/icons-react/es/Close";
-import {
-	FIELD_TYPES,
-	fieldKeyFromLabel,
-	typeLabel,
-} from "@crm/db/fields-shape";
+import { FIELD_TYPES, fieldKeyFromLabel } from "@crm/db/fields-shape";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -41,38 +37,20 @@ import { Textarea } from "@crm/ui/components/textarea";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
+import { useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import {
-	ADD_FIELD,
-	ADD_OPTION,
-	AGENT_HELP,
-	AGENT_LABEL,
-	ALL_FILLED,
-	ARCHIVE,
-	BRIEF_HELP,
-	BRIEF_LABEL,
-	CANCEL,
-	FILL_REST,
+	fieldFormat,
+	fieldText,
 	filterPlacement,
-	KEY_HELP,
-	KEY_LABEL,
-	LABEL_LABEL,
-	OPTIONS_LABEL,
 	optionLabel,
-	SAVE,
 	sheetPlacement,
-	TYPE_LABEL,
 	tablePlacement,
+	typeHint,
 } from "./fields-copy";
 import { type FieldEntity, kindOf } from "./fields-entity";
-
-const COVERAGE_NOUN = {
-	COMPANY: "companies",
-	CONTACT: "contacts",
-	DEAL: "deals",
-} satisfies Record<FieldEntity, string>;
 
 type FieldRecord = RouterOutputs["fields"]["list"][number];
 
@@ -86,19 +64,6 @@ type Draft = {
 	showOnTable: boolean;
 	showOnFilter: boolean;
 };
-
-const TYPE_HINTS = {
-	TEXT: "Text — a short line",
-	LONG_TEXT: "Long text — a paragraph",
-	NUMBER: "Number",
-	DATE: "Date",
-	CHECKBOX: "Checkbox — yes or no",
-	SELECT: "Select — one of a fixed list",
-	URL: "URL",
-	EMAIL: "Email",
-	PHONE: "Phone",
-	USER: "User — someone in the workspace",
-} satisfies Record<(typeof FIELD_TYPES)[number], string>;
 
 function optionId(option: { id?: string }, index: number): string {
 	return option.id ?? `draft-${index}`;
@@ -126,6 +91,7 @@ function draftFrom(field: FieldRecord | undefined): Draft {
 function Coverage({ field }: { field: FieldRecord }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 	const coverage = useQuery(
 		trpc.fields.coverage.queryOptions({ id: field.id }),
 	);
@@ -133,17 +99,17 @@ function Coverage({ field }: { field: FieldRecord }) {
 	const backfill = useMutation(
 		trpc.fields.backfill.mutationOptions({
 			onSuccess: async () => {
-				toast.success("Your agents will pick this up.");
+				toast.success(fieldText(messages, "agentsWillPickUp"));
 				await cache.fieldCoverage(field.id);
 			},
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "backfillError")),
 		}),
 	);
 
 	if (!field.agentFilled || !coverage.data) return null;
 
 	const { filled, total } = coverage.data;
-	const noun = COVERAGE_NOUN[field.entity as FieldEntity];
+	const noun = fieldText(messages, `entityPlural.${field.entity}`);
 	const covered = filled >= total;
 
 	return (
@@ -153,10 +119,16 @@ function Coverage({ field }: { field: FieldRecord }) {
 					<StatusIndicator
 						tone="primary"
 						className="font-medium text-foreground"
-						label={`Filled on ${filled} of ${total} ${noun}`}
+						label={fieldFormat(messages, "filledOn", {
+							filled,
+							total,
+							noun,
+						})}
 					/>
 					<span className="ps-4 text-muted-foreground text-xs">
-						{covered ? ALL_FILLED : `${total - filled} still to go`}
+						{covered
+							? fieldText(messages, "allFilled")
+							: fieldFormat(messages, "stillToGo", { count: total - filled })}
 					</span>
 				</div>
 				<Button
@@ -165,7 +137,7 @@ function Coverage({ field }: { field: FieldRecord }) {
 					disabled={backfill.isPending || covered}
 					onClick={() => backfill.mutate({ id: field.id })}
 				>
-					{FILL_REST}
+					{fieldText(messages, "fillRest")}
 				</Button>
 			</div>
 		</div>
@@ -183,6 +155,7 @@ export function FieldEditor({
 }) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const { messages } = useLocale();
 	const labelId = useId();
 	const briefId = useId();
 	const agentId = useId();
@@ -203,21 +176,21 @@ export function FieldEditor({
 	const create = useMutation(
 		trpc.fields.create.mutationOptions({
 			onSuccess: settle,
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "saveError")),
 		}),
 	);
 
 	const update = useMutation(
 		trpc.fields.update.mutationOptions({
 			onSuccess: settle,
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "saveError")),
 		}),
 	);
 
 	const archive = useMutation(
 		trpc.fields.archive.mutationOptions({
 			onSuccess: settle,
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "archiveError")),
 		}),
 	);
 
@@ -250,7 +223,9 @@ export function FieldEditor({
 			<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
 				<div className={SECTION}>
 					<Field>
-						<FieldLabel htmlFor={labelId}>{LABEL_LABEL}</FieldLabel>
+						<FieldLabel htmlFor={labelId}>
+							{fieldText(messages, "label")}
+						</FieldLabel>
 						<Input
 							id={labelId}
 							value={draft.label}
@@ -260,20 +235,26 @@ export function FieldEditor({
 
 					<Field>
 						<div className="flex items-baseline justify-between gap-2">
-							<FieldTitle>{KEY_LABEL}</FieldTitle>
+							<FieldTitle>{fieldText(messages, "key")}</FieldTitle>
 							<span className="font-mono text-muted-foreground text-xs">
 								{key || "—"}
 							</span>
 						</div>
-						<FieldDescription>{KEY_HELP}</FieldDescription>
+						<FieldDescription>
+							{fieldText(messages, "keyHelp")}
+						</FieldDescription>
 					</Field>
 				</div>
 
 				<div className={SECTION}>
 					<Field orientation="horizontal">
 						<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-							<FieldLabel htmlFor={agentId}>{AGENT_LABEL}</FieldLabel>
-							<FieldDescription>{AGENT_HELP}</FieldDescription>
+							<FieldLabel htmlFor={agentId}>
+								{fieldText(messages, "letAgentsFill")}
+							</FieldLabel>
+							<FieldDescription>
+								{fieldText(messages, "agentHelp")}
+							</FieldDescription>
 						</div>
 						<Switch
 							id={agentId}
@@ -283,20 +264,26 @@ export function FieldEditor({
 					</Field>
 
 					<Field>
-						<FieldLabel htmlFor={briefId}>{BRIEF_LABEL}</FieldLabel>
+						<FieldLabel htmlFor={briefId}>
+							{fieldText(messages, "briefLabel")}
+						</FieldLabel>
 						<Textarea
 							id={briefId}
 							rows={3}
 							value={draft.agentBrief}
 							onChange={(event) => patch({ agentBrief: event.target.value })}
 						/>
-						<FieldDescription>{BRIEF_HELP}</FieldDescription>
+						<FieldDescription>
+							{fieldText(messages, "briefHelp")}
+						</FieldDescription>
 					</Field>
 				</div>
 
 				<div className={SECTION}>
 					<Field>
-						<FieldLabel htmlFor={typeId}>{TYPE_LABEL}</FieldLabel>
+						<FieldLabel htmlFor={typeId}>
+							{fieldText(messages, "type")}
+						</FieldLabel>
 						<Select
 							value={draft.type}
 							onValueChange={(value) => patch({ type: value as Draft["type"] })}
@@ -307,7 +294,7 @@ export function FieldEditor({
 							<SelectContent>
 								{FIELD_TYPES.map((type) => (
 									<SelectItem key={type} value={type}>
-										{TYPE_HINTS[type] ?? typeLabel(type)}
+										{typeHint(messages, type)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -316,7 +303,9 @@ export function FieldEditor({
 
 					{draft.type === "SELECT" ? (
 						<Field aria-labelledby={optionsId}>
-							<FieldTitle id={optionsId}>{OPTIONS_LABEL}</FieldTitle>
+							<FieldTitle id={optionsId}>
+								{fieldText(messages, "options")}
+							</FieldTitle>
 							<SortableList
 								ids={draft.options.map(optionId)}
 								onReorder={(ids) =>
@@ -338,10 +327,10 @@ export function FieldEditor({
 										<SortableItem
 											key={optionId(option, index)}
 											id={optionId(option, index)}
-											label={option.label || "option"}
+											label={option.label || optionLabel(messages, index)}
 										>
 											<Input
-												aria-label={optionLabel(index)}
+												aria-label={optionLabel(messages, index)}
 												value={option.label}
 												onChange={(event) =>
 													patch({
@@ -366,7 +355,9 @@ export function FieldEditor({
 											>
 												<Icon icon={Close} />
 												<span className="sr-only">
-													Remove {optionLabel(index)}
+													{fieldFormat(messages, "removeOption", {
+														label: optionLabel(messages, index),
+													})}
 												</span>
 											</Button>
 										</SortableItem>
@@ -382,7 +373,7 @@ export function FieldEditor({
 								}
 							>
 								<Icon icon={Add} data-icon="inline-start" />
-								{ADD_OPTION}
+								{fieldText(messages, "addOption")}
 							</Button>
 						</Field>
 					) : null}
@@ -396,7 +387,7 @@ export function FieldEditor({
 								patch({ showOnSheet: checked === true })
 							}
 						/>
-						{sheetPlacement(entity)}
+						{sheetPlacement(messages, entity)}
 					</FieldLabel>
 					<FieldLabel className="items-center gap-2 font-normal">
 						<Checkbox
@@ -405,7 +396,7 @@ export function FieldEditor({
 								patch({ showOnTable: checked === true })
 							}
 						/>
-						{tablePlacement(entity)}
+						{tablePlacement(messages, entity)}
 					</FieldLabel>
 					{filterable ? (
 						<FieldLabel className="items-center gap-2 font-normal">
@@ -415,7 +406,7 @@ export function FieldEditor({
 									patch({ showOnFilter: checked === true })
 								}
 							/>
-							{filterPlacement(entity)}
+							{filterPlacement(messages, entity)}
 						</FieldLabel>
 					) : null}
 				</div>
@@ -425,15 +416,17 @@ export function FieldEditor({
 
 			<div className="flex shrink-0 items-center gap-2 border-t px-5 py-3">
 				<Button disabled={saving || draft.label.trim() === ""} onClick={save}>
-					{field ? SAVE : ADD_FIELD}
+					{field
+						? fieldText(messages, "saveChanges")
+						: fieldText(messages, "createField")}
 				</Button>
 				{field ? (
 					<Button variant="outline" onClick={() => setConfirming(true)}>
-						{ARCHIVE}
+						{fieldText(messages, "archive")}
 					</Button>
 				) : (
 					<Button variant="outline" onClick={onDone}>
-						{CANCEL}
+						{fieldText(messages, "cancel")}
 					</Button>
 				)}
 			</div>
@@ -442,18 +435,24 @@ export function FieldEditor({
 				<AlertDialog open={confirming} onOpenChange={setConfirming}>
 					<AlertDialogContent>
 						<AlertDialogHeader>
-							<AlertDialogTitle>Archive {field.label}?</AlertDialogTitle>
+							<AlertDialogTitle>
+								{fieldFormat(messages, "archiveFieldTitle", {
+									label: field.label,
+								})}
+							</AlertDialogTitle>
 							<AlertDialogDescription>
-								Hidden everywhere. Its values are kept.
+								{fieldText(messages, "archiveFieldDescription")}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel>{CANCEL}</AlertDialogCancel>
+							<AlertDialogCancel>
+								{fieldText(messages, "cancel")}
+							</AlertDialogCancel>
 							<AlertDialogAction
 								variant="destructive"
 								onClick={() => archive.mutate({ id: field.id })}
 							>
-								Archive field
+								{fieldText(messages, "archiveFieldConfirm")}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>

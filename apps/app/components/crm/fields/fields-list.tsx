@@ -5,7 +5,7 @@ import ChevronRight from "@carbon/icons-react/es/ChevronRight";
 import OverflowMenuVertical from "@carbon/icons-react/es/OverflowMenuVertical";
 import Renew from "@carbon/icons-react/es/Renew";
 import Warning from "@carbon/icons-react/es/Warning";
-import { fieldKeyFromLabel, typeLabel } from "@crm/db/fields-shape";
+import { fieldKeyFromLabel } from "@crm/db/fields-shape";
 import { Badge } from "@crm/ui/components/badge";
 import { Button } from "@crm/ui/components/button";
 import {
@@ -34,29 +34,16 @@ import { Spinner } from "@crm/ui/components/spinner";
 import { FIELD_TEMPLATES } from "@crm/validation/field-templates";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useLocale } from "@/components/locale-provider";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import {
-	ADD,
-	ARCHIVED_NOTE,
-	ARCHIVED_ROW,
-	CUSTOM_GROUP,
-	DRAG_NOTE,
-	EMPTY_BODY,
-	EMPTY_TITLE,
-	ERROR_BODY,
-	ERROR_TITLE,
-	FILTER_NOTE,
-	MANUAL_ONLY,
-	NEW_FIELD,
-	ORDER_NOTE,
-	RETRY,
-	STANDARD_NOTE,
-	STANDARD_ROW,
-	SUGGESTED_NOTE,
-	SUGGESTED_ROW,
-	TABLE_NOTE,
+	fieldFormat,
+	fieldText,
+	standardFieldLabel,
+	templateLabel,
+	typeName,
 } from "./fields-copy";
 import { type FieldEntity, kindOf } from "./fields-entity";
 import { STANDARD_FIELDS } from "./standard-fields";
@@ -65,23 +52,28 @@ type Field = RouterOutputs["fields"]["list"][number];
 
 const ROW = "flex items-center gap-2.5 border-b px-5 py-2";
 
-function summaryOf(field: Field): string {
+function summaryOf(
+	field: Field,
+	messages: ReturnType<typeof useLocale>["messages"],
+): string {
 	const parts: string[] = [];
 
 	if (field.agentFilled) {
 		parts.push(
 			field.agentBrief ??
 				(field.options.length > 0
-					? `${field.options.length} options`
+					? fieldFormat(messages, "optionCount", {
+							count: field.options.length,
+						})
 					: field.label),
 		);
 	} else {
-		parts.push(MANUAL_ONLY);
-		if (field.required) parts.push("required");
+		parts.push(fieldText(messages, "manualOnly"));
+		if (field.required) parts.push(fieldText(messages, "required"));
 	}
 
-	if (field.showOnTable) parts.push(TABLE_NOTE);
-	if (field.showOnFilter) parts.push(FILTER_NOTE);
+	if (field.showOnTable) parts.push(fieldText(messages, "tableNote"));
+	if (field.showOnFilter) parts.push(fieldText(messages, "filterNote"));
 
 	return parts.join(" · ");
 }
@@ -140,6 +132,7 @@ export function FieldsList({
 	onEdit: (key: string) => void;
 	onNew: () => void;
 }) {
+	const { messages } = useLocale();
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const queryClient = useQueryClient();
@@ -160,11 +153,11 @@ export function FieldsList({
 				}
 				return { previous };
 			},
-			onError: (error, _input, context) => {
+			onError: (_error, _input, context) => {
 				if (context?.previous) {
 					queryClient.setQueryData(listKey, context.previous);
 				}
-				toast.error(error.message);
+				toast.error(fieldText(messages, "reorderError"));
 			},
 			onSettled: () => cache.fields(kindOf(entity)),
 		}),
@@ -173,21 +166,21 @@ export function FieldsList({
 	const archive = useMutation(
 		trpc.fields.archive.mutationOptions({
 			onSuccess: () => cache.fields(kindOf(entity)),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "archiveError")),
 		}),
 	);
 
 	const restore = useMutation(
 		trpc.fields.restore.mutationOptions({
 			onSuccess: () => cache.fields(kindOf(entity)),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "restoreError")),
 		}),
 	);
 
 	const addSuggested = useMutation(
 		trpc.fields.create.mutationOptions({
 			onSuccess: () => cache.fields(kindOf(entity)),
-			onError: (error) => toast.error(error.message),
+			onError: () => toast.error(fieldText(messages, "suggestionError")),
 		}),
 	);
 
@@ -205,8 +198,8 @@ export function FieldsList({
 		<>
 			<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
 				<DisclosureRow
-					title={STANDARD_ROW}
-					note={`${standard.length} · ${STANDARD_NOTE}`}
+					title={fieldText(messages, "standardFields")}
+					note={`${standard.length} · ${fieldText(messages, "reorderAndHideOnly")}`}
 				>
 					<ul className="border-b bg-muted/40 py-1">
 						{standard.map((field) => (
@@ -214,7 +207,7 @@ export function FieldsList({
 								key={field}
 								className="px-5 py-1 text-muted-foreground text-xs"
 							>
-								{field}
+								{standardFieldLabel(messages, field)}
 							</li>
 						))}
 					</ul>
@@ -222,8 +215,8 @@ export function FieldsList({
 
 				{suggestions.length > 0 && (
 					<DisclosureRow
-						title={SUGGESTED_ROW}
-						note={`${suggestions.length} · ${SUGGESTED_NOTE}`}
+						title={fieldText(messages, "suggestedFields")}
+						note={`${suggestions.length} · ${fieldText(messages, "oneClickToAdd")}`}
 					>
 						<ul className="border-b bg-muted/40 py-1">
 							{suggestions.map((template) => (
@@ -232,10 +225,7 @@ export function FieldsList({
 									className="flex items-center gap-2.5 px-5 py-1.5"
 								>
 									<span className="flex-1 truncate text-muted-foreground text-xs">
-										{template.label}
-										{template.options && template.options.length > 0
-											? ` · ${template.options.join(", ")}`
-											: ` · ${typeLabel(template.type)}`}
+										{templateLabel(messages, template.label)}
 									</span>
 									<Button
 										variant="outline"
@@ -260,7 +250,7 @@ export function FieldsList({
 										}
 									>
 										<Icon icon={Add} data-icon="inline-start" />
-										{ADD}
+										{fieldText(messages, "add")}
 									</Button>
 								</li>
 							))}
@@ -270,7 +260,7 @@ export function FieldsList({
 
 				{query.isPending ? (
 					<div className="flex flex-1 items-center justify-center">
-						<Spinner />
+						<Spinner aria-label={fieldText(messages, "loading")} />
 					</div>
 				) : query.isError ? (
 					<Empty className="flex-1">
@@ -278,8 +268,10 @@ export function FieldsList({
 							<EmptyMedia variant="icon">
 								<Icon icon={Warning} />
 							</EmptyMedia>
-							<EmptyTitle>{ERROR_TITLE}</EmptyTitle>
-							<EmptyDescription>{ERROR_BODY}</EmptyDescription>
+							<EmptyTitle>{fieldText(messages, "errorTitle")}</EmptyTitle>
+							<EmptyDescription>
+								{fieldText(messages, "errorBody")}
+							</EmptyDescription>
 						</EmptyHeader>
 						<EmptyContent>
 							<Button
@@ -288,7 +280,7 @@ export function FieldsList({
 								onClick={() => query.refetch()}
 							>
 								<Icon icon={Renew} data-icon="inline-start" />
-								{RETRY}
+								{fieldText(messages, "retry")}
 							</Button>
 						</EmptyContent>
 					</Empty>
@@ -300,13 +292,17 @@ export function FieldsList({
 									<EmptyMedia variant="icon">
 										<Icon icon={Add} />
 									</EmptyMedia>
-									<EmptyTitle>{EMPTY_TITLE}</EmptyTitle>
-									<EmptyDescription>{EMPTY_BODY}</EmptyDescription>
+									<EmptyTitle>
+										{fieldText(messages, "noCustomFieldsTitle")}
+									</EmptyTitle>
+									<EmptyDescription>
+										{fieldText(messages, "noCustomFieldsBody")}
+									</EmptyDescription>
 								</EmptyHeader>
 								<EmptyContent>
 									<Button onClick={onNew}>
 										<Icon icon={Add} data-icon="inline-start" />
-										{NEW_FIELD}
+										{fieldText(messages, "newField")}
 									</Button>
 								</EmptyContent>
 							</Empty>
@@ -314,10 +310,10 @@ export function FieldsList({
 							<>
 								<div className="flex items-center justify-between gap-3 px-5 pt-3.5 pb-2">
 									<span className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-										{CUSTOM_GROUP}
+										{fieldText(messages, "customFields")}
 									</span>
 									<span className="text-muted-foreground text-xs">
-										{DRAG_NOTE}
+										{fieldText(messages, "dragToOrder")}
 									</span>
 								</div>
 
@@ -341,7 +337,7 @@ export function FieldsList({
 													{field.label}
 												</span>
 												<span className="w-full truncate text-muted-foreground text-xs">
-													{summaryOf(field)}
+													{summaryOf(field, messages)}
 												</span>
 											</button>
 
@@ -349,7 +345,7 @@ export function FieldsList({
 												variant="mono"
 												className="w-18 shrink-0 justify-center"
 											>
-												{field.typeLabel}
+												{typeName(messages, field.type)}
 											</Badge>
 
 											<DropdownMenu>
@@ -357,19 +353,21 @@ export function FieldsList({
 													<Button variant="ghost" size="icon-xs">
 														<Icon icon={OverflowMenuVertical} />
 														<span className="sr-only">
-															More for {field.label}
+															{fieldFormat(messages, "moreFor", {
+																label: field.label,
+															})}
 														</span>
 													</Button>
 												</DropdownMenuTrigger>
 												<DropdownMenuContent align="end">
 													<DropdownMenuItem onSelect={() => onEdit(field.key)}>
-														Edit
+														{fieldText(messages, "edit")}
 													</DropdownMenuItem>
 													<DropdownMenuSeparator />
 													<DropdownMenuItem
 														onSelect={() => archive.mutate({ id: field.id })}
 													>
-														Archive
+														{fieldText(messages, "archive")}
 													</DropdownMenuItem>
 												</DropdownMenuContent>
 											</DropdownMenu>
@@ -381,8 +379,8 @@ export function FieldsList({
 
 						{archived.length > 0 ? (
 							<DisclosureRow
-								title={ARCHIVED_ROW}
-								note={`${archived.length} · ${ARCHIVED_NOTE}`}
+								title={fieldText(messages, "archived")}
+								note={`${archived.length} · ${fieldText(messages, "valuesKeptHidden")}`}
 							>
 								<ul className="border-b">
 									{archived.map((field) => (
@@ -398,7 +396,7 @@ export function FieldsList({
 												size="xs"
 												onClick={() => restore.mutate({ id: field.id })}
 											>
-												Restore
+												{fieldText(messages, "restore")}
 											</Button>
 										</li>
 									))}
@@ -413,10 +411,10 @@ export function FieldsList({
 				<div className="flex shrink-0 items-center justify-between gap-3 border-t px-5 py-3">
 					<Button onClick={onNew}>
 						<Icon icon={Add} data-icon="inline-start" />
-						{NEW_FIELD}
+						{fieldText(messages, "newField")}
 					</Button>
 					<span className="text-right text-muted-foreground text-xs">
-						{ORDER_NOTE}
+						{fieldText(messages, "orderNote")}
 					</span>
 				</div>
 			) : null}
