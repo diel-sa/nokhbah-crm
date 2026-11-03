@@ -91,7 +91,7 @@ export function VerifyInstallation() {
 						<FieldLabel htmlFor={urlId}>
 							{t(messages, "settings.tracking.verify.pageLabel")}
 						</FieldLabel>
-						<InputGroup>
+						<InputGroup dir="ltr">
 							<InputGroupAddon>
 								<InputGroupText>https://</InputGroupText>
 							</InputGroupAddon>
@@ -241,12 +241,12 @@ function Outcome({ result, siteId }: { result: Result; siteId: string }) {
 						? t(messages, "settings.tracking.verify.onList")
 						: t(messages, "settings.tracking.verify.notOnList"),
 				})}
-				{result.container
-					? ` ${t(messages, "settings.tracking.verify.successGtmNote")}`
-					: ""}
-				{result.pageView
-					? ` ${t(messages, "settings.tracking.verify.successPageView")}`
-					: ` ${t(messages, "settings.tracking.verify.noPageViewYet")}`}
+			{result.container
+				? ` ${t(messages, "settings.tracking.verify.successGtmNote")}`
+				: ""}
+			{result.pageView
+				? ` ${t(messages, "settings.tracking.verify.successPageView")}`
+				: ` ${t(messages, "settings.tracking.verify.noPageViewYet")}`}
 			</AlertDescription>
 		</Alert>
 	);

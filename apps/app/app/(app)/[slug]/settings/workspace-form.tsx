@@ -134,7 +134,7 @@ export function WorkspaceForm() {
 							<FieldLabel htmlFor={websiteId}>
 								{t(messages, "settings.workspace.website")}
 							</FieldLabel>
-							<InputGroup>
+							<InputGroup dir="ltr">
 								<InputGroupAddon>
 									<InputGroupText>https://</InputGroupText>
 								</InputGroupAddon>

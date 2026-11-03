@@ -79,28 +79,28 @@ export function OnboardingForm({ placeholder }: { placeholder: string }) {
 
 				<Field>
 					<FieldLabel htmlFor={slugId}>Workspace URL</FieldLabel>
-					<InputGroup>
+					<InputGroup dir="ltr">
 						<InputGroupAddon>
 							<InputGroupText>/</InputGroupText>
 						</InputGroupAddon>
 						<InputGroupInput
 							id={slugId}
-							name="slug"
-							value={slug}
-							onChange={(event) => {
+						name="slug"
+						value={slug}
+						 onChange={(event) => {
 								slugEdited.current = true;
 								setSlug(workspaceSlugDraft(event.target.value));
-							}}
-							onBlur={() =>
-								setSlug((value) => (value ? workspaceSlug(value) : ""))
-							}
-							placeholder={workspaceSlug(placeholder)}
-							autoComplete="off"
-							autoCapitalize="off"
-							autoCorrect="off"
-							spellCheck={false}
-							required
-						/>
+						}}
+						onBlur={() =>
+							setSlug((value) => (value ? workspaceSlug(value) : ""))
+						}
+						placeholder={workspaceSlug(placeholder)}
+						autoComplete="off"
+						autoCapitalize="off"
+						autoCorrect="off"
+						spellCheck={false}
+						required
+					/>
 					</InputGroup>
 					<FieldDescription>
 						Your team will use this address to open the CRM.
@@ -109,21 +109,21 @@ export function OnboardingForm({ placeholder }: { placeholder: string }) {
 
 				<Field>
 					<FieldLabel htmlFor={websiteId}>Website</FieldLabel>
-					<InputGroup>
+					<InputGroup dir="ltr">
 						<InputGroupAddon>
 							<InputGroupText>https://</InputGroupText>
 						</InputGroupAddon>
 						<InputGroupInput
 							id={websiteId}
-							name="website"
-							placeholder="acme.com"
-							autoComplete="off"
-							autoCapitalize="off"
-							autoCorrect="off"
-							spellCheck={false}
-							inputMode="url"
-							required
-						/>
+						name="website"
+						placeholder="acme.com"
+						autoComplete="off"
+						autoCapitalize="off"
+						autoCorrect="off"
+						spellCheck={false}
+						inputMode="url"
+						required
+					/>
 					</InputGroup>
 					<FieldDescription>
 						Read once, so every answer afterwards knows what you sell.
