@@ -56,7 +56,6 @@ import {
 import { t, tf, useLocale } from "@/components/locale-provider";
 import {
 	type AgentRecord,
-	recordCopy,
 	recordFilter,
 	recordHeader,
 } from "@/lib/agent-record";
@@ -76,16 +75,20 @@ import {
 	type TranscriptItem,
 	toTranscript,
 } from "@/lib/agent-transcript";
+import type { Messages } from "@/lib/i18n/messages";
 import { useTRPC } from "@/lib/trpc/client";
 import { useRecordSheetView } from "./record-sheet/record-stack";
 
 export function AgentPanel({ record }: { record: AgentRecord }) {
+	const { messages } = useLocale();
 	const conversations = useConversations(recordFilter(record));
 	const { thread, setThread } = useRecordSheetView("overview");
 
 	const history = conversations.data ?? [];
 
-	if (conversations.isPending) return <Loading />;
+	if (conversations.isPending) {
+		return <Loading label={t(messages, "companySheet.agentPanel.loading")} />;
+	}
 
 	return (
 		<LoadedAgentPanel
@@ -148,6 +151,7 @@ function ThreadWithHistory({
 	onNewThread: () => void;
 }) {
 	const trpc = useTRPC();
+	const { messages } = useLocale();
 
 	const thread = useQuery<ThreadState>({
 		queryKey: ["agent-thread", conversation?.sessionId],
@@ -168,8 +172,9 @@ function ThreadWithHistory({
 		staleTime: SETTLED_TTL_MS,
 	});
 
-	if (conversation && (thread.isPending || (offline && archive.isPending)))
-		return <Loading />;
+	if (conversation && (thread.isPending || (offline && archive.isPending))) {
+		return <Loading label={t(messages, "companySheet.agentPanel.loading")} />;
+	}
 
 	return (
 		<Thread
@@ -184,10 +189,10 @@ function ThreadWithHistory({
 	);
 }
 
-function Loading() {
+function Loading({ label }: { label: string }) {
 	return (
 		<div className="flex flex-1 items-center justify-center">
-			<Spinner />
+			<Spinner aria-label={label} />
 		</div>
 	);
 }
@@ -204,7 +209,7 @@ function Thread({
 	onNewThread: () => void;
 }) {
 	const { messages: uiMessages } = useLocale();
-	const copy = recordCopy(record.kind);
+	const copy = localizedRecordCopy(uiMessages, record.kind);
 	const agent = useEveAgent({
 		headers: recordHeader(record),
 		...(thread && "session" in thread
@@ -261,7 +266,9 @@ function Thread({
 						</MessageScrollerContent>
 					</MessageScrollerViewport>
 
-					<MessageScrollerButton />
+					<MessageScrollerButton
+						aria-label={t(uiMessages, "companySheet.agentPanel.scrollToEnd")}
+					/>
 				</MessageScroller>
 			</MessageScrollerProvider>
 
@@ -312,7 +319,13 @@ function Thread({
 							variant="outline"
 							disabled={locked}
 						>
-							{busy ? <Spinner /> : <Icon icon={Send} />}
+							{busy ? (
+								<Spinner
+									aria-label={t(uiMessages, "companySheet.agentPanel.loading")}
+								/>
+							) : (
+								<Icon icon={Send} />
+							)}
 							<span className="sr-only">{t(uiMessages, "chat.panel.ask")}</span>
 						</Button>
 					</form>
@@ -329,7 +342,8 @@ function Idle({
 	kind: AgentRecord["kind"];
 	onAsk: (question: string) => void;
 }) {
-	const copy = recordCopy(kind);
+	const { messages } = useLocale();
+	const copy = localizedRecordCopy(messages, kind);
 
 	return (
 		<Empty width="wide">
@@ -359,16 +373,53 @@ function Idle({
 	);
 }
 
+function localizedRecordCopy(messages: Messages, kind: AgentRecord["kind"]) {
+	const basePath = "companySheet.agentPanel";
+	const path = kind === "company" ? basePath : `${basePath}.${kind}`;
+
+	return {
+		title: t(messages, `${path}.title`),
+		blurb: t(messages, `${path}.blurb`),
+		placeholder: t(messages, `${path}.placeholder`),
+		suggestions: [1, 2, 3].map((index) =>
+			t(messages, `${path}.suggestion${index}`),
+		),
+	};
+}
+
+function localizedToolLabel(
+	messages: Messages,
+	tool: string,
+	label: string,
+): string {
+	const path = `companySheet.agentPanel.tools.${tool}`;
+	const translated = t(messages, path);
+	if (translated === path) return label;
+
+	const separatorIndex = label.indexOf(" — ");
+	return separatorIndex < 0
+		? translated
+		: `${translated}${label.slice(separatorIndex)}`;
+}
+
 function Failure({ message }: { message: string }) {
-	const hint = message.includes("not reachable")
-		? "Start it with `bun run dev`, or check AGENT_URL."
-		: message.includes("not configured")
-			? "Set AGENT_BRIDGE_SECRET for both the app and the agent."
+	const { messages } = useLocale();
+	const unreachable = message.includes("not reachable");
+	const notConfigured = message.includes("not configured");
+	const displayMessage = unreachable
+		? t(messages, "companySheet.agentPanel.agentUnavailable")
+		: notConfigured
+			? t(messages, "companySheet.agentPanel.agentNotConfigured")
+			: message;
+	const hint = unreachable
+		? t(messages, "companySheet.agentPanel.notReachableHint")
+		: notConfigured
+			? t(messages, "companySheet.agentPanel.notConfiguredHint")
 			: null;
 
 	return (
 		<div className="border-t px-4 py-3 text-xs sm:px-5">
-			<p className="wrap-break-word text-destructive">{message}</p>
+			<p className="wrap-break-word text-destructive">{displayMessage}</p>
 			{hint ? (
 				<p className="wrap-break-word text-muted-foreground text-xs">{hint}</p>
 			) : null}
@@ -430,9 +481,17 @@ function Item({ item }: { item: TranscriptItem }) {
 		<div className="min-w-0 space-y-1.5">
 			<Marker>
 				<MarkerIcon>
-					{item.pending ? <Spinner /> : <Icon icon={TONE_ICONS[item.tone]} />}
+					{item.pending ? (
+						<Spinner
+							aria-label={t(messages, "companySheet.agentPanel.loading")}
+						/>
+					) : (
+						<Icon icon={TONE_ICONS[item.tone]} />
+					)}
 				</MarkerIcon>
-				<MarkerContent>{item.label}</MarkerContent>
+				<MarkerContent>
+					{localizedToolLabel(messages, item.tool, item.label)}
+				</MarkerContent>
 			</Marker>
 
 			{item.sources.length > 0 ? <Sources sources={item.sources} /> : null}

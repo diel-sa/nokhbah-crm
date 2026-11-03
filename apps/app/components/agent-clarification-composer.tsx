@@ -15,6 +15,7 @@ import {
 } from "@crm/ui/components/questionnaire";
 import type { EveMessageInputRequest } from "eve/react";
 import { type FormEvent, useState } from "react";
+import { t, useLocale } from "@/components/locale-provider";
 import { AGENT_COMPOSER_CLASS_NAME } from "./agent-composer-frame";
 
 const OPTION_VALUE_PREFIX = "option:";
@@ -32,6 +33,9 @@ export function AgentClarificationComposer({
 	pending: boolean;
 	onSubmit: (response: ClarificationResponse) => Promise<void>;
 }) {
+	const { messages } = useLocale();
+	const copy = (key: string) =>
+		t(messages, `companySheet.agentPanel.clarification.${key}`);
 	const options = question.options ?? [];
 	const [transportError, setTransportError] = useState<string | null>(null);
 	const showFreeform =
@@ -68,12 +72,8 @@ export function AgentClarificationComposer({
 					: { requestId: question.requestId, text: value }
 			) satisfies ClarificationResponse;
 			await onSubmit(response);
-		} catch (error) {
-			setTransportError(
-				error instanceof Error && error.message.trim()
-					? error.message
-					: "Unable to submit. Check your connection and try again.",
-			);
+		} catch {
+			setTransportError(copy("submitError"));
 		}
 	};
 
@@ -89,8 +89,8 @@ export function AgentClarificationComposer({
 				<QuestionnaireTitle>{question.prompt}</QuestionnaireTitle>
 				<QuestionnaireDescription>
 					{options.length > 0
-						? "Choose an answer, then submit."
-						: "Add the detail the agent needs to continue."}
+						? copy("chooseAnswer")
+						: copy("addDetailDescription")}
 				</QuestionnaireDescription>
 				<QuestionnaireChoices>
 					{options.map((option) => (
@@ -109,8 +109,10 @@ export function AgentClarificationComposer({
 					))}
 					{showFreeform ? (
 						<QuestionnaireInput
-							aria-label={options.length > 0 ? "Another answer" : "Your answer"}
-							placeholder="Add the detail the agent needs"
+							aria-label={
+								options.length > 0 ? copy("anotherAnswer") : copy("yourAnswer")
+							}
+							placeholder={copy("addDetailPlaceholder")}
 							disabled={pending}
 						/>
 					) : null}
@@ -126,9 +128,9 @@ export function AgentClarificationComposer({
 				<QuestionnaireSubmit disabled={pending} aria-busy={pending} size="sm">
 					<AsyncButtonContent
 						status={pending ? "pending" : "idle"}
-						pendingLabel="Submitting"
+						pendingLabel={copy("submitting")}
 					>
-						Submit answer
+						{copy("submitAnswer")}
 					</AsyncButtonContent>
 				</QuestionnaireSubmit>
 			</QuestionnaireActions>
