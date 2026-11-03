@@ -1568,7 +1568,7 @@
 		"deal": "الصفقة"
 	},
 	"enrichmentActions": {
-		"reEnrich": "إثراء مجدد",
+		"reEnrich": "تجديد الإثراء",
 		"research": "بحث",
 		"enrichQueued": "جارٍ البحث — ستتحدث هذه الصفحة عند الانتهاء.",
 		"enrichRunning": "يعمل بالفعل.",
