@@ -251,7 +251,7 @@ export function CompaniesTable() {
 			),
 		},
 		{
-			 id: "activity",
+			id: "activity",
 			label: t(messages, "companies.facetActivity"),
 			options: ACTIVITY_FACET_OPTIONS.filter(
 				(option) => (facetCounts?.activity?.[option.value] ?? 0) > 0,
